@@ -128,21 +128,18 @@ const RecommendationCard = ({
             </div>
             <div>
               <h3 className="text-lg font-bold text-gray-900 tracking-tight">{nutrient}</h3>
-              <p className="text-sm text-gray-500">{nutrient === 'Nitrogen' ? 'Nitroheno' : 
-                nutrient === 'Phosphorus' ? 'Posporo' :
-                nutrient === 'Potassium' ? 'Potasyo' : 'pH Level'}</p>
             </div>
           </div>
           
           {/* Status Badge */}
-          <div 
+          <div
             className="px-3 py-1.5 rounded-full text-xs font-semibold"
-            style={{ 
+            style={{
               background: `${currentColor}15`,
               color: currentColor
             }}
           >
-            {currentEmoji} {currentLevel === 'Low' ? 'Mababa' : currentLevel === 'Medium' ? 'Katamtaman' : 'Mataas'}
+            {currentEmoji} {currentLevel}
           </div>
         </div>
 
@@ -190,7 +187,7 @@ const RecommendationCard = ({
           style={{ background: 'linear-gradient(135deg, #F8FAF8 0%, #F0F4F0 100%)' }}
         >
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
-            Inirerekomenda / Recommended
+            Recommended
           </p>
           <p className="text-lg font-bold text-gray-900">{recommended}</p>
           <p className="text-sm text-gray-600 mt-1">{purpose}</p>
