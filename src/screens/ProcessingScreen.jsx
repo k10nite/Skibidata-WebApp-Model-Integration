@@ -392,10 +392,12 @@ export default function ProcessingScreen({ onComplete }) {
               {/* Continue Button */}
               <button
                 onClick={() => onComplete ? onComplete() : navigate('/soil-status-screen')}
-                className="group w-full bg-[#492828] hover:bg-[#3d2222] text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+                className="group w-full bg-[#492828] hover:bg-[#3d2222] text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-between"
               >
                 <span>View Soil Status</span>
-                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-all duration-300 group-hover:scale-110">
+                  <ArrowRight size={20} className="text-white" />
+                </div>
               </button>
             </div>
           )}
