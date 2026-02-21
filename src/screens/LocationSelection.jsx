@@ -1,389 +1,412 @@
-// SCREEN 1: LOCATION SELECTION - Filipino Rice Terrace Pin Drop
-// Earthy Farm Tech aesthetic with GSAP animations and real Unsplash imagery
-
-import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import { MapPin, Navigation, CheckCircle2 } from 'lucide-react';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
-import useAppStore from '../store/appStore';
-import { getMunicipalityByCoordinates } from '../data/carLocations';
-import 'leaflet/dist/leaflet.css';
+import { Crosshair, MapPin, Navigation, ChevronRight } from 'lucide-react';
+import { gsap } from 'gsap';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
-// Fix Leaflet default marker icon issue
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+// Fix Leaflet default icon issue
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
 });
 
-// Custom rice terrace marker icon
-const riceTerraceIcon = new L.Icon({
-  iconUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIyMCIgZmlsbD0iIzg0OTM0QSIgZmlsbC1vcGFjaXR5PSIwLjkiLz4KICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxNSIgZmlsbD0iI0ZBRjlGNiIgZmlsbC1vcGFjaXR5PSIwLjMiLz4KICA8cGF0aCBkPSJNMjAgMTBWMzBNMTAgMjBIMzAiIHN0cm9rZT0iI0ZBRjlGNiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+',
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-  popupAnchor: [0, -40],
+L.Marker.prototype.options.icon = DefaultIcon;
+
+// Custom pin icon for rice field theme
+const customPinIcon = L.divIcon({
+  className: 'custom-pin',
+  html: `
+    <div style="
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #2E7D32 0%, #84934A 100%);
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid white;
+    ">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="transform: rotate(45deg);">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+    </div>
+  `,
+  iconSize: [36, 36],
+  iconAnchor: [18, 36],
 });
+
+// Draggable marker component
+function DraggableMarker({ position, setPosition }) {
+  const [draggable, setDraggable] = useState(true);
+  const markerRef = useRef(null);
+
+  const eventHandlers = {
+    dragend() {
+      const marker = markerRef.current;
+      if (marker != null) {
+        setPosition(marker.getLatLng());
+      }
+    },
+  };
+
+  return (
+    <Marker
+      draggable={draggable}
+      eventHandlers={eventHandlers}
+      position={position}
+      ref={markerRef}
+      icon={customPinIcon}>
+    </Marker>
+  );
+}
 
 // Map click handler component
-function MapClickHandler({ onLocationSelect }) {
+function MapClickHandler({ setPosition }) {
   useMapEvents({
     click(e) {
-      onLocationSelect({ lat: e.latlng.lat, lng: e.latlng.lng });
+      setPosition(e.latlng);
     },
   });
   return null;
 }
 
 export default function LocationSelection() {
-  const navigate = useNavigate();
-  const { setLocation } = useAppStore();
-  const [selectedLocation, setSelectedLocation] = useState(null);
-  const [isGettingLocation, setIsGettingLocation] = useState(false);
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [coordinates, setCoordinates] = useState('');
-
-  // Refs for GSAP animations
+  // Default position (Philippines center - roughly Manila area)
+  const [position, setPosition] = useState({ lat: 14.5995, lng: 120.9842 });
+  const [isLocating, setIsLocating] = useState(false);
+  const [showContinue, setShowContinue] = useState(false);
+  
   const containerRef = useRef(null);
-  const headerRef = useRef(null);
-  const gpsButtonRef = useRef(null);
-  const mapButtonRef = useRef(null);
-  const confirmCardRef = useRef(null);
-  const continueButtonRef = useRef(null);
-  const coordinatesRef = useRef(null);
+  const titleRef = useRef(null);
+  const mapContainerRef = useRef(null);
+  const locationCardRef = useRef(null);
+  const continueBtnRef = useRef(null);
+  const gpsBtnRef = useRef(null);
+  const pulseRef = useRef(null);
 
-  // Central Luzon default position (Nueva Ecija rice terraces)
-  const defaultCenter = [16.4023, 120.5960];
-
-  // Create soil particles effect
+  // GSAP entrance animations
   useEffect(() => {
-    const particles = [];
-    const particleCount = 15;
-
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'soil-particle';
-      particle.style.left = `${Math.random() * 100}%`;
-      particle.style.animationDelay = `${Math.random() * 8}s`;
-      particle.style.animationDuration = `${6 + Math.random() * 4}s`;
-      containerRef.current?.appendChild(particle);
-      particles.push(particle);
-    }
-
-    return () => {
-      particles.forEach(p => p.remove());
-    };
-  }, []);
-
-  // GSAP Animations
-  useGSAP(() => {
-    // Screen fade-in with soil particle effect
-    const tl = gsap.timeline();
-
-    tl.from(containerRef.current, {
-      opacity: 0,
-      duration: 1,
-      ease: 'power2.out',
-    })
-    .from(headerRef.current, {
-      y: -50,
-      opacity: 0,
-      duration: 0.8,
-      ease: 'power3.out',
-    }, '-=0.5')
-    .from([gpsButtonRef.current, mapButtonRef.current], {
-      scale: 0,
-      opacity: 0,
-      duration: 0.6,
-      stagger: 0.2,
-      ease: 'back.out(1.7)',
-    }, '-=0.4');
-
-    // GPS button pulse animation
-    gsap.to(gpsButtonRef.current, {
-      scale: 1.05,
-      duration: 1.5,
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut',
-    });
-  }, []);
-
-  // Animate confirmation card
-  useGSAP(() => {
-    if (showConfirmation && confirmCardRef.current) {
-      gsap.fromTo(confirmCardRef.current,
-        { y: 100, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }
+    const ctx = gsap.context(() => {
+      // Title animation
+      gsap.fromTo(
+        titleRef.current,
+        { opacity: 0, y: -30 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }
       );
 
-      // Typewriter effect for coordinates
-      if (coordinatesRef.current && coordinates) {
-        const coordsText = coordinates;
-        let currentText = '';
-        let index = 0;
+      // Map container animation
+      gsap.fromTo(
+        mapContainerRef.current,
+        { opacity: 0, scale: 0.95 },
+        { opacity: 1, scale: 1, duration: 0.8, delay: 0.2, ease: 'power3.out' }
+      );
 
-        const typeInterval = setInterval(() => {
-          if (index < coordsText.length) {
-            currentText += coordsText[index];
-            coordinatesRef.current.textContent = currentText;
-            index++;
-          } else {
-            clearInterval(typeInterval);
-          }
-        }, 50);
+      // Location card animation
+      gsap.fromTo(
+        locationCardRef.current,
+        { opacity: 0, x: -30 },
+        { opacity: 1, x: 0, duration: 0.6, delay: 0.4, ease: 'power3.out' }
+      );
 
-        return () => clearInterval(typeInterval);
-      }
+      // GPS button animation
+      gsap.fromTo(
+        gpsBtnRef.current,
+        { opacity: 0, scale: 0.8 },
+        { opacity: 1, scale: 1, duration: 0.5, delay: 0.6, ease: 'back.out(1.7)' }
+      );
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Continue button slide-up animation
+  useEffect(() => {
+    if (showContinue && continueBtnRef.current) {
+      gsap.fromTo(
+        continueBtnRef.current,
+        { opacity: 0, y: 100 },
+        { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
+      );
     }
-  }, [showConfirmation, coordinates]);
+  }, [showContinue]);
 
-  // Animate continue button with magnetic attraction
-  useGSAP(() => {
-    if (continueButtonRef.current && selectedLocation) {
-      gsap.from(continueButtonRef.current, {
-        scale: 0,
-        rotation: 360,
-        duration: 0.8,
-        ease: 'elastic.out(1, 0.5)',
+  // GPS pulse animation
+  useEffect(() => {
+    if (isLocating && pulseRef.current) {
+      gsap.to(pulseRef.current, {
+        scale: 1.5,
+        opacity: 0,
+        duration: 1,
+        repeat: -1,
+        ease: 'power1.out',
       });
+    } else if (pulseRef.current) {
+      gsap.killTweensOf(pulseRef.current);
+      gsap.set(pulseRef.current, { scale: 1, opacity: 0.3 });
     }
-  }, [selectedLocation]);
+  }, [isLocating]);
 
-  const handleLocationChange = (location) => {
-    setSelectedLocation(location);
-    setShowConfirmation(true);
-    setCoordinates(`${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`);
-  };
+  const handleGetCurrentLocation = () => {
+    setIsLocating(true);
+    
+    // Button press animation
+    gsap.to(gpsBtnRef.current, {
+      scale: 0.95,
+      duration: 0.1,
+      yoyo: true,
+      repeat: 1,
+      ease: 'power2.inOut',
+    });
 
-  const handleUseGPS = () => {
-    setIsGettingLocation(true);
-
-    if ('geolocation' in navigator) {
+    if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const location = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
+        (pos) => {
+          const newPosition = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
           };
-          handleLocationChange(location);
-          setIsGettingLocation(false);
+          setPosition(newPosition);
+          setIsLocating(false);
+          setShowContinue(true);
+          
+          // Success animation
+          gsap.fromTo(
+            gpsBtnRef.current,
+            { backgroundColor: '#2E7D32' },
+            { backgroundColor: '#84934A', duration: 0.5, yoyo: true, repeat: 1 }
+          );
         },
         (error) => {
-          console.error('Error getting location:', error);
-          // Fallback to Central Luzon default
-          handleLocationChange({ lat: defaultCenter[0], lng: defaultCenter[1] });
-          setIsGettingLocation(false);
-        }
+          console.error('Geolocation error:', error);
+          setIsLocating(false);
+          // Show continue anyway after location attempt
+          setShowContinue(true);
+        },
+        { timeout: 10000, enableHighAccuracy: true }
       );
     } else {
-      // Fallback to default location
-      handleLocationChange({ lat: defaultCenter[0], lng: defaultCenter[1] });
-      setIsGettingLocation(false);
+      setIsLocating(false);
+      setShowContinue(true);
     }
   };
 
   const handleContinue = () => {
-    if (selectedLocation) {
-      const municipality = getMunicipalityByCoordinates(
-        selectedLocation.lat,
-        selectedLocation.lng
-      );
-
-      setLocation(
-        selectedLocation,
-        municipality.name,
-        municipality.barangays[0]?.name || 'Unknown'
-      );
-
-      navigate('/plant-selection');
-    }
+    // Button click animation
+    gsap.to(continueBtnRef.current, {
+      scale: 0.98,
+      duration: 0.1,
+      yoyo: true,
+      repeat: 1,
+      ease: 'power2.inOut',
+      onComplete: () => {
+        // Navigate to next screen
+        console.log('Continue with location:', position);
+      },
+    });
   };
 
   return (
-    <div
+    <div 
       ref={containerRef}
-      className="min-h-screen relative overflow-hidden"
-      style={{
-        backgroundImage: `linear-gradient(rgba(73, 40, 40, 0.3), rgba(73, 40, 40, 0.3)), url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }}
+      className="min-h-screen bg-gradient-to-br from-[#FAFAF8] via-[#F5F7F2] to-[#E8EDE3] relative overflow-hidden"
     >
-      {/* Glass Morphism Header */}
-      <header
-        ref={headerRef}
-        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg bg-white/20 border-b border-white/30 shadow-soil-md"
-      >
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1
-            className="text-[2.5rem] font-display font-bold text-white text-center mb-2"
-            style={{ fontFamily: 'var(--font-display)', textShadow: '0 2px 8px rgba(73, 40, 40, 0.5)' }}
-          >
-            Piliin ang Iyong Bukid
-          </h1>
-          <p
-            className="text-lg font-heading text-white/90 text-center"
-            style={{ fontFamily: 'var(--font-heading)' }}
-          >
-            Central Luzon Terrace Mapping
-          </p>
+      {/* Decorative background elements */}
+      <div className="absolute top-0 left-0 w-full h-80 bg-gradient-to-b from-[#2E7D32]/5 to-transparent pointer-events-none" />
+      <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-[#84934A]/10 blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 -left-20 w-60 h-60 rounded-full bg-[#2E7D32]/5 blur-3xl pointer-events-none" />
+
+      {/* Header */}
+      <header className="relative z-10 pt-6 pb-4 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-lg mx-auto">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#2E7D32] to-[#84934A] flex items-center justify-center shadow-lg shadow-[#2E7D32]/20">
+              <MapPin className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xs font-semibold tracking-widest text-[#84934A] uppercase">
+              Step 1 of 4
+            </span>
+          </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <div className="pt-40 pb-12 px-4 max-w-6xl mx-auto">
-        {/* Interactive Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center">
-          {/* GPS Location Button */}
-          <button
-            ref={gpsButtonRef}
-            onClick={handleUseGPS}
-            disabled={isGettingLocation}
-            className="btn-magnetic bg-primary hover:bg-secondary text-white px-8 py-4 rounded-[2rem] shadow-soil-lg flex items-center justify-center gap-3 text-lg font-heading font-semibold transition-all"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              backgroundColor: 'var(--color-primary)',
-            }}
-          >
-            <Navigation className="w-6 h-6" />
-            {isGettingLocation ? 'Getting Location...' : 'Use GPS Location'}
-          </button>
-
-          {/* Drop Pin Button */}
-          <button
-            ref={mapButtonRef}
-            className="btn-magnetic bg-white/90 hover:bg-white text-earth px-8 py-4 rounded-[2rem] shadow-soil-lg flex items-center justify-center gap-3 text-lg font-heading font-semibold transition-all border-2 border-secondary/30"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              color: 'var(--color-earth)',
-              borderColor: 'var(--color-secondary)',
-            }}
-          >
-            <MapPin className="w-6 h-6" />
-            Drop Pin on Map
-          </button>
+      {/* Title Section */}
+      <div ref={titleRef} className="relative z-10 px-4 sm:px-6 lg:px-8 mb-6">
+        <div className="max-w-lg mx-auto text-center">
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#492828] leading-tight mb-2">
+            Pumili ng Lokasyon
+          </h1>
+          <p className="text-lg sm:text-xl text-[#492828]/60 font-light">
+            Select Location
+          </p>
+          <p className="mt-3 text-sm text-[#492828]/50 max-w-xs mx-auto">
+            I-drag ang pin o gamitin ang GPS upang tukuyin ang iyong bukid. 
+            <span className="block text-xs mt-1 opacity-70">
+              Drag the pin or use GPS to locate your farm.
+            </span>
+          </p>
         </div>
+      </div>
 
-        {/* Map Container - Clay Card Style */}
-        <div className="clay-card overflow-hidden shadow-soil-lg mb-8" style={{ height: '500px' }}>
-          <MapContainer
-            center={defaultCenter}
-            zoom={10}
-            style={{ height: '100%', width: '100%', borderRadius: 'var(--radius-lg)' }}
-            zoomControl={true}
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            <MapClickHandler onLocationSelect={handleLocationChange} />
-            {selectedLocation && (
-              <Marker
-                position={[selectedLocation.lat, selectedLocation.lng]}
-                icon={riceTerraceIcon}
-              />
-            )}
-          </MapContainer>
+      {/* Map Section */}
+      <div 
+        ref={mapContainerRef} 
+        className="relative z-10 px-4 sm:px-6 lg:px-8 mb-6"
+      >
+        <div className="max-w-lg mx-auto">
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-[#2E7D32]/15 border-4 border-white">
+            <div className="h-80 sm:h-96 w-full">
+              <MapContainer
+                center={[position.lat, position.lng]}
+                zoom={13}
+                scrollWheelZoom={true}
+                style={{ height: '100%', width: '100%' }}
+                className="z-0"
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <DraggableMarker position={position} setPosition={setPosition} />
+                <MapClickHandler setPosition={setPosition} />
+              </MapContainer>
+            </div>
+
+            {/* Map overlay gradient */}
+            <div className="absolute inset-0 pointer-events-none rounded-3xl shadow-inner" 
+                 style={{ boxShadow: 'inset 0 0 40px rgba(0,0,0,0.1)' }} />
+          </div>
         </div>
+      </div>
 
-        {/* Location Confirmation Card - Slides up from bottom */}
-        {showConfirmation && (
-          <div
-            ref={confirmCardRef}
-            className="clay-card p-6 mb-6 bg-white"
-          >
+      {/* Location Info Card */}
+      <div 
+        ref={locationCardRef}
+        className="relative z-10 px-4 sm:px-6 lg:px-8 mb-6"
+      >
+        <div className="max-w-lg mx-auto">
+          <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-5 shadow-xl shadow-[#2E7D32]/10 border border-[#2E7D32]/10">
             <div className="flex items-start gap-4">
-              <div className="flex-shrink-0">
-                <CheckCircle2 className="w-8 h-8" style={{ color: 'var(--color-primary)' }} />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#2E7D32]/10 to-[#84934A]/10 flex items-center justify-center flex-shrink-0">
+                <Navigation className="w-6 h-6 text-[#2E7D32]" />
               </div>
-              <div className="flex-1">
-                <h3
-                  className="text-xl font-heading font-bold mb-2"
-                  style={{ color: 'var(--color-earth)', fontFamily: 'var(--font-heading)' }}
-                >
-                  Location Selected
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-[#492828] mb-1">
+                  Kasalukuyang Lokasyon / Current Location
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm font-heading font-semibold mb-1" style={{ color: 'var(--color-secondary)' }}>
-                      Coordinates
-                    </p>
-                    <p
-                      ref={coordinatesRef}
-                      className="data-text text-earth"
-                      style={{ fontFamily: 'var(--font-mono)' }}
-                    >
-                      {coordinates}
-                    </p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="text-[#492828]/50 w-8">Lat:</span>
+                    <span className="font-mono text-[#2E7D32] font-medium">
+                      {position.lat.toFixed(6)}° N
+                    </span>
                   </div>
-                  <div>
-                    <p className="text-sm font-heading font-semibold mb-1" style={{ color: 'var(--color-secondary)' }}>
-                      Region
-                    </p>
-                    <p className="font-heading" style={{ color: 'var(--color-earth)' }}>
-                      Central Luzon Rice Terraces
-                    </p>
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="text-[#492828]/50 w-8">Lng:</span>
+                    <span className="font-mono text-[#2E7D32] font-medium">
+                      {position.lng.toFixed(6)}° E
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        )}
-
-        {/* Continue Button - Magnetic Attraction */}
-        {selectedLocation && (
-          <div className="flex justify-center">
-            <button
-              ref={continueButtonRef}
-              onClick={handleContinue}
-              className="btn-magnetic bg-primary hover:bg-secondary text-white px-12 py-5 rounded-[2.5rem] shadow-soil-lg text-xl font-display font-bold transition-all flex items-center gap-3"
-              style={{
-                fontFamily: 'var(--font-display)',
-                backgroundColor: 'var(--color-primary)',
-              }}
-            >
-              Continue to Plant Selection
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
-            </button>
-          </div>
-        )}
-
-        {/* Info Banner */}
-        <div
-          className="mt-8 clay-card bg-white/95 p-6 border-l-4"
-          style={{ borderLeftColor: 'var(--color-primary)' }}
-        >
-          <p
-            className="concept-text text-center"
-            style={{
-              fontFamily: 'var(--font-serif)',
-              color: 'var(--color-earth)',
-              fontSize: '1rem',
-            }}
-          >
-            <strong>Pagsasaka sa Lupa</strong> - This system provides precise fertilizer recommendations
-            based on your farm's soil composition and location within the Central Luzon agricultural region.
-          </p>
         </div>
       </div>
+
+      {/* GPS Button */}
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8 mb-6">
+        <div className="max-w-lg mx-auto flex justify-center">
+          <button
+            ref={gpsBtnRef}
+            onClick={handleGetCurrentLocation}
+            disabled={isLocating}
+            className="group relative flex items-center gap-3 px-6 py-4 bg-white rounded-2xl shadow-xl shadow-[#2E7D32]/15 border border-[#2E7D32]/10 hover:shadow-2xl hover:shadow-[#2E7D32]/20 transition-all duration-300 disabled:opacity-70"
+          >
+            {/* Pulse animation ring */}
+            <div 
+              ref={pulseRef}
+              className={`absolute inset-0 rounded-2xl bg-[#2E7D32] opacity-0 ${isLocating ? 'block' : 'hidden'}`}
+            />
+            
+            <div className={`relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+              isLocating 
+                ? 'bg-gradient-to-br from-[#2E7D32] to-[#84934A]' 
+                : 'bg-gradient-to-br from-[#2E7D32]/10 to-[#84934A]/10 group-hover:from-[#2E7D32]/20 group-hover:to-[#84934A]/20'
+            }`}>
+              <Crosshair className={`w-6 h-6 transition-colors duration-300 ${
+                isLocating ? 'text-white' : 'text-[#2E7D32]'
+              }`} />
+            </div>
+            
+            <div className="relative text-left">
+              <span className="block text-sm font-semibold text-[#492828]">
+                {isLocating ? 'Kinukuha ang Lokasyon...' : 'Gamitin ang GPS'}
+              </span>
+              <span className="block text-xs text-[#492828]/50">
+                {isLocating ? 'Getting Location...' : 'Use Current Location'}
+              </span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      {/* Continue Button - Floating */}
+      {showContinue && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-6 pt-4 bg-gradient-to-t from-[#FAFAF8] via-[#FAFAF8] to-transparent">
+          <div className="max-w-lg mx-auto">
+            <button
+              ref={continueBtnRef}
+              onClick={handleContinue}
+              className="group w-full flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#2E7D32] to-[#84934A] rounded-2xl shadow-2xl shadow-[#2E7D32]/30 hover:shadow-[#2E7D32]/40 transition-all duration-300 hover:-translate-y-0.5"
+            >
+              <div className="text-left">
+                <span className="block text-base font-semibold text-white">
+                  Magpatuloy
+                </span>
+                <span className="block text-xs text-white/70">
+                  Continue
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-white/80 hidden sm:block">
+                  Step 2
+                </span>
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors duration-300">
+                  <ChevronRight className="w-5 h-5 text-white" />
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Spacer for floating button */}
+      {showContinue && <div className="h-24" />}
+
+      {/* Custom CSS for Leaflet */}
+      <style>{`
+        .leaflet-container {
+          font-family: inherit;
+        }
+        .leaflet-control-attribution {
+          font-size: 8px !important;
+          opacity: 0.6;
+        }
+        .custom-pin {
+          background: transparent;
+          border: none;
+        }
+      `}</style>
     </div>
   );
 }

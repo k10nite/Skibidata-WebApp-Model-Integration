@@ -12,38 +12,50 @@ import SoilStatus from './screens/SoilStatus';
 import PlantRequirements from './screens/PlantRequirements';
 import FertilizerRecommendations from './screens/FertilizerRecommendations';
 import Complete from './screens/Complete';
+import CompleteScreen from './screens/CompleteScreen';
+
+// Kimi-generated premium screens
+import PlantSelectionKimi from './screens/PlantSelection_Kimi';
+import ProcessingScreen from './screens/ProcessingScreen';
+import SoilStatusScreen from './screens/SoilStatusScreen';
+import FertilizerRecommendationsPremium from './screens/premium/FertilizerRecommendations';
+
+// Comparison page
+import ScreenComparison from './screens/ScreenComparison';
+import TestPage from './screens/TestPage';
 
 function App() {
   return (
     <div className="app-container min-h-screen">
       <AnimatePresence mode="wait">
         <Routes>
-          {/* Default redirect to location selection */}
-          <Route path="/" element={<Navigate to="/location-selection" replace />} />
+          {/* Default redirect to test page */}
+          <Route path="/" element={<Navigate to="/test" replace />} />
 
-          {/* Screen 1: Location Selection */}
+          {/* TEST PAGE */}
+          <Route path="/test" element={<TestPage />} />
+
+          {/* COMPARISON PAGE */}
+          <Route path="/compare" element={<ScreenComparison />} />
+
+          {/* ORIGINAL SCREENS (Earthy Farm Tech) */}
           <Route path="/location-selection" element={<LocationSelection />} />
-
-          {/* Screen 2: Plant Selection */}
           <Route path="/plant-selection" element={<PlantSelection />} />
-
-          {/* Screen 3: Processing */}
           <Route path="/processing" element={<Processing />} />
-
-          {/* Screen 4: Soil Status */}
           <Route path="/soil-status" element={<SoilStatus />} />
-
-          {/* Screen 5: Plant Requirements */}
           <Route path="/plant-requirements" element={<PlantRequirements />} />
-
-          {/* Screen 6: Fertilizer Recommendations */}
-          <Route path="/recommendations" element={<FertilizerRecommendations />} />
-
-          {/* Screen 7: Complete / End Actions */}
+          <Route path="/fertilizer-recommendations" element={<FertilizerRecommendations />} />
           <Route path="/complete" element={<Complete />} />
 
+          {/* KIMI PREMIUM SCREENS (Airbnb/Apple Style) */}
+          <Route path="/plant-selection-kimi" element={<PlantSelectionKimi />} />
+          <Route path="/processing-screen" element={<ProcessingScreen />} />
+          <Route path="/soil-status-screen" element={<SoilStatusScreen />} />
+          <Route path="/fertilizer-recommendations-premium" element={<FertilizerRecommendationsPremium />} />
+          <Route path="/complete-screen" element={<CompleteScreen />} />
+
           {/* Catch-all redirect */}
-          <Route path="*" element={<Navigate to="/location-selection" replace />} />
+          <Route path="*" element={<Navigate to="/compare" replace />} />
         </Routes>
       </AnimatePresence>
     </div>
