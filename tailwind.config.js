@@ -7,64 +7,67 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
+        // Filipino Farm Palette
+        earth: {
+          DEFAULT: '#492828',     // Clay soil dark
+          light: '#ECECEC',       // Light earth background
+          card: '#FAF9F6',        // Off-white card
         },
-        secondary: {
-          50: '#fefce8',
-          100: '#fef9c3',
-          200: '#fef08a',
-          300: '#fde047',
-          400: '#facc15',
-          500: '#eab308',
-          600: '#ca8a04',
-          700: '#a16207',
-          800: '#854d0e',
-          900: '#713f12',
+        rice: {
+          DEFAULT: '#84934A',     // Rice field green (primary)
+          dark: '#656D3F',        // Deep crop green (secondary)
         },
-        success: '#10b981',
-        warning: '#f59e0b',
-        error: '#ef4444',
-        info: '#3b82f6',
+        nutrient: {
+          low: '#CD5C5C',         // Red terracotta
+          medium: '#DAA520',      // Golden harvest
+          high: '#84934A',        // Rice green
+        },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Poppins', 'system-ui', 'sans-serif'],
+        heading: ['"Plus Jakarta Sans"', 'sans-serif'],
+        display: ['"Outfit"', 'sans-serif'],
+        serif: ['"Playfair Display"', 'serif'],
+        mono: ['"Roboto Mono"', 'monospace'],
       },
       boxShadow: {
-        'soft': '0 2px 8px rgba(0, 0, 0, 0.08)',
-        'medium': '0 4px 16px rgba(0, 0, 0, 0.12)',
-        'hard': '0 8px 32px rgba(0, 0, 0, 0.16)',
+        'soil-sm': '0 4px 12px rgba(73, 40, 40, 0.1)',
+        'soil-md': '0 8px 24px rgba(73, 40, 40, 0.15)',
+        'soil-lg': '0 12px 32px rgba(73, 40, 40, 0.2)',
       },
       borderRadius: {
-        'card': '12px',
+        'clay-sm': '1.5rem',
+        'clay-md': '2rem',
+        'clay-lg': '2.5rem',
       },
       animation: {
-        'fade-in': 'fadeIn 0.3s ease-in-out',
-        'slide-up': 'slideUp 0.3s ease-out',
-        'slide-down': 'slideDown 0.3s ease-out',
+        'soil-fall': 'soil-fall 8s infinite linear',
+        'drill-spin': 'drill-spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite',
+        'clay-shake': 'clay-shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97)',
+        'shimmer': 'shimmer 2s infinite',
+        'typewriter': 'typewriter 1.5s steps(40) forwards',
       },
       keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+        'soil-fall': {
+          '0%': { transform: 'translateY(-10px) rotate(0deg)', opacity: '0' },
+          '50%': { opacity: '0.6' },
+          '100%': { transform: 'translateY(100vh) rotate(360deg)', opacity: '0' },
         },
-        slideUp: {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
+        'drill-spin': {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
         },
-        slideDown: {
-          '0%': { transform: 'translateY(-20px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
+        'clay-shake': {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-4px)' },
+          '20%, 40%, 60%, 80%': { transform: 'translateX(4px)' },
+        },
+        'shimmer': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
+        'typewriter': {
+          'from': { width: '0' },
+          'to': { width: '100%' },
         },
       },
     },
