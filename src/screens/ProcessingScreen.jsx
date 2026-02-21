@@ -19,7 +19,8 @@ import {
   Sprout,
   ClipboardCheck,
   CheckCircle2,
-  Loader2
+  Loader2,
+  ArrowRight
 } from 'lucide-react';
 import useAppStore from '../store/appStore';
 import { getScenarioByLocation } from '../data/soilScenarios';
@@ -391,10 +392,10 @@ export default function ProcessingScreen({ onComplete }) {
               {/* Continue Button */}
               <button
                 onClick={() => onComplete ? onComplete() : navigate('/soil-status-screen')}
-                className="w-full bg-[#492828] hover:bg-[#3d2222] text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                className="group w-full bg-[#492828] hover:bg-[#3d2222] text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
               >
                 <span>View Soil Status</span>
-                <span>→</span>
+                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           )}
