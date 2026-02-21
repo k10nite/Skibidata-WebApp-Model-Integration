@@ -29,8 +29,8 @@ function App() {
     <div className="app-container min-h-screen">
       <AnimatePresence mode="wait">
         <Routes>
-          {/* Default redirect to test page */}
-          <Route path="/" element={<Navigate to="/test" replace />} />
+          {/* Default redirect to location selection */}
+          <Route path="/" element={<Navigate to="/location-selection" replace />} />
 
           {/* TEST PAGE */}
           <Route path="/test" element={<TestPage />} />

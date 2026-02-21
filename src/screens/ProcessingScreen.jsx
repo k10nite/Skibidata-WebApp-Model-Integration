@@ -299,10 +299,10 @@ export default function ProcessingScreen({ onComplete }) {
             {/* Title */}
             <div ref={titleRef}>
               <h1 className="text-2xl md:text-3xl font-bold text-[#492828] tracking-tight mb-2">
-                Analyzing Soil
+                Processing Your Selection
               </h1>
               <p className="text-[#84934A] font-medium">
-                Processing your data...
+                Analyzing crop and soil compatibility...
               </p>
             </div>
           </div>

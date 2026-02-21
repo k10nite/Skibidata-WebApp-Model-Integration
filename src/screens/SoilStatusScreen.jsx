@@ -378,7 +378,7 @@ export default function SoilStatusScreen() {
   };
 
   const handleContinue = () => {
-    navigate('/plant-requirements');
+    navigate('/fertilizer-recommendations-premium');
   };
   
   // Prepare nutrients data
@@ -407,6 +407,14 @@ export default function SoilStatusScreen() {
                 </h1>
                 <p className="text-xs text-gray-500">Nutrient Analysis</p>
               </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#2E7D32] to-[#84934A] flex items-center justify-center shadow-lg shadow-[#2E7D32]/20">
+                <Gauge className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-xs font-semibold tracking-widest text-[#84934A] uppercase hidden sm:inline">
+                Step 3 of 4
+              </span>
             </div>
           </div>
         </div>
@@ -487,11 +495,10 @@ export default function SoilStatusScreen() {
             onClick={handleContinue}
             className="group bg-gray-900 hover:bg-gray-800 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
           >
-            <span>View Recommendations</span>
-            <span className="text-gray-400 text-sm"></span>
-            <ArrowRight 
-              size={20} 
-              className="group-hover:translate-x-1 transition-transform" 
+            <span>View Fertilizer Recommendations</span>
+            <ArrowRight
+              size={20}
+              className="group-hover:translate-x-1 transition-transform"
             />
           </button>
         </div>

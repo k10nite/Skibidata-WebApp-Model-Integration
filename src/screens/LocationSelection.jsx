@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import { Crosshair, MapPin, Navigation, ChevronRight } from 'lucide-react';
 import { gsap } from 'gsap';
@@ -80,11 +81,12 @@ function MapClickHandler({ setPosition }) {
 }
 
 export default function LocationSelection() {
+  const navigate = useNavigate();
   // Default position (Philippines center - roughly Manila area)
   const [position, setPosition] = useState({ lat: 14.5995, lng: 120.9842 });
   const [isLocating, setIsLocating] = useState(false);
   const [showContinue, setShowContinue] = useState(false);
-  
+
   const containerRef = useRef(null);
   const titleRef = useRef(null);
   const mapContainerRef = useRef(null);
@@ -155,17 +157,8 @@ export default function LocationSelection() {
     }
   }, [isLocating]);
 
-  const handleGetCurrentLocation = () => {
+  const handleSelectGPS = () => {
     setIsLocating(true);
-    
-    // Button press animation
-    gsap.to(gpsBtnRef.current, {
-      scale: 0.95,
-      duration: 0.1,
-      yoyo: true,
-      repeat: 1,
-      ease: 'power2.inOut',
-    });
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -177,18 +170,10 @@ export default function LocationSelection() {
           setPosition(newPosition);
           setIsLocating(false);
           setShowContinue(true);
-          
-          // Success animation
-          gsap.fromTo(
-            gpsBtnRef.current,
-            { backgroundColor: '#2E7D32' },
-            { backgroundColor: '#84934A', duration: 0.5, yoyo: true, repeat: 1 }
-          );
         },
         (error) => {
           console.error('Geolocation error:', error);
           setIsLocating(false);
-          // Show continue anyway after location attempt
           setShowContinue(true);
         },
         { timeout: 10000, enableHighAccuracy: true }
@@ -199,6 +184,15 @@ export default function LocationSelection() {
     }
   };
 
+  // Show continue button when position changes (from dragging/clicking)
+  useEffect(() => {
+    // Don't show on initial load, only when user interacts
+    const hasChanged = position.lat !== 14.5995 || position.lng !== 120.9842;
+    if (hasChanged) {
+      setShowContinue(true);
+    }
+  }, [position]);
+
   const handleContinue = () => {
     // Button click animation
     gsap.to(continueBtnRef.current, {
@@ -208,8 +202,9 @@ export default function LocationSelection() {
       repeat: 1,
       ease: 'power2.inOut',
       onComplete: () => {
-        // Navigate to next screen
+        // Navigate to plant selection screen
         console.log('Continue with location:', position);
+        navigate('/plant-selection-kimi');
       },
     });
   };
@@ -239,26 +234,20 @@ export default function LocationSelection() {
       </header>
 
       {/* Title Section */}
-      <div ref={titleRef} className="relative z-10 px-4 sm:px-6 lg:px-8 mb-6">
+      <div ref={titleRef} className="relative z-10 px-4 sm:px-6 lg:px-8 mb-4">
         <div className="max-w-lg mx-auto text-center">
           <h1 className="text-3xl sm:text-4xl font-bold text-[#492828] leading-tight mb-2">
-            Pumili ng Lokasyon
+            Select Farm Location
           </h1>
-          <p className="text-lg sm:text-xl text-[#492828]/60 font-light">
-            Select Location
-          </p>
-          <p className="mt-3 text-sm text-[#492828]/50 max-w-xs mx-auto">
-            I-drag ang pin o gamitin ang GPS upang tukuyin ang iyong bukid. 
-            <span className="block text-xs mt-1 opacity-70">
-              Drag the pin or use GPS to locate your farm.
-            </span>
+          <p className="mt-3 text-sm text-[#492828]/60 max-w-md mx-auto">
+            Drag the pin on the map or use GPS to set your farm location
           </p>
         </div>
       </div>
 
       {/* Map Section */}
-      <div 
-        ref={mapContainerRef} 
+      <div
+        ref={mapContainerRef}
         className="relative z-10 px-4 sm:px-6 lg:px-8 mb-6"
       >
         <div className="max-w-lg mx-auto">
@@ -281,14 +270,45 @@ export default function LocationSelection() {
             </div>
 
             {/* Map overlay gradient */}
-            <div className="absolute inset-0 pointer-events-none rounded-3xl shadow-inner" 
+            <div className="absolute inset-0 pointer-events-none rounded-3xl shadow-inner"
                  style={{ boxShadow: 'inset 0 0 40px rgba(0,0,0,0.1)' }} />
           </div>
         </div>
       </div>
 
+      {/* GPS Button */}
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8 mb-6">
+        <div className="max-w-lg mx-auto">
+          <button
+            ref={gpsBtnRef}
+            onClick={handleSelectGPS}
+            disabled={isLocating}
+            className="group w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-[#2E7D32] to-[#84934A] rounded-2xl shadow-xl shadow-[#2E7D32]/20 hover:shadow-2xl hover:shadow-[#2E7D32]/30 transition-all duration-300 disabled:opacity-70"
+          >
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+              isLocating ? 'bg-white/30' : 'bg-white/20 group-hover:bg-white/30'
+            }`}>
+              <Crosshair className={`w-5 h-5 text-white ${isLocating ? 'animate-pulse' : ''}`} />
+            </div>
+
+            <div className="text-left flex-1">
+              <span className="block text-base font-semibold text-white">
+                {isLocating ? 'Getting Your Location...' : 'Use My Current Location'}
+              </span>
+              <span className="block text-xs text-white/70">
+                {isLocating ? 'Please wait...' : 'Automatically set pin to GPS location'}
+              </span>
+            </div>
+          </button>
+
+          <p className="text-center text-xs text-[#492828]/40 mt-2">
+            You can also click or drag the pin on the map
+          </p>
+        </div>
+      </div>
+
       {/* Location Info Card */}
-      <div 
+      <div
         ref={locationCardRef}
         className="relative z-10 px-4 sm:px-6 lg:px-8 mb-6"
       >
@@ -300,7 +320,7 @@ export default function LocationSelection() {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-semibold text-[#492828] mb-1">
-                  Kasalukuyang Lokasyon / Current Location
+                  Current Location
                 </h3>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-xs">
@@ -322,43 +342,6 @@ export default function LocationSelection() {
         </div>
       </div>
 
-      {/* GPS Button */}
-      <div className="relative z-10 px-4 sm:px-6 lg:px-8 mb-6">
-        <div className="max-w-lg mx-auto flex justify-center">
-          <button
-            ref={gpsBtnRef}
-            onClick={handleGetCurrentLocation}
-            disabled={isLocating}
-            className="group relative flex items-center gap-3 px-6 py-4 bg-white rounded-2xl shadow-xl shadow-[#2E7D32]/15 border border-[#2E7D32]/10 hover:shadow-2xl hover:shadow-[#2E7D32]/20 transition-all duration-300 disabled:opacity-70"
-          >
-            {/* Pulse animation ring */}
-            <div 
-              ref={pulseRef}
-              className={`absolute inset-0 rounded-2xl bg-[#2E7D32] opacity-0 ${isLocating ? 'block' : 'hidden'}`}
-            />
-            
-            <div className={`relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
-              isLocating 
-                ? 'bg-gradient-to-br from-[#2E7D32] to-[#84934A]' 
-                : 'bg-gradient-to-br from-[#2E7D32]/10 to-[#84934A]/10 group-hover:from-[#2E7D32]/20 group-hover:to-[#84934A]/20'
-            }`}>
-              <Crosshair className={`w-6 h-6 transition-colors duration-300 ${
-                isLocating ? 'text-white' : 'text-[#2E7D32]'
-              }`} />
-            </div>
-            
-            <div className="relative text-left">
-              <span className="block text-sm font-semibold text-[#492828]">
-                {isLocating ? 'Kinukuha ang Lokasyon...' : 'Gamitin ang GPS'}
-              </span>
-              <span className="block text-xs text-[#492828]/50">
-                {isLocating ? 'Getting Location...' : 'Use Current Location'}
-              </span>
-            </div>
-          </button>
-        </div>
-      </div>
-
       {/* Continue Button - Floating */}
       {showContinue && (
         <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-6 pt-4 bg-gradient-to-t from-[#FAFAF8] via-[#FAFAF8] to-transparent">
@@ -370,13 +353,13 @@ export default function LocationSelection() {
             >
               <div className="text-left">
                 <span className="block text-base font-semibold text-white">
-                  Magpatuloy
+                  Continue to Plant Selection
                 </span>
                 <span className="block text-xs text-white/70">
-                  Continue
+                  Next Step
                 </span>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <span className="text-xs font-medium text-white/80 hidden sm:block">
                   Step 2
