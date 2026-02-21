@@ -21,6 +21,9 @@ import {
   CheckCircle2,
   Loader2
 } from 'lucide-react';
+import useAppStore from '../store/appStore';
+import { getScenarioByLocation } from '../data/soilScenarios';
+import { getRecommendationsForScenario, getRecommendationSummary } from '../data/fertilizerRecommendations';
 
 // Processing steps with bilingual labels
 const PROCESSING_STEPS = [
@@ -182,6 +185,7 @@ function ProgressStep({ step, index, currentStep, isCompleted, isActive }) {
  */
 export default function ProcessingScreen({ onComplete }) {
   const navigate = useNavigate();
+  const { location, selectedPlant, plantRequirements, setSoilData, setRecommendations } = useAppStore();
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
@@ -254,8 +258,22 @@ export default function ProcessingScreen({ onComplete }) {
       setProgress(100);
       setIsComplete(true);
 
-      // Auto-navigate to soil status screen after a short delay
+      // Process soil data and navigate after a short delay
       const completeTimer = setTimeout(() => {
+        // Process soil scenario and recommendations
+        const scenario = getScenarioByLocation(location.lat, location.lng);
+        const recommendations = getRecommendationsForScenario(
+          scenario.status,
+          plantRequirements,
+          selectedPlant.name
+        );
+        const summary = getRecommendationSummary(recommendations);
+
+        // Store in app state
+        setSoilData(scenario.status, scenario);
+        setRecommendations(recommendations, summary);
+
+        // Navigate to soil status
         if (onComplete) {
           onComplete();
         } else {
@@ -265,7 +283,7 @@ export default function ProcessingScreen({ onComplete }) {
 
       return () => clearTimeout(completeTimer);
     }
-  }, [currentStep, isComplete, onComplete]);
+  }, [currentStep, isComplete, onComplete, location, selectedPlant, plantRequirements, setSoilData, setRecommendations, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FAF9F6] via-white to-[#E8F5E9] flex items-center justify-center p-4 overflow-hidden">
