@@ -345,14 +345,22 @@ export default function SoilStatusScreen() {
   const { soilData, soilScenario, municipality } = useAppStore();
   const containerRef = useRef(null);
   const buttonRef = useRef(null);
-  
-  // Redirect if no soil data
-  useEffect(() => {
-    if (!soilData) {
-      navigate('/location-selection');
-    }
-  }, [soilData, navigate]);
-  
+
+  // Use mockup data if no real data (for prototype)
+  const displayData = soilData || {
+    N: 'LOW',
+    P: 'MEDIUM',
+    K: 'LOW',
+    pH: 'MEDIUM'
+  };
+
+  const displayScenario = soilScenario || {
+    location: { barangay: 'La Trinidad' },
+    soilType: 'Clay Loam'
+  };
+
+  const displayMunicipality = municipality || 'Benguet';
+
   // Button animation
   useGSAP(() => {
     gsap.fromTo(
@@ -361,17 +369,6 @@ export default function SoilStatusScreen() {
       { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out', delay: 1 }
     );
   }, { scope: buttonRef });
-  
-  if (!soilData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-stone-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-gray-200 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading soil data...</p>
-        </div>
-      </div>
-    );
-  }
   
   const handleBack = () => {
     navigate('/processing-screen');
@@ -416,7 +413,7 @@ export default function SoilStatusScreen() {
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Location Summary */}
         <div className="mb-6">
-          <LocationSummary soilScenario={soilScenario} municipality={municipality} />
+          <LocationSummary soilScenario={displayScenario} municipality={displayMunicipality} />
         </div>
         
         {/* Page Title */}
@@ -435,7 +432,7 @@ export default function SoilStatusScreen() {
             <NutrientGaugeCard
               key={nutrient}
               nutrient={nutrient}
-              status={soilData[nutrient]}
+              status={displayData[nutrient]}
               delay={0.2 + (index * 0.15)}
             />
           ))}
