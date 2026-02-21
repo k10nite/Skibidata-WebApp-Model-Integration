@@ -221,7 +221,7 @@ export default function LocationSelection() {
 
 
       {/* Title Section */}
-      <div ref={titleRef} className="relative z-10 px-4 sm:px-6 lg:px-8 mb-4">
+      <div ref={titleRef} className="relative z-10 px-4 sm:px-6 lg:px-8 pt-8 mb-4">
         <div className="max-w-lg mx-auto text-center">
           <h1 className="text-3xl sm:text-4xl font-bold text-[#492828] leading-tight mb-2">
             Select Farm Location
