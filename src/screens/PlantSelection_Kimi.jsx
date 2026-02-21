@@ -44,38 +44,38 @@ const CROP_CATEGORIES = [
 
 const CROPS_DATA = [
   // Rice & Grains
-  { id: 'rice', name: 'Palay', nameEn: 'Rice', category: 'grains', icon: '🌾', color: '#84A946', season: 'Tag-ulan', duration: '3-4 buwan' },
-  { id: 'corn', name: 'Mais', nameEn: 'Corn', category: 'grains', icon: '🌽', color: '#F4D03F', season: 'Tag-init', duration: '2-3 buwan' },
-  { id: 'sorghum', name: 'Sorghum', nameEn: 'Sorghum', category: 'grains', icon: '🌾', color: '#D4A574', season: 'Tag-init', duration: '3-4 buwan' },
+  { id: 'rice', name: 'Palay', nameEn: 'Rice', category: 'grains', icon: '🌾', color: '#84A946', season: 'Rainy Season', duration: '3-4 months' },
+  { id: 'corn', name: 'Mais', nameEn: 'Corn', category: 'grains', icon: '🌽', color: '#F4D03F', season: 'Dry Season', duration: '2-3 months' },
+  { id: 'sorghum', name: 'Sorghum', nameEn: 'Sorghum', category: 'grains', icon: '🌾', color: '#D4A574', season: 'Dry Season', duration: '3-4 months' },
 
   // Vegetables
-  { id: 'tomato', name: 'Kamatis', nameEn: 'Tomato', category: 'vegetables', icon: '🍅', color: '#E74C3C', season: 'Tag-init', duration: '2-3 buwan' },
-  { id: 'eggplant', name: 'Talong', nameEn: 'Eggplant', category: 'vegetables', icon: '🍆', color: '#8E44AD', season: 'Buong taon', duration: '3-4 buwan' },
-  { id: 'okra', name: 'Okra', nameEn: 'Okra', category: 'vegetables', icon: '🥬', color: '#27AE60', season: 'Tag-init', duration: '2-3 buwan' },
-  { id: 'ampalaya', name: 'Ampalaya', nameEn: 'Bitter Gourd', category: 'vegetables', icon: '🥒', color: '#2ECC71', season: 'Tag-ulan', duration: '3-4 buwan' },
-  { id: 'squash', name: 'Kalabasa', nameEn: 'Squash', category: 'vegetables', icon: '🎃', color: '#E67E22', season: 'Tag-init', duration: '3-4 buwan' },
-  { id: 'pechay', name: 'Pechay', nameEn: 'Peck Choi', category: 'vegetables', icon: '🥬', color: '#16A085', season: 'Buong taon', duration: '1-2 buwan' },
-  { id: 'sitaw', name: 'Sitaw', nameEn: 'String Beans', category: 'vegetables', icon: '🫘', color: '#52BE80', season: 'Tag-ulan', duration: '2-3 buwan' },
-  { id: 'pepper', name: 'Sili', nameEn: 'Chili Pepper', category: 'vegetables', icon: '🌶️', color: '#C0392B', season: 'Tag-init', duration: '3-4 buwan' },
+  { id: 'tomato', name: 'Kamatis', nameEn: 'Tomato', category: 'vegetables', icon: '🍅', color: '#E74C3C', season: 'Dry Season', duration: '2-3 months' },
+  { id: 'eggplant', name: 'Talong', nameEn: 'Eggplant', category: 'vegetables', icon: '🍆', color: '#8E44AD', season: 'Year-round', duration: '3-4 months' },
+  { id: 'okra', name: 'Okra', nameEn: 'Okra', category: 'vegetables', icon: '🥬', color: '#27AE60', season: 'Dry Season', duration: '2-3 months' },
+  { id: 'ampalaya', name: 'Ampalaya', nameEn: 'Bitter Gourd', category: 'vegetables', icon: '🥒', color: '#2ECC71', season: 'Rainy Season', duration: '3-4 months' },
+  { id: 'squash', name: 'Kalabasa', nameEn: 'Squash', category: 'vegetables', icon: '🎃', color: '#E67E22', season: 'Dry Season', duration: '3-4 months' },
+  { id: 'pechay', name: 'Pechay', nameEn: 'Peck Choi', category: 'vegetables', icon: '🥬', color: '#16A085', season: 'Year-round', duration: '1-2 months' },
+  { id: 'sitaw', name: 'Sitaw', nameEn: 'String Beans', category: 'vegetables', icon: '🫘', color: '#52BE80', season: 'Rainy Season', duration: '2-3 months' },
+  { id: 'pepper', name: 'Sili', nameEn: 'Chili Pepper', category: 'vegetables', icon: '🌶️', color: '#C0392B', season: 'Dry Season', duration: '3-4 months' },
 
   // Fruits
-  { id: 'banana', name: 'Saging', nameEn: 'Banana', category: 'fruits', icon: '🍌', color: '#F1C40F', season: 'Buong taon', duration: '9-12 buwan' },
-  { id: 'mango', name: 'Mangga', nameEn: 'Mango', category: 'fruits', icon: '🥭', color: '#F39C12', season: 'Tag-init', duration: '3-5 taon' },
-  { id: 'papaya', name: 'Papaya', nameEn: 'Papaya', category: 'fruits', icon: '🫐', color: '#E74C3C', season: 'Buong taon', duration: '6-9 buwan' },
-  { id: 'pineapple', name: 'Pinya', nameEn: 'Pineapple', category: 'fruits', icon: '🍍', color: '#F1C40F', season: 'Tag-init', duration: '12-18 buwan' },
-  { id: 'coconut', name: 'Niyog', nameEn: 'Coconut', category: 'fruits', icon: '🥥', color: '#D7CCC8', season: 'Buong taon', duration: '3-5 taon' },
+  { id: 'banana', name: 'Saging', nameEn: 'Banana', category: 'fruits', icon: '🍌', color: '#F1C40F', season: 'Year-round', duration: '9-12 months' },
+  { id: 'mango', name: 'Mangga', nameEn: 'Mango', category: 'fruits', icon: '🥭', color: '#F39C12', season: 'Dry Season', duration: '3-5 years' },
+  { id: 'papaya', name: 'Papaya', nameEn: 'Papaya', category: 'fruits', icon: '🫐', color: '#E74C3C', season: 'Year-round', duration: '6-9 months' },
+  { id: 'pineapple', name: 'Pinya', nameEn: 'Pineapple', category: 'fruits', icon: '🍍', color: '#F1C40F', season: 'Dry Season', duration: '12-18 months' },
+  { id: 'coconut', name: 'Niyog', nameEn: 'Coconut', category: 'fruits', icon: '🥥', color: '#D7CCC8', season: 'Year-round', duration: '3-5 years' },
 
   // High Value Crops
-  { id: 'coffee', name: 'Kape', nameEn: 'Coffee', category: 'highvalue', icon: '☕', color: '#6D4C41', season: 'Tag-ulan', duration: '2-3 taon' },
-  { id: 'cacao', name: 'Kakaw', nameEn: 'Cacao', category: 'highvalue', icon: '🍫', color: '#5D4037', season: 'Buong taon', duration: '2-3 taon' },
-  { id: 'vanilla', name: 'Vanilla', nameEn: 'Vanilla', category: 'highvalue', icon: '🌿', color: '#D7CCC8', season: 'Tag-init', duration: '2-3 taon' },
+  { id: 'coffee', name: 'Kape', nameEn: 'Coffee', category: 'highvalue', icon: '☕', color: '#6D4C41', season: 'Rainy Season', duration: '2-3 years' },
+  { id: 'cacao', name: 'Kakaw', nameEn: 'Cacao', category: 'highvalue', icon: '🍫', color: '#5D4037', season: 'Year-round', duration: '2-3 years' },
+  { id: 'vanilla', name: 'Vanilla', nameEn: 'Vanilla', category: 'highvalue', icon: '🌿', color: '#D7CCC8', season: 'Dry Season', duration: '2-3 years' },
 
   // Root Crops
-  { id: 'cassava', name: 'Kamoteng Kahoy', nameEn: 'Cassava', category: 'rootcrops', icon: '🍠', color: '#D7CCC8', season: 'Buong taon', duration: '8-12 buwan' },
-  { id: 'sweetpotato', name: 'Kamote', nameEn: 'Sweet Potato', category: 'rootcrops', icon: '🍠', color: '#E67E22', season: 'Buong taon', duration: '3-4 buwan' },
-  { id: 'ginger', name: 'Luya', nameEn: 'Ginger', category: 'rootcrops', icon: '🫚', color: '#F5DEB3', season: 'Tag-ulan', duration: '8-10 buwan' },
-  { id: 'taro', name: 'Gabi', nameEn: 'Taro', category: 'rootcrops', icon: '🥔', color: '#8D6E63', season: 'Tag-ulan', duration: '6-9 buwan' },
-  { id: 'carrot', name: 'Karot', nameEn: 'Carrot', category: 'rootcrops', icon: '🥕', color: '#E67E22', season: 'Tag-init', duration: '2-3 buwan' },
+  { id: 'cassava', name: 'Kamoteng Kahoy', nameEn: 'Cassava', category: 'rootcrops', icon: '🍠', color: '#D7CCC8', season: 'Year-round', duration: '8-12 months' },
+  { id: 'sweetpotato', name: 'Kamote', nameEn: 'Sweet Potato', category: 'rootcrops', icon: '🍠', color: '#E67E22', season: 'Year-round', duration: '3-4 months' },
+  { id: 'ginger', name: 'Luya', nameEn: 'Ginger', category: 'rootcrops', icon: '🫚', color: '#F5DEB3', season: 'Rainy Season', duration: '8-10 months' },
+  { id: 'taro', name: 'Gabi', nameEn: 'Taro', category: 'rootcrops', icon: '🥔', color: '#8D6E63', season: 'Rainy Season', duration: '6-9 months' },
+  { id: 'carrot', name: 'Karot', nameEn: 'Carrot', category: 'rootcrops', icon: '🥕', color: '#E67E22', season: 'Dry Season', duration: '2-3 months' },
 ];
 
 // ============================================
@@ -248,30 +248,24 @@ export default function PlantSelection({ onSelect, onBack }) {
         className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 sm:h-20">
-            {/* Back Button */}
-            <button
-              onClick={() => onBack ? onBack() : navigate('/location-selection')}
-              className="flex items-center gap-2 text-gray-600 hover:text-[#492828] transition-colors duration-200 group"
-            >
-              <div className="p-2 rounded-full bg-gray-100 group-hover:bg-[#84934A]/10 transition-colors">
-                <ArrowRight className="w-5 h-5 rotate-180" />
-              </div>
-              <span className="hidden sm:inline font-medium">Back</span>
-            </button>
-
-            {/* Title */}
-            <div className="text-center">
-              <h1 className="text-xl sm:text-2xl font-bold text-[#492828] tracking-tight">
-                Select Your Crop
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">
-                Choose what you want to plant
-              </p>
+          {/* Step Indicator */}
+          <div className="flex items-center justify-center gap-3 pt-4">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#2E7D32] to-[#84934A] flex items-center justify-center shadow-lg shadow-[#2E7D32]/20">
+              <Sprout className="w-5 h-5 text-white" />
             </div>
+            <span className="text-xs font-semibold tracking-widest text-[#84934A] uppercase">
+              Step 2 of 4
+            </span>
+          </div>
 
-            {/* Spacer for balance */}
-            <div className="w-20" />
+          {/* Title */}
+          <div className="text-center py-4">
+            <h1 className="text-xl sm:text-2xl font-bold text-[#492828] tracking-tight mb-1">
+              Select Your Crop
+            </h1>
+            <p className="text-xs sm:text-sm text-gray-500">
+              Choose what you want to plant
+            </p>
           </div>
         </div>
       </header>
@@ -344,8 +338,7 @@ export default function PlantSelection({ onSelect, onBack }) {
                 `}
               >
                 <Icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{category.name}</span>
-                <span className="sm:hidden">{category.nameEn}</span>
+                <span>{category.nameEn}</span>
               </button>
             );
           })}
@@ -355,7 +348,7 @@ export default function PlantSelection({ onSelect, onBack }) {
         <div className="flex items-center justify-between mb-6">
           <p className="text-gray-600">
             <span className="font-semibold text-[#492828]">{filteredCrops.length}</span>
-            {' '}na pananim nakita
+            {' '}crops found
           </p>
           {selectedCrop && (
             <div className="flex items-center gap-2 text-[#84934A] font-medium">
@@ -391,10 +384,10 @@ export default function PlantSelection({ onSelect, onBack }) {
               <Search className="w-10 h-10 text-gray-400" />
             </div>
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
-              Walang nahanap na pananim
+              No crops found
             </h3>
             <p className="text-gray-500">
-          Subukang maghanap ng ibang keyword
+              Try searching with different keywords
             </p>
           </div>
         )}
@@ -516,17 +509,11 @@ function CropCard({ crop, isSelected, onSelect }) {
 
         {/* Names */}
         <h3 className={`
-          font-bold text-base sm:text-lg mb-1
+          font-bold text-base sm:text-lg mb-3
           ${isSelected ? 'text-white' : 'text-[#492828]'}
         `}>
-          {crop.name}
-        </h3>
-        <p className={`
-          text-xs sm:text-sm
-          ${isSelected ? 'text-white/80' : 'text-gray-500'}
-        `}>
           {crop.nameEn}
-        </p>
+        </h3>
 
         {/* Season Badge */}
         <div className={`
@@ -577,8 +564,8 @@ function CropDetailsBar({ crop, onClose }) {
               {crop.icon}
             </div>
             <div>
-              <h4 className="font-bold text-[#492828] text-lg">{crop.name}</h4>
-              <p className="text-gray-500 text-sm">{crop.nameEn} • {crop.season}</p>
+              <h4 className="font-bold text-[#492828] text-lg">{crop.nameEn}</h4>
+              <p className="text-gray-500 text-sm">{crop.season} • {crop.duration}</p>
             </div>
           </div>
 

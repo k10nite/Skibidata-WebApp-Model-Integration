@@ -357,7 +357,7 @@ export default function FertilizerRecommendations() {
       style={{ background: 'linear-gradient(180deg, #FAFAFA 0%, #F5F5F5 100%)' }}
     >
       {/* Header Section */}
-      <div 
+      <div
         ref={headerRef}
         className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-gray-200/50"
       >
@@ -368,9 +368,19 @@ export default function FertilizerRecommendations() {
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-xl hover:bg-gray-100"
             >
               <ChevronLeft size={20} />
-              <span className="font-medium">Back / Bumalik</span>
+              <span className="font-medium">Back</span>
             </button>
-            
+
+            {/* Step Indicator */}
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#2E7D32] to-[#84934A] flex items-center justify-center shadow-lg shadow-[#2E7D32]/20">
+                <Beaker className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-xs font-semibold tracking-widest text-[#84934A] uppercase hidden sm:inline">
+                Step 4 of 4
+              </span>
+            </div>
+
             <div className="flex gap-2">
               <button
                 onClick={handleDownloadReport}
