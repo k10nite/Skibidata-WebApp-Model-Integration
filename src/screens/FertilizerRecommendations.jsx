@@ -1,6 +1,6 @@
-// Screen 6: Fertilizer Recommendations - Fertilizer Sack Stack
+// Screen 6: Fertilizer Recommendations - Clean Product Cards
 // PEAK MOMENT 3: Main results reveal with staggered animations
-// Shows specific fertilizer products to address nutrient gaps
+// Airbnb-style professional product listing with clean design
 
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -12,108 +12,67 @@ export default function FertilizerRecommendations() {
   const { selectedPlant, recommendations } = useAppStore();
 
   // Refs for GSAP animations
-  const bannerRef = useRef(null);
-  const sacksRef = useRef([]);
+  const headerRef = useRef(null);
+  const cardsRef = useRef([]);
   const summaryRef = useRef(null);
-  const advisoryRef = useRef(null);
 
-  // Fertilizer products data with Filipino labels
+  // Fertilizer products data
   const fertilizerProducts = [
     {
       id: 'nitrogen',
       name: 'Urea (46-0-0)',
-      nutrient: 'NITROGEN',
-      image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400',
-      currentLevel: 'LOW',
-      targetLevel: 'HIGH',
-      currentBadgeColor: '#EF4444', // Red
-      targetArrow: '↑',
-      purpose: 'Palakasin ang dahon at tangkay',
-      purposeEn: 'Strengthen leaves and stems',
-      application: '2-3 sako bawat ektarya',
-      applicationEn: '2-3 bags per hectare',
-      timing: '2 linggo bago magtanim',
-      timingEn: '2 weeks before planting',
+      subtitle: 'Nitrogen Supplement',
+      application: '2-3 bags per hectare',
+      timing: '2 weeks before planting',
       price: 1450,
-      bagSize: '50kg',
-      priority: 'HIGH',
-      priorityIcon: '🔴'
+      unit: 'per 50kg bag',
+      priority: 'high',
+      priorityLabel: 'High Priority',
+      estimatedBags: 2.5
     },
     {
       id: 'phosphorus',
       name: 'DAP (18-46-0)',
-      nutrient: 'PHOSPHORUS',
-      image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400',
-      currentLevel: 'MEDIUM',
-      targetLevel: 'MEDIUM-HIGH',
-      currentBadgeColor: '#F59E0B', // Yellow
-      targetArrow: '↗',
-      purpose: 'Para sa malakas na ugat',
-      purposeEn: 'For strong roots',
-      application: '1-2 sako bawat ektarya',
-      applicationEn: '1-2 bags per hectare',
-      timing: 'Sa pagtatanim',
-      timingEn: 'At planting',
+      subtitle: 'Phosphorus Supplement',
+      application: '1-2 bags per hectare',
+      timing: 'At planting',
       price: 1680,
-      bagSize: '50kg',
-      priority: 'MEDIUM',
-      priorityIcon: '🟡'
+      unit: 'per 50kg bag',
+      priority: 'medium',
+      priorityLabel: 'Medium Priority',
+      estimatedBags: 1.5
     },
     {
       id: 'potassium',
       name: 'Muriate of Potash (0-0-60)',
-      nutrient: 'POTASSIUM',
-      image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400',
-      currentLevel: 'LOW',
-      targetLevel: 'HIGH',
-      currentBadgeColor: '#EF4444', // Red
-      targetArrow: '↑',
-      purpose: 'Gawing mataas ang kalidad ng bunga',
-      purposeEn: 'Improve fruit quality',
-      application: '1-2 sako bawat ektarya',
-      applicationEn: '1-2 bags per hectare',
-      timing: 'Sa pamumulaklak',
-      timingEn: 'During flowering',
+      subtitle: 'Potassium Supplement',
+      application: '1-2 bags per hectare',
+      timing: 'During flowering',
       price: 1580,
-      bagSize: '50kg',
-      priority: 'HIGH',
-      priorityIcon: '🔴'
+      unit: 'per 50kg bag',
+      priority: 'high',
+      priorityLabel: 'High Priority',
+      estimatedBags: 1.5
     },
     {
-      id: 'ph',
+      id: 'lime',
       name: 'Agricultural Lime',
-      nutrient: 'pH ADJUSTMENT',
-      image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400',
-      currentLevel: 'SLIGHTLY ACIDIC',
-      targetLevel: 'NEUTRAL',
-      currentBadgeColor: '#F59E0B', // Yellow
-      targetArrow: '→',
-      purpose: 'Itama ang asido ng lupa',
-      purposeEn: 'Correct soil acidity',
-      application: '5-10 sako bawat ektarya',
-      applicationEn: '5-10 bags per hectare',
-      timing: '1 buwan bago magtanim',
-      timingEn: '1 month before planting',
+      subtitle: 'pH Adjustment',
+      application: '5-10 bags per hectare',
+      timing: '1 month before planting',
       price: 180,
-      bagSize: '50kg',
-      priority: 'MEDIUM',
-      priorityIcon: '🟡'
+      unit: 'per 50kg bag',
+      priority: 'medium',
+      priorityLabel: 'Medium Priority',
+      estimatedBags: 7.5
     }
   ];
 
   // Calculate total cost
-  const calculateTotalCost = () => {
-    // Average bags for calculation
-    const costs = [
-      2.5 * 1450, // Nitrogen: 2-3 bags avg 2.5
-      1.5 * 1680, // Phosphorus: 1-2 bags avg 1.5
-      1.5 * 1580, // Potassium: 1-2 bags avg 1.5
-      7.5 * 180   // Lime: 5-10 bags avg 7.5
-    ];
-    return costs.reduce((sum, cost) => sum + cost, 0);
-  };
-
-  const totalCost = calculateTotalCost();
+  const totalCost = fertilizerProducts.reduce(
+    (sum, product) => sum + (product.price * product.estimatedBags),
+    0
+  );
 
   useEffect(() => {
     if (!selectedPlant) {
@@ -121,89 +80,31 @@ export default function FertilizerRecommendations() {
       return;
     }
 
-    // GSAP Timeline for animations
-    const tl = gsap.timeline();
+    // GSAP Timeline for smooth entrance animations
+    const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
 
-    // 1. Clay-shake banner animation on load
-    tl.to(bannerRef.current, {
-      x: -4,
-      duration: 0.1,
-      yoyo: true,
-      repeat: 5,
-      ease: 'power1.inOut'
-    })
-    .to(bannerRef.current, {
-      x: 0,
-      duration: 0.1
-    });
-
-    // 2. Sack cards cascade from top with 0.2s stagger
+    // 1. Header fade in
     tl.fromTo(
-      sacksRef.current,
-      {
-        opacity: 0,
-        y: -50,
-        scale: 0.9
-      },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.6,
-        stagger: 0.2,
-        ease: 'back.out(1.2)'
-      },
+      headerRef.current,
+      { opacity: 0, y: -20 },
+      { opacity: 1, y: 0, duration: 0.5 }
+    );
+
+    // 2. Product cards stagger
+    tl.fromTo(
+      cardsRef.current,
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 0.6, stagger: 0.15 },
       '-=0.3'
     );
 
-    // 3. Total cost summary animation
+    // 3. Summary card
     tl.fromTo(
       summaryRef.current,
-      {
-        opacity: 0,
-        y: 30,
-        scale: 0.95
-      },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.5,
-        ease: 'power2.out'
-      },
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.5 },
       '-=0.2'
     );
-
-    // 4. Advisory banner with clay-shake
-    tl.fromTo(
-      advisoryRef.current,
-      {
-        opacity: 0,
-        y: 20
-      },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.4
-      }
-    )
-    .to(advisoryRef.current, {
-      x: -3,
-      duration: 0.08,
-      yoyo: true,
-      repeat: 5,
-      ease: 'power1.inOut'
-    });
-
-    // Arrow pulse animation (continuous)
-    gsap.to('.arrow-pulse', {
-      scale: 1.2,
-      duration: 0.8,
-      yoyo: true,
-      repeat: -1,
-      ease: 'power1.inOut',
-      stagger: 0.2
-    });
 
   }, [selectedPlant, navigate]);
 
@@ -215,230 +116,239 @@ export default function FertilizerRecommendations() {
     navigate('/plant-requirements');
   };
 
+  const handleDownloadReport = () => {
+    console.log('Downloading report...');
+  };
+
+  const handleAddToPlan = (productName) => {
+    console.log(`Added ${productName} to plan`);
+  };
+
+  // Priority styling - subtle and professional
+  const getPriorityStyles = (priority) => {
+    if (priority === 'high') {
+      return {
+        bg: 'bg-red-50',
+        text: 'text-red-700',
+        border: 'border-red-200',
+        dot: 'bg-red-500'
+      };
+    }
+    return {
+      bg: 'bg-amber-50',
+      text: 'text-amber-700',
+      border: 'border-amber-200',
+      dot: 'bg-amber-500'
+    };
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-amber-50 to-green-100 p-6 pb-24">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8 pb-24">
+      <div className="max-w-5xl mx-auto">
 
-        {/* Header Banner */}
-        <div
-          ref={bannerRef}
-          className="bg-gradient-to-r from-[#84934A] to-[#656D3F] text-white rounded-2xl shadow-lg p-8 mb-8 text-center relative overflow-hidden"
-          style={{
-            boxShadow: '0 8px 24px rgba(73, 40, 40, 0.2)'
-          }}
-        >
-          <div className="absolute inset-0 opacity-10">
-            <div className="terrace-pattern w-full h-full"></div>
-          </div>
-          <h1 className="text-4xl font-bold mb-2 relative z-10" style={{ fontFamily: 'Outfit, sans-serif' }}>
-            Mga Inirerekomendang Pataba
-          </h1>
-          <p className="text-xl opacity-90 relative z-10" style={{ fontFamily: 'Outfit, sans-serif' }}>
-            Para sa iyong {selectedPlant?.name || 'Kamatis'}
-          </p>
-          <div className="text-sm opacity-80 mt-1 relative z-10">
-            (Recommended Fertilizers for your {selectedPlant?.name || 'Tomato'})
-          </div>
-        </div>
-
-        {/* Fertilizer Stack - Vertical */}
-        <div className="space-y-6 mb-8">
-          {fertilizerProducts.map((product, index) => (
-            <div
-              key={product.id}
-              ref={(el) => (sacksRef.current[index] = el)}
-              className="sack-card p-6 relative group cursor-pointer"
-              onMouseEnter={(e) => {
-                // Clay-morph hover effect
-                gsap.to(e.currentTarget, {
-                  y: -8,
-                  boxShadow: '0 12px 32px rgba(73, 40, 40, 0.25)',
-                  duration: 0.3,
-                  ease: 'power2.out'
-                });
-              }}
-              onMouseLeave={(e) => {
-                gsap.to(e.currentTarget, {
-                  y: 0,
-                  boxShadow: '0 4px 12px rgba(73, 40, 40, 0.1)',
-                  duration: 0.3,
-                  ease: 'power2.out'
-                });
-              }}
-            >
-              {/* Priority Badge - Top Right */}
-              <div className="absolute top-4 right-4 flex items-center gap-2">
-                <span className="text-2xl">{product.priorityIcon}</span>
-                <span
-                  className="px-3 py-1 rounded-full text-sm font-bold text-white"
-                  style={{
-                    backgroundColor: product.priority === 'HIGH' ? '#EF4444' : '#F59E0B'
-                  }}
-                >
-                  {product.priority}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                {/* Left: Product Image */}
-                <div className="md:col-span-1">
-                  <div className="aspect-square rounded-xl overflow-hidden shadow-md">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                  </div>
-                  <div className="mt-3 text-center">
-                    <p className="font-bold text-lg text-[#492828]">{product.name}</p>
-                    <p className="text-sm text-[#656D3F] font-mono">{product.nutrient}</p>
-                  </div>
-                </div>
-
-                {/* Middle: Status & Details */}
-                <div className="md:col-span-2 space-y-4">
-
-                  {/* Current → Target Status */}
-                  <div className="flex items-center justify-start gap-4 bg-white/80 rounded-lg p-4">
-                    <div className="text-center">
-                      <span
-                        className="inline-block px-4 py-2 rounded-lg text-white font-bold text-sm"
-                        style={{ backgroundColor: product.currentBadgeColor }}
-                      >
-                        {product.currentLevel}
-                      </span>
-                      <p className="text-xs text-gray-600 mt-1">Kasalukuyan</p>
-                    </div>
-
-                    <div className="arrow-pulse text-4xl text-[#84934A] font-bold">
-                      {product.targetArrow}
-                    </div>
-
-                    <div className="text-center">
-                      <span
-                        className="inline-block px-4 py-2 rounded-lg text-white font-bold text-sm"
-                        style={{ backgroundColor: '#10B981' }}
-                      >
-                        {product.targetLevel}
-                      </span>
-                      <p className="text-xs text-gray-600 mt-1">Target</p>
-                    </div>
-                  </div>
-
-                  {/* Purpose */}
-                  <div className="bg-[#84934A]/10 rounded-lg p-3 border-l-4 border-[#84934A]">
-                    <p className="font-semibold text-[#492828] mb-1">
-                      🎯 Layunin (Purpose):
-                    </p>
-                    <p className="text-[#656D3F] font-medium">{product.purpose}</p>
-                    <p className="text-sm text-gray-600 italic">({product.purposeEn})</p>
-                  </div>
-
-                  {/* Application Details */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-
-                    {/* Application Rate */}
-                    <div className="bg-white rounded-lg p-3 border border-gray-200">
-                      <p className="text-xs font-bold text-gray-500 uppercase mb-1">
-                        📦 Dami (Application)
-                      </p>
-                      <p className="font-bold text-[#492828]">{product.application}</p>
-                      <p className="text-xs text-gray-600">({product.applicationEn})</p>
-                    </div>
-
-                    {/* Timing */}
-                    <div className="bg-white rounded-lg p-3 border border-gray-200">
-                      <p className="text-xs font-bold text-gray-500 uppercase mb-1">
-                        ⏰ Kailan (Timing)
-                      </p>
-                      <p className="font-bold text-[#492828]">{product.timing}</p>
-                      <p className="text-xs text-gray-600">({product.timingEn})</p>
-                    </div>
-                  </div>
-
-                  {/* Price */}
-                  <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-lg p-3 text-white">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-semibold">💰 Presyo (Price):</span>
-                      <span className="text-2xl font-bold">₱{product.price.toLocaleString()}</span>
-                    </div>
-                    <p className="text-xs text-green-100 text-right">per {product.bagSize} bag</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Total Cost Summary */}
-        <div
-          ref={summaryRef}
-          className="clay-card bg-gradient-to-br from-[#492828] to-[#656D3F] text-white p-8 mb-6"
-        >
-          <div className="text-center">
-            <p className="text-lg font-semibold mb-2 opacity-90">
-              💵 Kabuuang Gastos
-            </p>
-            <p className="text-5xl font-bold mb-2">
-              ₱{totalCost.toLocaleString()}
-            </p>
-            <p className="text-sm opacity-80">
-              Para sa 1 ektarya (For 1 hectare)
-            </p>
-          </div>
-
-          <div className="mt-6 pt-6 border-t border-white/20">
-            <p className="text-center text-sm">
-              <span className="font-semibold">Nota:</span> Mga average na presyo batay sa merkado.
-              Maaaring mag-iba depende sa lokasyon.
-            </p>
-            <p className="text-center text-xs opacity-70 mt-1">
-              (Note: Average market prices. May vary by location.)
-            </p>
-          </div>
-        </div>
-
-        {/* Advisory Banner */}
-        <div
-          ref={advisoryRef}
-          className="clay-card bg-amber-50 border-2 border-amber-400 p-6 mb-8"
-        >
-          <div className="flex items-start gap-4">
-            <div className="text-5xl">👨‍🌾</div>
-            <div className="flex-1">
-              <p className="font-bold text-lg text-[#492828] mb-2">
-                Paalala ng Magsasaka (Farmer's Advisory)
-              </p>
-              <p className="text-[#656D3F] font-semibold">
-                ✓ Isama sa lupa bago magtanim
-              </p>
-              <p className="text-sm text-gray-600 italic">
-                (Mix into soil before planting)
-              </p>
-              <p className="text-sm text-gray-700 mt-2">
-                Sundin ang tamang dami at oras ng paggamit para sa pinakamahusay na resulta.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex justify-between items-center">
+        {/* Header Section */}
+        <div ref={headerRef} className="mb-8">
+          {/* Back Button */}
           <button
             onClick={handleBack}
-            className="btn-magnetic px-6 py-3 bg-white border-2 border-[#84934A] text-[#84934A] rounded-xl font-bold hover:bg-[#84934A] hover:text-white transition-colors duration-300"
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+            style={{ fontFamily: 'Inter, sans-serif' }}
           >
-            ← Bumalik (Back)
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="font-medium">Back</span>
           </button>
 
-          <button
-            onClick={handleContinue}
-            className="btn-magnetic px-8 py-3 bg-gradient-to-r from-[#84934A] to-[#656D3F] text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300"
+          {/* Title */}
+          <h1
+            className="text-3xl md:text-4xl font-semibold text-gray-900 mb-2"
+            style={{ fontFamily: 'Inter, sans-serif' }}
           >
-            📥 Download Report →
-          </button>
+            Fertilizer Recommendations
+          </h1>
+          <p
+            className="text-lg text-gray-600"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            Recommended for {selectedPlant?.name || 'Kamatis'}
+          </p>
+          <p
+            className="text-sm text-gray-500 mt-1"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            La Trinidad, Benguet · 1 hectare
+          </p>
         </div>
+
+        {/* Product Cards */}
+        <div className="space-y-4 mb-6">
+          {fertilizerProducts.map((product, index) => {
+            const priorityStyles = getPriorityStyles(product.priority);
+
+            return (
+              <div
+                key={product.id}
+                ref={(el) => (cardsRef.current[index] = el)}
+                className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300 group"
+              >
+                <div className="flex flex-col gap-4">
+
+                  {/* Header Row */}
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3
+                        className="text-xl font-semibold text-gray-900 mb-1"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        {product.name}
+                      </h3>
+                      <p
+                        className="text-sm text-gray-600"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        {product.subtitle}
+                      </p>
+                    </div>
+
+                    {/* Priority Badge - Subtle */}
+                    <div
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${priorityStyles.bg} ${priorityStyles.border} border`}
+                    >
+                      <div className={`w-2 h-2 rounded-full ${priorityStyles.dot}`}></div>
+                      <span
+                        className={`text-xs font-medium ${priorityStyles.text}`}
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        {product.priorityLabel}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="border-t border-gray-100"></div>
+
+                  {/* Application Instructions */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p
+                        className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        Application
+                      </p>
+                      <p
+                        className="text-sm text-gray-900 font-medium"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        {product.application}
+                      </p>
+                    </div>
+                    <div>
+                      <p
+                        className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        Timing
+                      </p>
+                      <p
+                        className="text-sm text-gray-900 font-medium"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        {product.timing}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Price and Action Row */}
+                  <div className="flex items-center justify-between pt-2">
+                    <div>
+                      <p
+                        className="text-2xl font-semibold text-gray-900"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        ₱{product.price.toLocaleString()}
+                      </p>
+                      <p
+                        className="text-xs text-gray-500"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        {product.unit}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => handleAddToPlan(product.name)}
+                      className="px-6 py-2.5 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+                      style={{ fontFamily: 'Inter, sans-serif' }}
+                    >
+                      Add to Plan
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Cost Summary Card */}
+        <div
+          ref={summaryRef}
+          className="bg-gray-900 rounded-xl p-8 text-white"
+        >
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+
+            {/* Left: Cost Info */}
+            <div>
+              <p
+                className="text-sm text-gray-400 mb-2"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                Cost Summary
+              </p>
+              <p
+                className="text-4xl font-semibold mb-1"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                ₱{totalCost.toLocaleString()}
+              </p>
+              <p
+                className="text-sm text-gray-400"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                Estimated total for 1 hectare
+              </p>
+            </div>
+
+            {/* Right: Actions */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={handleDownloadReport}
+                className="px-6 py-3 bg-white text-gray-900 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Download Report
+              </button>
+
+              <button
+                onClick={handleContinue}
+                className="px-6 py-3 bg-[#84934A] text-white rounded-lg font-medium hover:bg-[#6d7a3d] transition-colors flex items-center justify-center gap-2"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                Continue
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
   );

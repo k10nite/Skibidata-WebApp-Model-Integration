@@ -1,10 +1,10 @@
 /**
  * PlantSelection Screen
- * 
+ *
  * A stunning crop selection screen for AgriCapture - Filipino Farm App.
  * Features 20+ crops organized by category with premium design,
  * GSAP animations, and Tailwind CSS styling.
- * 
+ *
  * Design System:
  * - Colors: Rice Green (#84934A), Clay Dark (#492828), Golden Harvest (#DAA520)
  * - Typography: Inter font family with tight tracking
@@ -47,7 +47,7 @@ const CROPS_DATA = [
   { id: 'rice', name: 'Palay', nameEn: 'Rice', category: 'grains', icon: '🌾', color: '#84A946', season: 'Tag-ulan', duration: '3-4 buwan' },
   { id: 'corn', name: 'Mais', nameEn: 'Corn', category: 'grains', icon: '🌽', color: '#F4D03F', season: 'Tag-init', duration: '2-3 buwan' },
   { id: 'sorghum', name: 'Sorghum', nameEn: 'Sorghum', category: 'grains', icon: '🌾', color: '#D4A574', season: 'Tag-init', duration: '3-4 buwan' },
-  
+
   // Vegetables
   { id: 'tomato', name: 'Kamatis', nameEn: 'Tomato', category: 'vegetables', icon: '🍅', color: '#E74C3C', season: 'Tag-init', duration: '2-3 buwan' },
   { id: 'eggplant', name: 'Talong', nameEn: 'Eggplant', category: 'vegetables', icon: '🍆', color: '#8E44AD', season: 'Buong taon', duration: '3-4 buwan' },
@@ -57,19 +57,19 @@ const CROPS_DATA = [
   { id: 'pechay', name: 'Pechay', nameEn: 'Peck Choi', category: 'vegetables', icon: '🥬', color: '#16A085', season: 'Buong taon', duration: '1-2 buwan' },
   { id: 'sitaw', name: 'Sitaw', nameEn: 'String Beans', category: 'vegetables', icon: '🫘', color: '#52BE80', season: 'Tag-ulan', duration: '2-3 buwan' },
   { id: 'pepper', name: 'Sili', nameEn: 'Chili Pepper', category: 'vegetables', icon: '🌶️', color: '#C0392B', season: 'Tag-init', duration: '3-4 buwan' },
-  
+
   // Fruits
   { id: 'banana', name: 'Saging', nameEn: 'Banana', category: 'fruits', icon: '🍌', color: '#F1C40F', season: 'Buong taon', duration: '9-12 buwan' },
   { id: 'mango', name: 'Mangga', nameEn: 'Mango', category: 'fruits', icon: '🥭', color: '#F39C12', season: 'Tag-init', duration: '3-5 taon' },
   { id: 'papaya', name: 'Papaya', nameEn: 'Papaya', category: 'fruits', icon: '🫐', color: '#E74C3C', season: 'Buong taon', duration: '6-9 buwan' },
   { id: 'pineapple', name: 'Pinya', nameEn: 'Pineapple', category: 'fruits', icon: '🍍', color: '#F1C40F', season: 'Tag-init', duration: '12-18 buwan' },
   { id: 'coconut', name: 'Niyog', nameEn: 'Coconut', category: 'fruits', icon: '🥥', color: '#D7CCC8', season: 'Buong taon', duration: '3-5 taon' },
-  
+
   // High Value Crops
   { id: 'coffee', name: 'Kape', nameEn: 'Coffee', category: 'highvalue', icon: '☕', color: '#6D4C41', season: 'Tag-ulan', duration: '2-3 taon' },
   { id: 'cacao', name: 'Kakaw', nameEn: 'Cacao', category: 'highvalue', icon: '🍫', color: '#5D4037', season: 'Buong taon', duration: '2-3 taon' },
   { id: 'vanilla', name: 'Vanilla', nameEn: 'Vanilla', category: 'highvalue', icon: '🌿', color: '#D7CCC8', season: 'Tag-init', duration: '2-3 taon' },
-  
+
   // Root Crops
   { id: 'cassava', name: 'Kamoteng Kahoy', nameEn: 'Cassava', category: 'rootcrops', icon: '🍠', color: '#D7CCC8', season: 'Buong taon', duration: '8-12 buwan' },
   { id: 'sweetpotato', name: 'Kamote', nameEn: 'Sweet Potato', category: 'rootcrops', icon: '🍠', color: '#E67E22', season: 'Buong taon', duration: '3-4 buwan' },
@@ -126,11 +126,11 @@ export default function PlantSelection({ onSelect, onBack }) {
 
       gsap.fromTo(categories,
         { opacity: 0, y: 20, scale: 0.9 },
-        { 
-          opacity: 1, 
-          y: 0, 
+        {
+          opacity: 1,
+          y: 0,
           scale: 1,
-          duration: 0.5, 
+          duration: 0.5,
           stagger: 0.08,
           ease: 'back.out(1.7)',
           delay: 0.3
@@ -149,10 +149,10 @@ export default function PlantSelection({ onSelect, onBack }) {
 
       gsap.fromTo(cards,
         { opacity: 0, y: 30 },
-        { 
-          opacity: 1, 
-          y: 0, 
-          duration: 0.5, 
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
           stagger: 0.06,
           ease: 'power2.out'
         }
@@ -211,7 +211,8 @@ export default function PlantSelection({ onSelect, onBack }) {
           if (onSelect) {
             onSelect(selectedCrop);
           } else {
-            navigate('/processing', { state: { crop: selectedCrop } });
+            // Navigate to processing screen
+            navigate('/processing-screen', { state: { crop: selectedCrop } });
           }
         }
       });
@@ -237,12 +238,12 @@ export default function PlantSelection({ onSelect, onBack }) {
   };
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="min-h-screen bg-gradient-to-b from-[#FAF9F6] to-[#F5F3EF]"
     >
       {/* Header Section */}
-      <header 
+      <header
         ref={headerRef}
         className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100"
       >
@@ -250,7 +251,7 @@ export default function PlantSelection({ onSelect, onBack }) {
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Back Button */}
             <button
-              onClick={onBack}
+              onClick={() => onBack ? onBack() : navigate('/location-selection')}
               className="flex items-center gap-2 text-gray-600 hover:text-[#492828] transition-colors duration-200 group"
             >
               <div className="p-2 rounded-full bg-gray-100 group-hover:bg-[#84934A]/10 transition-colors">
@@ -265,7 +266,7 @@ export default function PlantSelection({ onSelect, onBack }) {
                 Select Your Crop
               </h1>
               <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">
-                Select Your Crop
+                Choose what you want to plant
               </p>
             </div>
 
@@ -293,7 +294,7 @@ export default function PlantSelection({ onSelect, onBack }) {
 
         {/* Search Bar */}
         <div className="max-w-xl mx-auto mb-8">
-          <div 
+          <div
             className={`
               relative flex items-center bg-white rounded-2xl shadow-sm border-2 transition-all duration-300
               ${isSearchFocused ? 'border-[#84934A] shadow-lg shadow-[#84934A]/10' : 'border-gray-200'}
@@ -321,14 +322,14 @@ export default function PlantSelection({ onSelect, onBack }) {
         </div>
 
         {/* Category Chips */}
-        <div 
+        <div
           ref={categoriesRef}
           className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12"
         >
           {CROP_CATEGORIES.map((category) => {
             const Icon = category.icon;
             const isActive = selectedCategory === category.id;
-            
+
             return (
               <button
                 key={category.id}
@@ -336,8 +337,8 @@ export default function PlantSelection({ onSelect, onBack }) {
                 className={`
                   category-chip flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full
                   font-medium text-sm sm:text-base transition-all duration-300
-                  ${isActive 
-                    ? 'bg-[#492828] text-white shadow-lg shadow-[#492828]/25 scale-105' 
+                  ${isActive
+                    ? 'bg-[#492828] text-white shadow-lg shadow-[#492828]/25 scale-105'
                     : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 hover:border-gray-300'
                   }
                 `}
@@ -365,13 +366,13 @@ export default function PlantSelection({ onSelect, onBack }) {
         </div>
 
         {/* Crops Grid */}
-        <div 
+        <div
           ref={cropsGridRef}
           className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6"
         >
           {filteredCrops.map((crop) => {
             const isSelected = selectedCrop?.id === crop.id;
-            
+
             return (
               <CropCard
                 key={crop.id}
@@ -427,8 +428,8 @@ export default function PlantSelection({ onSelect, onBack }) {
 
       {/* Selected Crop Details Modal (Inline) */}
       {selectedCrop && (
-        <CropDetailsBar 
-          crop={selectedCrop} 
+        <CropDetailsBar
+          crop={selectedCrop}
           onClose={() => setSelectedCrop(null)}
         />
       )}
@@ -478,8 +479,8 @@ function CropCard({ crop, isSelected, onSelect }) {
         crop-card relative overflow-hidden cursor-pointer
         rounded-2xl sm:rounded-3xl p-4 sm:p-6
         transition-all duration-300
-        ${isSelected 
-          ? 'bg-[#84934A] text-white shadow-xl shadow-[#84934A]/30 ring-2 ring-[#84934A] ring-offset-2' 
+        ${isSelected
+          ? 'bg-[#84934A] text-white shadow-xl shadow-[#84934A]/30 ring-2 ring-[#84934A] ring-offset-2'
           : 'bg-white hover:shadow-lg border border-gray-100 hover:border-gray-200'
         }
       `}
@@ -503,7 +504,7 @@ function CropCard({ crop, isSelected, onSelect }) {
       {/* Content */}
       <div className="relative z-10">
         {/* Icon */}
-        <div 
+        <div
           className={`
             w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-3xl sm:text-4xl mb-4
             ${isSelected ? 'bg-white/20' : 'bg-gray-50'}
@@ -530,8 +531,8 @@ function CropCard({ crop, isSelected, onSelect }) {
         {/* Season Badge */}
         <div className={`
           inline-flex items-center gap-1 mt-3 px-2 py-1 rounded-full text-xs font-medium
-          ${isSelected 
-            ? 'bg-white/20 text-white' 
+          ${isSelected
+            ? 'bg-white/20 text-white'
             : 'bg-gray-100 text-gray-600'
           }
         `}>
@@ -569,7 +570,7 @@ function CropDetailsBar({ crop, onClose }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div 
+            <div
               className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
               style={{ backgroundColor: `${crop.color}20` }}
             >
@@ -580,7 +581,7 @@ function CropDetailsBar({ crop, onClose }) {
               <p className="text-gray-500 text-sm">{crop.nameEn} • {crop.season}</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <div className="hidden sm:block text-right">
               <p className="text-sm text-gray-500">Growing Duration</p>
