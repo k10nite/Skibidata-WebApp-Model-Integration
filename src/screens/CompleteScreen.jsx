@@ -267,7 +267,7 @@ function ShareModal({ isOpen, onClose, onShare }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div ref={modalRef} className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-gray-900">Ibahagi / Share</h3>
+          <h3 className="text-xl font-bold text-gray-900">Share</h3>
           <button 
             onClick={onClose}
             className="p-2 rounded-full hover:bg-gray-100 transition-colors"
@@ -285,7 +285,7 @@ function ShareModal({ isOpen, onClose, onShare }) {
             >
               <span className="text-2xl">{option.icon}</span>
               <span className="font-medium text-gray-900">
-                {option.name === 'Copy Link' && copied ? 'Nakopya! / Copied!' : option.name}
+                {option.name === 'Copy Link' && copied ? 'Copied!' : option.name}
               </span>
             </button>
           ))}
@@ -320,8 +320,8 @@ export default function CompleteScreen() {
     resetApp,
   } = useAppStore();
 
-  // Format current date/time in Filipino
-  const currentDate = new Date().toLocaleString('fil-PH', {
+  // Format current date/time in English
+  const currentDate = new Date().toLocaleString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -392,7 +392,7 @@ export default function CompleteScreen() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ulat-pataba-${selectedPlant?.name || 'analysis'}-${new Date().toISOString().split('T')[0]}.txt`;
+    a.download = `fertilizer-report-${selectedPlant?.name || 'analysis'}-${new Date().toISOString().split('T')[0]}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -402,14 +402,13 @@ export default function CompleteScreen() {
   const generateTextSummary = () => {
     return `
 ================================================================================
-ULAT NG REKOMENDASYON SA PATABA
-(Fertilizer Recommendation Report)
+FERTILIZER RECOMMENDATION REPORT
 ================================================================================
-Petsa: ${currentDate}
-Lokasyon: ${municipality || 'CAR Region'}
-Tanim: ${selectedPlant?.name || 'Hindi tinukoy'} (${selectedPlant?.scientificName || ''})
+Date: ${currentDate}
+Location: ${municipality || 'CAR Region'}
+Plant: ${selectedPlant?.name || 'Not specified'} (${selectedPlant?.scientificName || ''})
 
-KALAGAYAN NG LUPA (Soil Status)
+SOIL STATUS
 --------------------------------------------------------------------------------
 Nitrogen (N):        ${soilData?.nitrogen || 'N/A'}
 Phosphorus (P):      ${soilData?.phosphorus || 'N/A'}
@@ -434,7 +433,7 @@ ${i + 1}. ${rec.fertilizer.name} (${rec.fertilizer.formula})
 `).join('\n') || 'No fertilizer needed - soil is in perfect condition!'}
 
 ================================================================================
-Created by AgriCapture - Powered by Sentinel-2 Satellite & AI
+Created by LupAI - Powered by Sentinel-2 Satellite & AI
 For CAR Highland Farmers
 ================================================================================
     `.trim();
@@ -523,7 +522,7 @@ For CAR Highland Farmers
               <SummaryItem
                 icon={Sprout}
                 label="Plant"
-                value={selectedPlant?.name || 'Rice (Palay)'}
+                value={selectedPlant?.name || 'Rice'}
                 subvalue={selectedPlant?.scientificName || 'Oryza sativa'}
                 delay={0}
               />
@@ -573,7 +572,7 @@ For CAR Highland Farmers
             <ActionButton
               icon={Download}
               label="Export Results"
-              sublabel="I-export"
+              sublabel="Download as text file"
               onClick={handleDownloadReport}
               delay={1.0}
               variant="success"
