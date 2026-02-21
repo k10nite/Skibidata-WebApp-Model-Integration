@@ -482,13 +482,12 @@ export default function SoilStatusScreen() {
         >
           <button
             onClick={handleContinue}
-            className="group bg-gray-900 hover:bg-gray-800 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
+            className="group bg-gray-900 hover:bg-gray-800 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-between w-full"
           >
             <span>View Fertilizer Recommendations</span>
-            <ArrowRight
-              size={20}
-              className="group-hover:translate-x-1 transition-transform"
-            />
+            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-all duration-300 group-hover:scale-110">
+              <ArrowRight size={22} className="text-white" />
+            </div>
           </button>
         </div>
       </main>

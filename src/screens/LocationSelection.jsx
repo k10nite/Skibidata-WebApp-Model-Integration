@@ -347,13 +347,8 @@ export default function LocationSelection() {
                 </span>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-white/80 hidden sm:block">
-                  Step 2
-                </span>
-                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors duration-300">
-                  <ChevronRight className="w-5 h-5 text-white" />
-                </div>
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-all duration-300 group-hover:scale-110">
+                <ChevronRight className="w-6 h-6 text-white" />
               </div>
             </button>
           </div>

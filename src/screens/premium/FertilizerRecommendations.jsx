@@ -443,10 +443,12 @@ export default function FertilizerRecommendations() {
               </button>
               <button
                 onClick={handleContinue}
-                className="flex items-center justify-center gap-2 px-8 py-3.5 bg-white text-gray-900 rounded-xl font-semibold hover:bg-gray-50 transition-all shadow-lg"
+                className="group flex items-center justify-between gap-4 px-8 py-3.5 bg-white text-gray-900 rounded-xl font-semibold hover:bg-gray-50 transition-all shadow-lg"
               >
-                Continue
-                <ArrowRight size={20} />
+                <span>Continue</span>
+                <div className="w-10 h-10 rounded-full bg-gray-900/10 flex items-center justify-center group-hover:bg-gray-900/20 transition-all duration-300 group-hover:scale-110">
+                  <ArrowRight size={20} className="text-gray-900" />
+                </div>
               </button>
             </div>
           </div>
