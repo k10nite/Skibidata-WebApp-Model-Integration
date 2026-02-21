@@ -408,14 +408,6 @@ export default function SoilStatusScreen() {
                 <p className="text-xs text-gray-500">Nutrient Analysis</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#2E7D32] to-[#84934A] flex items-center justify-center shadow-lg shadow-[#2E7D32]/20">
-                <Gauge className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-xs font-semibold tracking-widest text-[#84934A] uppercase hidden sm:inline">
-                Step 3 of 4
-              </span>
-            </div>
           </div>
         </div>
       </header>

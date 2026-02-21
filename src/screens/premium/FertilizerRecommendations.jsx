@@ -371,16 +371,6 @@ export default function FertilizerRecommendations() {
               <span className="font-medium">Back</span>
             </button>
 
-            {/* Step Indicator */}
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#2E7D32] to-[#84934A] flex items-center justify-center shadow-lg shadow-[#2E7D32]/20">
-                <Beaker className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-xs font-semibold tracking-widest text-[#84934A] uppercase hidden sm:inline">
-                Step 4 of 4
-              </span>
-            </div>
-
             <div className="flex gap-2">
               <button
                 onClick={handleDownloadReport}

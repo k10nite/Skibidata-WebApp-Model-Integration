@@ -248,18 +248,8 @@ export default function PlantSelection({ onSelect, onBack }) {
         className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Step Indicator */}
-          <div className="flex items-center justify-center gap-3 pt-4">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#2E7D32] to-[#84934A] flex items-center justify-center shadow-lg shadow-[#2E7D32]/20">
-              <Sprout className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xs font-semibold tracking-widest text-[#84934A] uppercase">
-              Step 2 of 4
-            </span>
-          </div>
-
           {/* Title */}
-          <div className="text-center py-4">
+          <div className="text-center py-6">
             <h1 className="text-xl sm:text-2xl font-bold text-[#492828] tracking-tight mb-1">
               Select Your Crop
             </h1>

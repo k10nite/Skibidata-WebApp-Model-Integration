@@ -253,11 +253,15 @@ export default function ProcessingScreen({ onComplete }) {
       // All steps complete
       setProgress(100);
       setIsComplete(true);
-      
-      // Trigger onComplete callback after a short delay
+
+      // Auto-navigate to soil status screen after a short delay
       const completeTimer = setTimeout(() => {
-        if (onComplete) onComplete();
-      }, 800);
+        if (onComplete) {
+          onComplete();
+        } else {
+          navigate('/soil-status-screen');
+        }
+      }, 1200);
 
       return () => clearTimeout(completeTimer);
     }
