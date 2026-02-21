@@ -324,7 +324,7 @@ function LocationSummary({ soilScenario, municipality }) {
         <MapPin size={20} className="text-emerald-600" />
       </div>
       <div className="min-w-0">
-        <p className="text-xs text-gray-500 uppercase tracking-wide">Lokasyon / Location</p>
+        <p className="text-xs text-gray-500 uppercase tracking-wide">Location</p>
         <p className="text-sm font-semibold text-gray-900 truncate">
           {soilScenario?.location?.barangay || municipality || 'La Trinidad'}, Benguet
         </p>
