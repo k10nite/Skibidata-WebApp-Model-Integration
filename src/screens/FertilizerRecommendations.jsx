@@ -2,77 +2,73 @@
 // PEAK MOMENT 3: Main results reveal with staggered animations
 // Airbnb-style professional product listing with clean design
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import useAppStore from '../store/appStore';
+import {
+  calculateFertilizerRecommendation,
+  PH_FERTILIZERS,
+  CROP_REQUIREMENTS
+} from '../services/fertilizerEngine';
+
+// Map plant names to crop keys in CROP_REQUIREMENTS
+const PLANT_TO_CROP_KEY = {
+  'Cabbage': 'cabbage',
+  'Repolyo': 'cabbage',
+  'Lettuce': 'lettuce',
+  'Litsugas': 'lettuce',
+  'Potato': 'potato',
+  'Patatas': 'potato',
+  'Carrot': 'carrot',
+  'Karot': 'carrot',
+  'Tomato': 'tomato',
+  'Kamatis': 'tomato',
+  'Snap Beans': 'beans',
+  'Baguio Beans': 'beans',
+  'Sweet Potato': 'sweetPotato',
+  'Kamote': 'sweetPotato',
+  'Chayote': 'chayote',
+  'Sayote': 'chayote'
+};
+
+// Default soil data for mockup/demo when real data is not available
+const DEFAULT_SOIL_DATA = {
+  ph: 5.8,
+  nitrogen: { value: 0.12, rating: 'Low' },
+  phosphorus: { value: 15, rating: 'Medium' },
+  potassium: { value: 120, rating: 'Medium' }
+};
 
 export default function FertilizerRecommendations() {
   const navigate = useNavigate();
-  const { selectedPlant, recommendations } = useAppStore();
+  const { selectedPlant, soilData, municipality, setRecommendations } = useAppStore();
 
   // Refs for GSAP animations
   const headerRef = useRef(null);
   const cardsRef = useRef([]);
+  const phSectionRef = useRef(null);
+  const organicSectionRef = useRef(null);
   const summaryRef = useRef(null);
 
-  // Fertilizer products data
-  const fertilizerProducts = [
-    {
-      id: 'nitrogen',
-      name: 'Urea (46-0-0)',
-      subtitle: 'Nitrogen Supplement',
-      application: '2-3 bags per hectare',
-      timing: '2 weeks before planting',
-      price: 1450,
-      unit: 'per 50kg bag',
-      priority: 'high',
-      priorityLabel: 'High Priority',
-      estimatedBags: 2.5
-    },
-    {
-      id: 'phosphorus',
-      name: 'DAP (18-46-0)',
-      subtitle: 'Phosphorus Supplement',
-      application: '1-2 bags per hectare',
-      timing: 'At planting',
-      price: 1680,
-      unit: 'per 50kg bag',
-      priority: 'medium',
-      priorityLabel: 'Medium Priority',
-      estimatedBags: 1.5
-    },
-    {
-      id: 'potassium',
-      name: 'Muriate of Potash (0-0-60)',
-      subtitle: 'Potassium Supplement',
-      application: '1-2 bags per hectare',
-      timing: 'During flowering',
-      price: 1580,
-      unit: 'per 50kg bag',
-      priority: 'high',
-      priorityLabel: 'High Priority',
-      estimatedBags: 1.5
-    },
-    {
-      id: 'lime',
-      name: 'Agricultural Lime',
-      subtitle: 'pH Adjustment',
-      application: '5-10 bags per hectare',
-      timing: '1 month before planting',
-      price: 180,
-      unit: 'per 50kg bag',
-      priority: 'medium',
-      priorityLabel: 'Medium Priority',
-      estimatedBags: 7.5
-    }
-  ];
+  // Determine crop key from selected plant
+  const cropKey = useMemo(() => {
+    if (!selectedPlant?.name) return 'cabbage';
+    return PLANT_TO_CROP_KEY[selectedPlant.name] || 'cabbage';
+  }, [selectedPlant]);
 
-  // Calculate total cost
-  const totalCost = fertilizerProducts.reduce(
-    (sum, product) => sum + (product.price * product.estimatedBags),
-    0
-  );
+  // Calculate fertilizer recommendations
+  const fertilizerData = useMemo(() => {
+    const soil = soilData || DEFAULT_SOIL_DATA;
+    return calculateFertilizerRecommendation(soil, cropKey, 1);
+  }, [soilData, cropKey]);
+
+  // Store recommendations in app store
+  useEffect(() => {
+    if (fertilizerData) {
+      setRecommendations(fertilizerData.recommendations, fertilizerData.summary);
+    }
+  }, [fertilizerData, setRecommendations]);
 
   useEffect(() => {
     if (!selectedPlant) {
@@ -92,13 +88,33 @@ export default function FertilizerRecommendations() {
 
     // 2. Product cards stagger
     tl.fromTo(
-      cardsRef.current,
+      cardsRef.current.filter(Boolean),
       { opacity: 0, y: 30 },
       { opacity: 1, y: 0, duration: 0.6, stagger: 0.15 },
       '-=0.3'
     );
 
-    // 3. Summary card
+    // 3. pH section
+    if (phSectionRef.current) {
+      tl.fromTo(
+        phSectionRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.5 },
+        '-=0.2'
+      );
+    }
+
+    // 4. Organic section
+    if (organicSectionRef.current) {
+      tl.fromTo(
+        organicSectionRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.5 },
+        '-=0.2'
+      );
+    }
+
+    // 5. Summary card
     tl.fromTo(
       summaryRef.current,
       { opacity: 0, y: 20 },
@@ -124,23 +140,36 @@ export default function FertilizerRecommendations() {
     console.log(`Added ${productName} to plan`);
   };
 
-  // Priority styling - subtle and professional
-  const getPriorityStyles = (priority) => {
-    if (priority === 'high') {
+  // Get stage styling
+  const getStageStyles = (stage) => {
+    if (stage.includes('Basal')) {
       return {
-        bg: 'bg-red-50',
-        text: 'text-red-700',
-        border: 'border-red-200',
-        dot: 'bg-red-500'
+        bg: 'bg-emerald-50',
+        text: 'text-emerald-700',
+        border: 'border-emerald-200',
+        dot: 'bg-emerald-500',
+        label: 'Basal'
+      };
+    }
+    if (stage.includes('First')) {
+      return {
+        bg: 'bg-blue-50',
+        text: 'text-blue-700',
+        border: 'border-blue-200',
+        dot: 'bg-blue-500',
+        label: 'Side Dress 1'
       };
     }
     return {
       bg: 'bg-amber-50',
       text: 'text-amber-700',
       border: 'border-amber-200',
-      dot: 'bg-amber-500'
+      dot: 'bg-amber-500',
+      label: 'Side Dress 2'
     };
   };
+
+  const locationDisplay = municipality || 'La Trinidad, Benguet';
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8 pb-24">
@@ -171,24 +200,24 @@ export default function FertilizerRecommendations() {
             className="text-lg text-gray-600"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
-            Recommended for {selectedPlant?.name || 'Kamatis'}
+            Recommended for {fertilizerData.crop.name}
           </p>
           <p
             className="text-sm text-gray-500 mt-1"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
-            La Trinidad, Benguet · 1 hectare
+            {locationDisplay} · {fertilizerData.summary.areaHectares} hectare
           </p>
         </div>
 
-        {/* Product Cards */}
+        {/* Application Schedule Cards */}
         <div className="space-y-4 mb-6">
-          {fertilizerProducts.map((product, index) => {
-            const priorityStyles = getPriorityStyles(product.priority);
+          {fertilizerData.recommendations.map((rec, index) => {
+            const stageStyles = getStageStyles(rec.stage);
 
             return (
               <div
-                key={product.id}
+                key={`${rec.stage}-${rec.fertilizer.name}-${index}`}
                 ref={(el) => (cardsRef.current[index] = el)}
                 className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300 group"
               >
@@ -201,26 +230,26 @@ export default function FertilizerRecommendations() {
                         className="text-xl font-semibold text-gray-900 mb-1"
                         style={{ fontFamily: 'Inter, sans-serif' }}
                       >
-                        {product.name}
+                        {rec.fertilizer.name}
                       </h3>
                       <p
                         className="text-sm text-gray-600"
                         style={{ fontFamily: 'Inter, sans-serif' }}
                       >
-                        {product.subtitle}
+                        {rec.fertilizer.brand}
                       </p>
                     </div>
 
-                    {/* Priority Badge - Subtle */}
+                    {/* Stage Badge */}
                     <div
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${priorityStyles.bg} ${priorityStyles.border} border`}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${stageStyles.bg} ${stageStyles.border} border`}
                     >
-                      <div className={`w-2 h-2 rounded-full ${priorityStyles.dot}`}></div>
+                      <div className={`w-2 h-2 rounded-full ${stageStyles.dot}`}></div>
                       <span
-                        className={`text-xs font-medium ${priorityStyles.text}`}
+                        className={`text-xs font-medium ${stageStyles.text}`}
                         style={{ fontFamily: 'Inter, sans-serif' }}
                       >
-                        {product.priorityLabel}
+                        {stageStyles.label}
                       </span>
                     </div>
                   </div>
@@ -229,19 +258,19 @@ export default function FertilizerRecommendations() {
                   <div className="border-t border-gray-100"></div>
 
                   {/* Application Instructions */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <p
                         className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1"
                         style={{ fontFamily: 'Inter, sans-serif' }}
                       >
-                        Application
+                        Amount
                       </p>
                       <p
                         className="text-sm text-gray-900 font-medium"
                         style={{ fontFamily: 'Inter, sans-serif' }}
                       >
-                        {product.application}
+                        {rec.amountKg} kg
                       </p>
                     </div>
                     <div>
@@ -255,7 +284,21 @@ export default function FertilizerRecommendations() {
                         className="text-sm text-gray-900 font-medium"
                         style={{ fontFamily: 'Inter, sans-serif' }}
                       >
-                        {product.timing}
+                        {rec.timing}
+                      </p>
+                    </div>
+                    <div>
+                      <p
+                        className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        Method
+                      </p>
+                      <p
+                        className="text-sm text-gray-900 font-medium"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        {rec.method}
                       </p>
                     </div>
                   </div>
@@ -267,18 +310,18 @@ export default function FertilizerRecommendations() {
                         className="text-2xl font-semibold text-gray-900"
                         style={{ fontFamily: 'Inter, sans-serif' }}
                       >
-                        ₱{product.price.toLocaleString()}
+                        PHP {rec.cost.toLocaleString()}
                       </p>
                       <p
                         className="text-xs text-gray-500"
                         style={{ fontFamily: 'Inter, sans-serif' }}
                       >
-                        {product.unit}
+                        PHP {rec.fertilizer.pricePerKg}/kg
                       </p>
                     </div>
 
                     <button
-                      onClick={() => handleAddToPlan(product.name)}
+                      onClick={() => handleAddToPlan(rec.fertilizer.name)}
                       className="px-6 py-2.5 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
                       style={{ fontFamily: 'Inter, sans-serif' }}
                     >
@@ -290,6 +333,100 @@ export default function FertilizerRecommendations() {
               </div>
             );
           })}
+        </div>
+
+        {/* pH Adjustment Section */}
+        {fertilizerData.phAdjustment.needed && (
+          <div
+            ref={phSectionRef}
+            className="bg-orange-50 rounded-xl border border-orange-200 p-6 mb-6"
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3
+                  className="text-lg font-semibold text-orange-900 mb-2"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  pH Adjustment Required
+                </h3>
+                <p
+                  className="text-sm text-orange-800 mb-3"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  {fertilizerData.phAdjustment.reason}
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white/50 rounded-lg p-4">
+                  <div>
+                    <p className="text-xs font-medium text-orange-600 uppercase tracking-wide mb-1">Action</p>
+                    <p className="text-sm text-orange-900 font-medium">{fertilizerData.phAdjustment.action}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-orange-600 uppercase tracking-wide mb-1">Amount</p>
+                    <p className="text-sm text-orange-900 font-medium">{fertilizerData.phAdjustment.amount}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-orange-600 uppercase tracking-wide mb-1">Timing</p>
+                    <p className="text-sm text-orange-900 font-medium">{fertilizerData.phAdjustment.timing}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Organic Alternative Section */}
+        <div
+          ref={organicSectionRef}
+          className="bg-green-50 rounded-xl border border-green-200 p-6 mb-6"
+        >
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3
+                className="text-lg font-semibold text-green-900 mb-2"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                Organic Alternative
+              </h3>
+              <p
+                className="text-sm text-green-800 mb-4"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                {fertilizerData.organicOption.note}
+              </p>
+              <div className="space-y-3">
+                {fertilizerData.organicOption.materials.map((material, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between bg-white/50 rounded-lg p-4"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-green-900">{material.fertilizer.name}</p>
+                      <p className="text-xs text-green-700">{material.amountKg} kg needed</p>
+                    </div>
+                    <p className="text-lg font-semibold text-green-900">
+                      PHP {material.cost.toLocaleString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 pt-4 border-t border-green-200 flex items-center justify-between">
+                <p className="text-sm font-medium text-green-800">Total Organic Option Cost</p>
+                <p className="text-xl font-semibold text-green-900">
+                  PHP {fertilizerData.organicOption.totalCost.toLocaleString()}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Cost Summary Card */}
@@ -305,20 +442,25 @@ export default function FertilizerRecommendations() {
                 className="text-sm text-gray-400 mb-2"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                Cost Summary
+                Conventional Fertilizer Cost
               </p>
               <p
                 className="text-4xl font-semibold mb-1"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                ₱{totalCost.toLocaleString()}
+                PHP {fertilizerData.summary.totalCostPHP.toLocaleString()}
               </p>
               <p
                 className="text-sm text-gray-400"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                Estimated total for 1 hectare
+                Estimated total for {fertilizerData.summary.areaHectares} hectare · Expected yield: {fertilizerData.summary.expectedYield}
               </p>
+              <div className="mt-3 flex gap-4 text-xs text-gray-400">
+                <span>N: {fertilizerData.summary.totalNutrients.n} kg</span>
+                <span>P: {fertilizerData.summary.totalNutrients.p} kg</span>
+                <span>K: {fertilizerData.summary.totalNutrients.k} kg</span>
+              </div>
             </div>
 
             {/* Right: Actions */}

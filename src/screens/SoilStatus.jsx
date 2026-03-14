@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import useAppStore from '../store/appStore';
+import { getSatelliteAnalysis } from '../services/satelliteService';
 import {
   BarChart,
   Bar,
@@ -31,7 +32,11 @@ import {
   Minus,
   AlertCircle,
   CheckCircle,
-  Info
+  Info,
+  Loader2,
+  Leaf,
+  Thermometer,
+  CloudRain
 } from 'lucide-react';
 
 // Professional color palette
@@ -131,16 +136,95 @@ const CustomTooltip = ({ active, payload }) => {
   return null;
 };
 
+// Mock data fallback for when satellite service fails
+const MOCK_SATELLITE_DATA = {
+  weather: {
+    current: {
+      temperature: 22,
+      humidity: 75,
+      precipitation: 0,
+      soilTemperature: 18,
+      soilMoisture: 55
+    },
+    elevation: 1300,
+    location: 'La Trinidad'
+  },
+  vegetation: {
+    ndvi: 0.62,
+    healthStatus: 'Healthy',
+    recommendation: 'Vegetation health is good'
+  },
+  soil: {
+    ph: 5.8,
+    nitrogen: { percentage: 0.14, rating: 'Low', ppm: 140 },
+    phosphorus: { ppm: 9.5, rating: 'Low' },
+    potassium: { ppm: 125, rating: 'Adequate' },
+    organicMatter: { percentage: 3.8, rating: 'High' },
+    soilType: 'Inceptisol (Volcanic)',
+    texture: 'Clay Loam'
+  }
+};
+
 export default function SoilStatus() {
   const navigate = useNavigate();
   const { soilData, soilScenario, municipality } = useAppStore();
   const containerRef = useRef(null);
-  const [weather] = useState({
-    temp: 24,
-    humidity: 65,
-    windSpeed: 5,
+
+  // Satellite data state
+  const [satelliteData, setSatelliteData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch satellite data on mount
+  useEffect(() => {
+    const fetchSatelliteData = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Use municipality from store, fallback to soilScenario location or 'La Trinidad'
+        const location = municipality || soilScenario?.location?.barangay || 'La Trinidad';
+        console.log('[SoilStatus] Fetching satellite data for:', location);
+
+        const data = await getSatelliteAnalysis(location);
+        console.log('[SoilStatus] Satellite data received:', data);
+        setSatelliteData(data);
+      } catch (err) {
+        console.error('[SoilStatus] Failed to fetch satellite data:', err);
+        setError('Failed to fetch real-time data. Using estimated values.');
+        setSatelliteData(MOCK_SATELLITE_DATA);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSatelliteData();
+  }, [municipality, soilScenario]);
+
+  // Derive weather data from satellite data or use mock
+  const weather = satelliteData?.weather?.current ? {
+    temp: Math.round(satelliteData.weather.current.temperature),
+    humidity: Math.round(satelliteData.weather.current.humidity),
+    precipitation: satelliteData.weather.current.precipitation,
+    soilTemp: Math.round(satelliteData.weather.current.soilTemperature || 0),
+    soilMoisture: Math.round(satelliteData.weather.current.soilMoisture || 0),
+    condition: satelliteData.weather.current.precipitation > 0 ? 'Rainy' :
+               satelliteData.weather.current.humidity > 80 ? 'Cloudy' : 'Sunny'
+  } : {
+    temp: 22,
+    humidity: 75,
+    precipitation: 0,
+    soilTemp: 18,
+    soilMoisture: 55,
     condition: 'Sunny'
-  });
+  };
+
+  // Vegetation data
+  const vegetation = satelliteData?.vegetation || {
+    ndvi: 0.55,
+    healthStatus: 'Moderate',
+    recommendation: 'Unable to fetch data'
+  };
 
   // Redirect if no soil data
   useEffect(() => {
@@ -151,7 +235,7 @@ export default function SoilStatus() {
 
   // GSAP Animations
   useEffect(() => {
-    if (!soilData || !containerRef.current) return;
+    if (!soilData || !containerRef.current || isLoading) return;
 
     const ctx = gsap.context(() => {
       // Header animation
@@ -212,10 +296,23 @@ export default function SoilStatus() {
     }, containerRef);
 
     return () => ctx.revert();
-  }, [soilData]);
+  }, [soilData, isLoading]);
 
   if (!soilData) {
     return null;
+  }
+
+  // Loading state UI
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-green-600 animate-spin mx-auto mb-4" />
+          <p className="text-lg font-semibold text-gray-700">Analyzing Satellite Data</p>
+          <p className="text-sm text-gray-500 mt-2">Fetching weather and soil information...</p>
+        </div>
+      </div>
+    );
   }
 
   // Prepare chart data
@@ -280,15 +377,32 @@ export default function SoilStatus() {
           <div className="top-card bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                Weather
+                Current Weather
               </h2>
+              {error && (
+                <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded">
+                  Estimated
+                </span>
+              )}
               <Cloud className="w-5 h-5 text-gray-400" />
             </div>
 
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center">
-                  <Sun className="w-8 h-8 text-white" />
+                <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
+                  weather.condition === 'Rainy'
+                    ? 'bg-gradient-to-br from-blue-400 to-blue-600'
+                    : weather.condition === 'Cloudy'
+                    ? 'bg-gradient-to-br from-gray-400 to-gray-600'
+                    : 'bg-gradient-to-br from-yellow-400 to-orange-500'
+                }`}>
+                  {weather.condition === 'Rainy' ? (
+                    <CloudRain className="w-8 h-8 text-white" />
+                  ) : weather.condition === 'Cloudy' ? (
+                    <Cloud className="w-8 h-8 text-white" />
+                  ) : (
+                    <Sun className="w-8 h-8 text-white" />
+                  )}
                 </div>
                 <div>
                   <p className="text-3xl font-bold text-gray-900">{weather.temp}°C</p>
@@ -305,10 +419,27 @@ export default function SoilStatus() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Wind className="w-4 h-4 text-gray-500" />
+                  <CloudRain className="w-4 h-4 text-blue-400" />
                   <div>
-                    <p className="text-xs text-gray-500">Wind</p>
-                    <p className="text-sm font-semibold text-gray-900">{weather.windSpeed} m/s</p>
+                    <p className="text-xs text-gray-500">Precipitation</p>
+                    <p className="text-sm font-semibold text-gray-900">{weather.precipitation} mm</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-100">
+                <div className="flex items-center gap-2">
+                  <Thermometer className="w-4 h-4 text-orange-500" />
+                  <div>
+                    <p className="text-xs text-gray-500">Soil Temp</p>
+                    <p className="text-sm font-semibold text-gray-900">{weather.soilTemp}°C</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Droplets className="w-4 h-4 text-emerald-500" />
+                  <div>
+                    <p className="text-xs text-gray-500">Soil Moisture</p>
+                    <p className="text-sm font-semibold text-gray-900">{weather.soilMoisture}%</p>
                   </div>
                 </div>
               </div>
@@ -319,37 +450,151 @@ export default function SoilStatus() {
           <div className="top-card bg-white rounded-2xl shadow-sm p-6 border border-gray-100 lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                Field Location
+                Field Location & Vegetation Health
               </h2>
-              <MapPin className="w-5 h-5 text-gray-400" />
+              <Leaf className="w-5 h-5 text-green-500" />
             </div>
 
-            <div className="relative h-40 bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl overflow-hidden">
-              {/* Simplified field visualization */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-green-600 rounded-full mx-auto mb-3 flex items-center justify-center shadow-lg">
-                    <MapPin className="w-8 h-8 text-white" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Location Info */}
+              <div className="relative h-40 bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl overflow-hidden">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-14 h-14 bg-green-600 rounded-full mx-auto mb-2 flex items-center justify-center shadow-lg">
+                      <MapPin className="w-7 h-7 text-white" />
+                    </div>
+                    <p className="text-sm font-semibold text-gray-700">
+                      {municipality || soilScenario?.location?.barangay || 'La Trinidad'}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Elev: {satelliteData?.weather?.elevation || soilScenario?.elevation || '1,300'}m
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {satelliteData?.soil?.soilType || soilScenario?.soilType || 'Clay Loam'}
+                    </p>
                   </div>
-                  <p className="text-sm font-semibold text-gray-700">
-                    {soilScenario?.location?.barangay || 'La Trinidad'}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Elevation: {soilScenario?.elevation || '1,400'}m | {soilScenario?.soilType || 'Clay Loam'}
-                  </p>
                 </div>
+                <div className="absolute inset-0 opacity-20"
+                  style={{
+                    backgroundImage: 'linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)',
+                    backgroundSize: '20px 20px'
+                  }}
+                />
               </div>
 
-              {/* Grid pattern overlay */}
-              <div className="absolute inset-0 opacity-20"
-                style={{
-                  backgroundImage: 'linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)',
-                  backgroundSize: '20px 20px'
-                }}
-              />
+              {/* Vegetation Health Panel */}
+              <div className="bg-gradient-to-br from-emerald-50 to-green-100 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Leaf className="w-5 h-5 text-emerald-600" />
+                  <span className="text-sm font-semibold text-gray-700">Vegetation Index</span>
+                </div>
+
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="flex-1">
+                    <div className="text-2xl font-bold text-gray-900">
+                      {(vegetation.ndvi * 100).toFixed(0)}%
+                    </div>
+                    <div className={`text-sm font-medium ${
+                      vegetation.healthStatus === 'Healthy' ? 'text-green-600' :
+                      vegetation.healthStatus === 'Moderate' ? 'text-amber-600' : 'text-red-600'
+                    }`}>
+                      {vegetation.healthStatus}
+                    </div>
+                  </div>
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                    vegetation.healthStatus === 'Healthy' ? 'bg-green-500' :
+                    vegetation.healthStatus === 'Moderate' ? 'bg-amber-500' : 'bg-red-500'
+                  }`}>
+                    {vegetation.healthStatus === 'Healthy' ? (
+                      <CheckCircle className="w-6 h-6 text-white" />
+                    ) : vegetation.healthStatus === 'Moderate' ? (
+                      <Minus className="w-6 h-6 text-white" />
+                    ) : (
+                      <AlertCircle className="w-6 h-6 text-white" />
+                    )}
+                  </div>
+                </div>
+
+                <p className="text-xs text-gray-600">{vegetation.recommendation}</p>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Satellite Soil Property Estimates */}
+        {satelliteData?.soil && (
+          <div className="top-card bg-white rounded-2xl shadow-sm p-6 border border-gray-100 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                Satellite-Derived Soil Estimates
+              </h2>
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                Based on weather & regional data
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-xs text-gray-500 mb-1">pH Level</p>
+                <p className="text-xl font-bold text-gray-900">
+                  {satelliteData.soil.ph?.toFixed(1) || '5.8'}
+                </p>
+                <p className="text-xs text-amber-600">Slightly Acidic</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-xs text-gray-500 mb-1">Nitrogen (N)</p>
+                <p className="text-xl font-bold text-gray-900">
+                  {satelliteData.soil.nitrogen?.ppm?.toFixed(0) || '140'} <span className="text-sm font-normal">ppm</span>
+                </p>
+                <p className={`text-xs ${satelliteData.soil.nitrogen?.rating === 'Adequate' ? 'text-green-600' : 'text-amber-600'}`}>
+                  {satelliteData.soil.nitrogen?.rating || 'Low'}
+                </p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-xs text-gray-500 mb-1">Phosphorus (P)</p>
+                <p className="text-xl font-bold text-gray-900">
+                  {satelliteData.soil.phosphorus?.ppm?.toFixed(1) || '9.5'} <span className="text-sm font-normal">ppm</span>
+                </p>
+                <p className={`text-xs ${satelliteData.soil.phosphorus?.rating === 'Adequate' ? 'text-green-600' : 'text-amber-600'}`}>
+                  {satelliteData.soil.phosphorus?.rating || 'Low'}
+                </p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-xs text-gray-500 mb-1">Potassium (K)</p>
+                <p className="text-xl font-bold text-gray-900">
+                  {satelliteData.soil.potassium?.ppm?.toFixed(0) || '125'} <span className="text-sm font-normal">ppm</span>
+                </p>
+                <p className={`text-xs ${satelliteData.soil.potassium?.rating === 'Adequate' ? 'text-green-600' : 'text-amber-600'}`}>
+                  {satelliteData.soil.potassium?.rating || 'Adequate'}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-xs text-gray-500">Organic Matter</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  {satelliteData.soil.organicMatter?.percentage?.toFixed(1) || '3.8'}%
+                  <span className="text-xs text-green-600 ml-1">
+                    ({satelliteData.soil.organicMatter?.rating || 'High'})
+                  </span>
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Soil Type</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  {satelliteData.soil.soilType || 'Inceptisol'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Texture</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  {satelliteData.soil.texture || 'Clay Loam'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Nutrient Overview Chart */}
         <div className="chart-card bg-white rounded-2xl shadow-sm p-6 border border-gray-100 mb-8">

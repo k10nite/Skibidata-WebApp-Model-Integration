@@ -2,26 +2,27 @@
 // PEAK MOMENT 2: Creates anticipation and engagement
 // Clean, minimal design with elegant loading indicators
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import useAppStore from '../store/appStore';
 import { getScenarioByLocation } from '../data/soilScenarios';
 import { getRecommendationsForScenario, getRecommendationSummary } from '../data/fertilizerRecommendations';
+import { getSatelliteAnalysis } from '../services/satelliteService';
 
 // Processing steps with clean, minimal descriptions
 const PROCESSING_STEPS = [
   {
-    text: 'Location data fetched',
+    text: 'Fetching location data',
     duration: 1.5
   },
   {
-    text: 'Satellite imagery loaded',
-    duration: 1.5
+    text: 'Loading weather data',
+    duration: 2.0
   },
   {
-    text: 'Testing NPK levels',
-    duration: 2
+    text: 'Analyzing soil conditions',
+    duration: 2.0
   },
   {
     text: 'Generating recommendations',
@@ -31,7 +32,7 @@ const PROCESSING_STEPS = [
 
 export default function Processing() {
   const navigate = useNavigate();
-  const { location, selectedPlant, plantRequirements, setSoilData, setRecommendations } = useAppStore();
+  const { location, municipality, selectedPlant, plantRequirements, setSoilData, setRecommendations, setSatelliteData } = useAppStore();
 
   // Refs for GSAP animations
   const timelineRef = useRef(null);
@@ -42,26 +43,83 @@ export default function Processing() {
 
   const [currentStep, setCurrentStep] = useState(-1);
   const [progress, setProgress] = useState(0);
+  const [satelliteDataFetched, setSatelliteDataFetched] = useState(false);
+  const satelliteDataRef = useRef(null);
+  const fetchStartedRef = useRef(false);
+
+  // Fetch satellite data in the background
+  const fetchSatelliteData = useCallback(async () => {
+    if (fetchStartedRef.current) return;
+    fetchStartedRef.current = true;
+
+    try {
+      // Use municipality name for satellite analysis
+      const locationName = municipality || 'La Trinidad';
+      console.log('[PROCESSING] Fetching satellite data for:', locationName);
+
+      const data = await getSatelliteAnalysis(locationName);
+      console.log('[PROCESSING] Satellite data received:', data);
+
+      satelliteDataRef.current = data;
+      setSatelliteDataFetched(true);
+    } catch (error) {
+      console.error('[PROCESSING] Satellite fetch error:', error);
+      satelliteDataRef.current = null;
+      setSatelliteDataFetched(true);
+    }
+  }, [municipality]);
+
+  // Start fetching satellite data immediately
+  useEffect(() => {
+    fetchSatelliteData();
+  }, [fetchSatelliteData]);
 
   useEffect(() => {
     // Create GSAP timeline
     const tl = gsap.timeline({
       onComplete: () => {
-        // Process soil scenario and recommendations
-        const scenario = getScenarioByLocation(location.lat, location.lng);
-        const recommendations = getRecommendationsForScenario(
-          scenario.status,
-          plantRequirements,
-          selectedPlant.name
-        );
-        const summary = getRecommendationSummary(recommendations);
+        // Wait for satellite data if not yet received
+        const processAndNavigate = () => {
+          // Store satellite data in app state
+          if (satelliteDataRef.current) {
+            setSatelliteData(satelliteDataRef.current);
+          }
 
-        // Store in app state
-        setSoilData(scenario.status, scenario);
-        setRecommendations(recommendations, summary);
+          // Process soil scenario and recommendations
+          const scenario = getScenarioByLocation(location.lat, location.lng);
+          const recommendations = getRecommendationsForScenario(
+            scenario.status,
+            plantRequirements,
+            selectedPlant.name
+          );
+          const summary = getRecommendationSummary(recommendations);
 
-        // Navigate to soil status after completion
-        setTimeout(() => navigate('/soil-status'), 300);
+          // Store in app state
+          setSoilData(scenario.status, scenario);
+          setRecommendations(recommendations, summary);
+
+          // Navigate to soil status after completion
+          setTimeout(() => navigate('/soil-status'), 300);
+        };
+
+        // If satellite data is ready, proceed immediately
+        if (satelliteDataFetched) {
+          processAndNavigate();
+        } else {
+          // Wait for satellite data with a timeout
+          const checkInterval = setInterval(() => {
+            if (satelliteDataFetched || satelliteDataRef.current) {
+              clearInterval(checkInterval);
+              processAndNavigate();
+            }
+          }, 100);
+
+          // Timeout after 5 seconds - proceed anyway with fallback
+          setTimeout(() => {
+            clearInterval(checkInterval);
+            processAndNavigate();
+          }, 5000);
+        }
       }
     });
 
@@ -139,7 +197,7 @@ export default function Processing() {
         timelineRef.current.kill();
       }
     };
-  }, [location, selectedPlant, plantRequirements, navigate, setSoilData, setRecommendations]);
+  }, [location, selectedPlant, plantRequirements, navigate, setSoilData, setRecommendations, setSatelliteData, satelliteDataFetched]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white relative overflow-hidden">

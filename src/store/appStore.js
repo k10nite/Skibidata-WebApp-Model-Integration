@@ -20,6 +20,11 @@ const useAppStore = create((set) => ({
   soilData: null,
   soilScenario: null,
 
+  // Satellite analysis data (real-time from APIs)
+  satelliteData: null,
+  weatherData: null,
+  vegetationIndex: null,
+
   // Recommendations (Screen 6)
   recommendations: null,
   recommendationSummary: null,
@@ -33,6 +38,14 @@ const useAppStore = create((set) => ({
 
   setSoilData: (soilData, scenario) =>
     set({ soilData, soilScenario: scenario }),
+
+  setSatelliteData: (satelliteData) =>
+    set({
+      satelliteData,
+      weatherData: satelliteData?.weather || null,
+      vegetationIndex: satelliteData?.vegetation || null,
+      soilData: satelliteData?.soil || null
+    }),
 
   setRecommendations: (recommendations, summary) =>
     set({ recommendations, recommendationSummary: summary }),
@@ -55,6 +68,9 @@ const useAppStore = create((set) => ({
       plantRequirements: null,
       soilData: null,
       soilScenario: null,
+      satelliteData: null,
+      weatherData: null,
+      vegetationIndex: null,
       recommendations: null,
       recommendationSummary: null
     })
