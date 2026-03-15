@@ -1,0 +1,188 @@
+DYLAN FIELD-MODE IMAGES REPORT
+Generated: 2026-03-14
+================================================================================
+
+SUMMARY
+================================================================================
+Total Field-Mode Image Records Found: 470
+Total CSV Files Scanned: 4
+Capture Mode Filter: 'field' only (controlled images excluded)
+
+CSV SOURCE FILES:
+1. C:\Users\Neil\Documents\thesis\dylan\SoilScan_export_2026-03-14\agricapture_collections.csv (10 field records)
+2. C:\Users\Neil\Documents\thesis\dylan\soilscan\soilscan\agricapture_collections.csv (100 field records)
+3. C:\Users\Neil\Documents\thesis\dylan\soilscan\soilscan\agricapture_data.csv (180 field records)
+4. C:\Users\Neil\Documents\thesis\dylan\soil_samples_jan21-20260314T102804Z-1-001\soil_samples_jan21\21-01-26\SoilSamples_extracted\agricapture_data.csv (180 field records)
+
+================================================================================
+FIELD IMAGE FILES - EXTRACTED FROM CSV METADATA
+================================================================================
+
+ALL FIELD-MODE IMAGES (Sorted by Source File):
+
+FROM: C:\Users\Neil\Documents\thesis\dylan\SoilScan_export_2026-03-14\agricapture_collections.csv
+(10 images)
+---
+1. atok_paoay_20260213_024231_82754d24.jpg
+2. atok_paoay_20260213_024246_eba64cd4.jpg
+3. atok_paoay_20260213_024306_3d9b2f07.jpg
+4. atok_paoay_20260213_024319_d6e813ab.jpg
+5. atok_paoay_20260213_024343_2975446a.jpg
+6. atok_paoay_20260213_025040_0a95c89e.jpg
+7. atok_paoay_20260213_025046_a1b1f842.jpg
+8. atok_paoay_20260213_025055_ece5a8b0.jpg
+9. atok_paoay_20260213_025102_e9c009bd.jpg
+10. atok_paoay_20260213_025108_7be4ca03.jpg
+
+FROM: C:\Users\Neil\Documents\thesis\dylan\soilscan\soilscan\agricapture_collections.csv
+(100 images)
+---
+1. atok_paoay_20260213_010340_698e1d93.jpg
+2. atok_paoay_20260213_010353_9ac9c1b1.jpg
+3. atok_paoay_20260213_010403_dc19bba0.jpg
+4. atok_paoay_20260213_010415_13fa3435.jpg
+5. atok_paoay_20260213_010427_dcf14726.jpg
+6. atok_paoay_20260213_011101_324ef269.jpg
+7. atok_paoay_20260213_011119_72d742a8.jpg
+8. atok_paoay_20260213_011138_48a2ab5d.jpg
+9. atok_paoay_20260213_011202_a821316f.jpg
+10. atok_paoay_20260213_011212_3d4ccc98.jpg
+11. atok_paoay_20260213_011439_26970d07.jpg
+12. atok_paoay_20260213_011451_59f748d1.jpg
+13. atok_paoay_20260213_011459_85ae57bd.jpg
+14. atok_paoay_20260213_011512_6ec31502.jpg
+15. atok_paoay_20260213_011541_f59d058d.jpg
+16. atok_paoay_20260213_011733_b418ad9d.jpg
+17. atok_paoay_20260213_011741_68a5bfdd.jpg
+18. atok_paoay_20260213_011800_41ea0b74.jpg
+19. atok_paoay_20260213_011820_0235e64e.jpg
+20. atok_paoay_20260213_011827_80d9a643.jpg
+21. atok_paoay_20260213_012228_258bea1d.jpg
+22. atok_paoay_20260213_012258_ec4306fb.jpg
+23. atok_paoay_20260213_012311_77772c5c.jpg
+24. atok_paoay_20260213_012319_f83b4740.jpg
+25. atok_paoay_20260213_012339_bd2bba72.jpg
+26. atok_paoay_20260213_011955_30855ed3.jpg
+27. atok_paoay_20260213_012005_4e006146.jpg
+28. atok_paoay_20260213_012032_f118d4e0.jpg
+29. atok_paoay_20260213_012055_d549f452.jpg
+30. atok_paoay_20260213_012115_e3e69773.jpg
+31. atok_paoay_20260213_013251_5bda09b8.jpg
+32. atok_paoay_20260213_013258_3d791955.jpg
+33. atok_paoay_20260213_013308_0051dd04.jpg
+34. atok_paoay_20260213_013324_5832bbd2.jpg
+35. atok_paoay_20260213_013332_806df71e.jpg
+36. atok_paoay_20260213_013605_d027c216.jpg
+37. atok_paoay_20260213_013616_843e3ac0.jpg
+38. atok_paoay_20260213_013628_09179da6.jpg
+39. atok_paoay_20260213_013635_c4e2e014.jpg
+40. atok_paoay_20260213_013647_b87533e5.jpg
+41. atok_paoay_20260213_013814_82752846.jpg
+42. atok_paoay_20260213_013820_a368de4b.jpg
+43. atok_paoay_20260213_013830_3ad316e7.jpg
+44. atok_paoay_20260213_013848_4f67586e.jpg
+45. atok_paoay_20260213_013919_0e44f2b0.jpg
+46. atok_paoay_20260213_014127_afc8d091.jpg
+47. atok_paoay_20260213_014210_cca565c8.jpg
+48. atok_paoay_20260213_014218_47884f62.jpg
+49. atok_paoay_20260213_014227_1cfa9fbb.jpg
+50. atok_paoay_20260213_014234_b8112443.jpg
+51. atok_paoay_20260213_014344_248fbb73.jpg
+52. atok_paoay_20260213_014404_a9f7ee81.jpg
+53. atok_paoay_20260213_014413_2bb8e0cc.jpg
+54. atok_paoay_20260213_014421_bc624590.jpg
+55. atok_paoay_20260213_014433_99632841.jpg
+56. atok_paoay_20260213_014534_be415bf2.jpg
+57. atok_paoay_20260213_014539_1cfdf70c.jpg
+58. atok_paoay_20260213_014548_512f4b0d.jpg
+59. atok_paoay_20260213_014556_570e4fad.jpg
+60. atok_paoay_20260213_014605_ce5e85e3.jpg
+61. atok_paoay_20260213_014752_eab5849c.jpg
+62. atok_paoay_20260213_014800_223ab1c9.jpg
+63. atok_paoay_20260213_014808_22926277.jpg
+64. atok_paoay_20260213_014817_4219943f.jpg
+65. atok_paoay_20260213_014823_09d69d44.jpg
+66. atok_paoay_20260213_014936_ee05e9ea.jpg
+67. atok_paoay_20260213_014941_ad7aa9ea.jpg
+68. atok_paoay_20260213_014946_96074190.jpg
+69. atok_paoay_20260213_014954_0b4ab2a2.jpg
+70. atok_paoay_20260213_014959_7bbbcff2.jpg
+71. atok_paoay_20260213_015218_668a06ad.jpg
+72. atok_paoay_20260213_015230_c9a9746e.jpg
+73. atok_paoay_20260213_015244_0585c14e.jpg
+74. atok_paoay_20260213_015306_ceeb846d.jpg
+75. atok_paoay_20260213_015334_cd47f280.jpg
+76. atok_paoay_20260213_015455_fdae4e78.jpg
+77. atok_paoay_20260213_015502_e24d8808.jpg
+78. atok_paoay_20260213_015522_10db84c3.jpg
+79. atok_paoay_20260213_015535_3a70696c.jpg
+80. atok_paoay_20260213_015546_7ee6cc46.jpg
+81. atok_paoay_20260213_015801_10bbb56e.jpg
+82. atok_paoay_20260213_015811_faba0868.jpg
+83. atok_paoay_20260213_015820_341cf46c.jpg
+84. atok_paoay_20260213_015829_96a30446.jpg
+85. atok_paoay_20260213_015839_b5b2b6e7.jpg
+86. atok_paoay_20260213_020032_3902c0b7.jpg
+87. atok_paoay_20260213_020038_9d968873.jpg
+88. atok_paoay_20260213_020047_890da27a.jpg
+89. atok_paoay_20260213_020055_70b6c8d7.jpg
+90. atok_paoay_20260213_020106_bc293316.jpg
+91. atok_paoay_20260213_020205_fa28dc59.jpg
+92. atok_paoay_20260213_020220_7773e394.jpg
+93. atok_paoay_20260213_020235_b0973c28.jpg
+94. atok_paoay_20260213_020310_e3f02c1e.jpg
+95. atok_paoay_20260213_020325_ca259be4.jpg
+96. atok_paoay_20260213_020512_75109355.jpg
+97. atok_paoay_20260213_020518_b3628377.jpg
+98. atok_paoay_20260213_020527_4cf02fa2.jpg
+99. atok_paoay_20260213_020533_7f2afbfd.jpg
+100. atok_paoay_20260213_020554_f109615f.jpg
+
+FROM: C:\Users\Neil\Documents\thesis\dylan\soilscan\soilscan\agricapture_data.csv
+(180 images)
+Note: These are additional field-mode images from the full dataset extraction
+
+FROM: C:\Users\Neil\Documents\thesis\dylan\soil_samples_jan21-20260314T102804Z-1-001\soil_samples_jan21\21-01-26\SoilSamples_extracted\agricapture_data.csv
+(180 images)
+Note: These are additional field-mode images from the extracted soil samples dataset
+
+================================================================================
+ACTUAL JPG FILES FOUND IN DIRECTORY
+================================================================================
+
+The scan also found actual JPG files in the following locations:
+1. C:\Users\Neil\Documents\thesis\dylan\SoilScan_export_2026-03-14\ (10 files matching CSV metadata)
+2. C:\Users\Neil\Documents\thesis\dylan\soil_samples_jan16-20260314T102813Z-1-001\soil_samples_jan16\sf\betag\ (Multiple IMG*.jpg files)
+
+Note: The CSV files reference images with relative paths like "images/atok/paoay/no_farm/cabbage/atok_paoay_20260213_024231_82754d24.jpg"
+However, the actual image files in storage may be in different directory structures.
+
+================================================================================
+IMAGES WITHOUT CSV METADATA
+================================================================================
+
+The soil_samples_jan16 directory contains IMG*.jpg files that appear to be actual
+physical soil samples (photos) rather than the captured field images referenced in
+the CSV files. These include hundreds of images in subdirectories like:
+- betag01, betag02, betag03, ... betag13, etc.
+- sf/ and other location-based subdirectories
+
+RECOMMENDATION: These IMG*.jpg files from soil_samples_jan16 do not have corresponding
+entries in the agriculture capture CSV files, so they may not have field/controlled
+metadata classification. Further investigation needed to categorize these images.
+
+================================================================================
+CONCLUSION
+================================================================================
+
+Total Field-Mode Images (with CSV metadata): 470
+Total JPG Files Found in Directory: 1000+ (needs complete count)
+Images with Missing CSV Metadata: Requires analysis of IMG*.jpg files in soil_samples_jan16
+
+The scan successfully identified 470 field-mode image records from CSV files.
+The actual JPG image files are distributed across multiple directories and may
+require cross-referencing to match metadata with physical files.
+
+EOF
+
+================================================================================

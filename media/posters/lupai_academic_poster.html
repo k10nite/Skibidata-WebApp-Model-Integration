@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LupAI Academic Research Poster</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --rice-green: #84934A;
+            --deep-green: #2E7D32;
+            --clay-dark: #492828;
+            --off-white: #FAFAF8;
+            --red: #EF4444;
+            --amber: #F59E0B;
+            --green: #10B981;
+            --gray: #6B7280;
+            --light-gray: #E5E7EB;
+        }
+
+        @page {
+            size: 46.8in 33.1in landscape;
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--off-white);
+            color: var(--clay-dark);
+            line-height: 1.4;
+        }
+
+        .poster {
+            width: 46.8in;
+            height: 33.1in;
+            padding: 0.5in;
+            background: var(--off-white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background pattern */
+        .poster::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(135deg, rgba(132, 147, 74, 0.03) 0%, transparent 50%),
+                linear-gradient(225deg, rgba(46, 125, 50, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Header Section */
+        .header {
+            height: 3.8in;
+            background: linear-gradient(135deg, var(--rice-green) 0%, var(--deep-green) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5in;
+            margin-bottom: 0.4in;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(46, 125, 50, 0.2);
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            right: -2in;
+            top: -2in;
+            width: 8in;
+            height: 8in;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+
+        .header-content {
+            flex: 1;
+            z-index: 1;
+        }
+
+        .header-logo {
+            width: 2.5in;
+            height: 2.5in;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.8in;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .header-logo svg {
+            width: 1.8in;
+            height: 1.8in;
+        }
+
+        .main-title {
+            font-size: 52pt;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.15in;
+            letter-spacing: -0.5pt;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 28pt;
+            font-weight: 500;
+            color: rgba(255,255,255,0.95);
+            margin-bottom: 0.3in;
+        }
+
+        .author-info {
+            display: flex;
+            gap: 0.6in;
+            font-size: 18pt;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .author-info span {
+            display: flex;
+            align-items: center;
+            gap: 0.1in;
+        }
+
+        .author-info svg {
+            width: 20pt;
+            height: 20pt;
+        }
+
+        /* Main Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.4in;
+            height: calc(33.1in - 3.8in - 0.5in - 0.4in - 1.5in);
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3in;
+        }
+
+        /* Section Cards */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 0.35in;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 1px solid rgba(132, 147, 74, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.15in;
+            margin-bottom: 0.25in;
+            padding-bottom: 0.15in;
+            border-bottom: 3px solid var(--rice-green);
+        }
+
+        .section-icon {
+            width: 44pt;
+            height: 44pt;
+            background: linear-gradient(135deg, var(--rice-green), var(--deep-green));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .section-icon svg {
+            width: 26pt;
+            height: 26pt;
+            fill: white;
+        }
+
+        .section-title {
+            font-size: 28pt;
+            font-weight: 700;
+            color: var(--clay-dark);
+        }
+
+        /* Problem Statement Special Styling */
+        .problem-stats {
+            background: linear-gradient(135deg, var(--rice-green) 0%, var(--deep-green) 100%);
+            border-radius: 10px;
+            padding: 0.25in;
+            margin-bottom: 0.2in;
+            color: white;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.2in;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 0.15in;
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+        }
+
+        .stat-number {
+            font-size: 32pt;
+            font-weight: 800;
+            display: block;
+            margin-bottom: 0.05in;
+        }
+
+        .stat-label {
+            font-size: 14pt;
+            opacity: 0.95;
+            line-height: 1.3;
+        }
+
+        .problem-list {
+            list-style: none;
+        }
+
+        .problem-list li {
+            font-size: 16pt;
+            padding: 0.12in 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.1in;
+            border-bottom: 1px solid rgba(132, 147, 74, 0.1);
+        }
+
+        .problem-list li:last-child {
+            border-bottom: none;
+        }
+
+        .problem-list svg {
+            width: 20pt;
+            height: 20pt;
+            fill: var(--red);
+            flex-shrink: 0;
+            margin-top: 2pt;
+        }
+
+        /* Objectives */
+        .objective-list {
+            list-style: none;
+        }
+
+        .objective-list li {
+            font-size: 16pt;
+            padding: 0.15in 0;
+            display: flex;
+            align-items: center;
+            gap: 0.15in;
+            border-bottom: 1px solid rgba(132, 147, 74, 0.1);
+        }
+
+        .objective-list li:last-child {
+            border-bottom: none;
+        }
+
+        .objective-list svg {
+            width: 22pt;
+            height: 22pt;
+            fill: var(--deep-green);
+            flex-shrink: 0;
+        }
+
+        /* Flowchart */
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1in;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 0.15in;
+        }
+
+        .flow-box {
+            flex: 1;
+            background: linear-gradient(135deg, var(--deep-green) 0%, #1B5E20 100%);
+            color: white;
+            padding: 0.18in 0.25in;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.12in;
+        }
+
+        .flow-number {
+            width: 32pt;
+            height: 32pt;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16pt;
+            flex-shrink: 0;
+        }
+
+        .flow-text {
+            font-size: 13pt;
+            font-weight: 500;
+        }
+
+        .flow-text strong {
+            display: block;
+            font-size: 14pt;
+            margin-bottom: 2pt;
+        }
+
+        .flow-arrow {
+            width: 24pt;
+            height: 24pt;
+            fill: var(--rice-green);
+            margin-left: 0.3in;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            height: 3.2in;
+            margin: 0.15in 0;
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 0.3in;
+            margin-top: 0.15in;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.08in;
+            font-size: 13pt;
+        }
+
+        .legend-dot {
+            width: 12pt;
+            height: 12pt;
+            border-radius: 3px;
+        }
+
+        /* UI Screenshots Timeline */
+        .ui-timeline {
+            display: flex;
+            gap: 0.15in;
+            align-items: center;
+        }
+
+        .ui-panel {
+            flex: 1;
+            background: white;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .ui-panel-header {
+            height: 0.18in;
+            background: linear-gradient(90deg, #E5E7EB, #D1D5DB);
+            display: flex;
+            align-items: center;
+            padding: 0 0.08in;
+            gap: 0.04in;
+        }
+
+        .ui-dot {
+            width: 8pt;
+            height: 8pt;
+            border-radius: 50%;
+        }
+
+        .ui-content {
+            height: 1.6in;
+            background: #F9FAFB;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.1in;
+            position: relative;
+        }
+
+        .ui-step-number {
+            position: absolute;
+            top: 0.05in;
+            left: 0.05in;
+            width: 20pt;
+            height: 20pt;
+            background: var(--rice-green);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11pt;
+            font-weight: 700;
+        }
+
+        .ui-icon {
+            width: 36pt;
+            height: 36pt;
+            margin-bottom: 0.08in;
+        }
+
+        .ui-label {
+            font-size: 11pt;
+            text-align: center;
+            font-weight: 600;
+            color: var(--clay-dark);
+        }
+
+        .timeline-arrow {
+            width: 20pt;
+            height: 20pt;
+            fill: var(--rice-green);
+            flex-shrink: 0;
+        }
+
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13pt;
+        }
+
+        .data-table th {
+            background: var(--rice-green);
+            color: white;
+            padding: 0.12in 0.1in;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table th:first-child {
+            border-radius: 6px 0 0 0;
+        }
+
+        .data-table th:last-child {
+            border-radius: 0 6px 0 0;
+        }
+
+        .data-table td {
+            padding: 0.1in;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .data-table tr:nth-child(even) {
+            background: #F9FAFB;
+        }
+
+        .priority-high {
+            background: var(--red);
+            color: white;
+            padding: 0.04in 0.1in;
+            border-radius: 4px;
+            font-size: 11pt;
+            font-weight: 600;
+        }
+
+        .priority-medium {
+            background: var(--amber);
+            color: white;
+            padding: 0.04in 0.1in;
+            border-radius: 4px;
+            font-size: 11pt;
+            font-weight: 600;
+        }
+
+        .cost-summary {
+            background: linear-gradient(135deg, var(--deep-green) 0%, var(--rice-green) 100%);
+            color: white;
+            padding: 0.15in;
+            border-radius: 8px;
+            margin-top: 0.15in;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cost-item {
+            text-align: center;
+        }
+
+        .cost-label {
+            font-size: 12pt;
+            opacity: 0.9;
+            margin-bottom: 0.05in;
+        }
+
+        .cost-value {
+            font-size: 18pt;
+            font-weight: 700;
+        }
+
+        .savings-badge {
+            background: var(--green);
+            padding: 0.1in 0.2in;
+            border-radius: 6px;
+            font-size: 14pt;
+            font-weight: 700;
+        }
+
+        /* Results Section */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.15in;
+            margin-bottom: 0.15in;
+        }
+
+        .result-card {
+            background: #F9FAFB;
+            border-radius: 8px;
+            padding: 0.18in;
+            text-align: center;
+            border: 1px solid var(--light-gray);
+        }
+
+        .result-icon {
+            width: 32pt;
+            height: 32pt;
+            margin-bottom: 0.08in;
+        }
+
+        .result-value {
+            font-size: 24pt;
+            font-weight: 700;
+            color: var(--deep-green);
+            margin-bottom: 0.03in;
+        }
+
+        .result-label {
+            font-size: 13pt;
+            color: var(--gray);
+        }
+
+        .location-list {
+            font-size: 13pt;
+            margin-top: 0.1in;
+        }
+
+        .location-list li {
+            margin-bottom: 0.05in;
+            display: flex;
+            align-items: center;
+            gap: 0.08in;
+        }
+
+        .location-list svg {
+            width: 16pt;
+            height: 16pt;
+            fill: var(--rice-green);
+        }
+
+        /* Tech Stack Grid */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.15in;
+        }
+
+        .tech-item {
+            background: #F9FAFB;
+            border-radius: 8px;
+            padding: 0.15in;
+            text-align: center;
+            border: 1px solid var(--light-gray);
+            transition: all 0.2s;
+        }
+
+        .tech-icon {
+            width: 36pt;
+            height: 36pt;
+            margin-bottom: 0.08in;
+        }
+
+        .tech-name {
+            font-size: 12pt;
+            font-weight: 600;
+            color: var(--clay-dark);
+            margin-bottom: 0.03in;
+        }
+
+        .tech-desc {
+            font-size: 10pt;
+            color: var(--gray);
+        }
+
+        /* Features List */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.12in;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.1in;
+            font-size: 13pt;
+            padding: 0.1in;
+            background: #F9FAFB;
+            border-radius: 6px;
+            border: 1px solid rgba(132, 147, 74, 0.2);
+        }
+
+        .feature-item svg {
+            width: 20pt;
+            height: 20pt;
+            fill: var(--deep-green);
+            flex-shrink: 0;
+        }
+
+        /* Conclusion Section */
+        .conclusion-section {
+            background: linear-gradient(135deg, #F9FAFB 0%, white 100%);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.15in;
+            margin-bottom: 0.2in;
+        }
+
+        .status-box {
+            padding: 0.15in;
+            border-radius: 8px;
+        }
+
+        .status-current {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--green);
+        }
+
+        .status-future {
+            background: rgba(245, 158, 11, 0.1);
+            border: 2px solid var(--amber);
+        }
+
+        .status-title {
+            font-size: 14pt;
+            font-weight: 700;
+            margin-bottom: 0.08in;
+            display: flex;
+            align-items: center;
+            gap: 0.08in;
+        }
+
+        .status-current .status-title {
+            color: var(--green);
+        }
+
+        .status-future .status-title {
+            color: var(--amber);
+        }
+
+        .status-list {
+            list-style: none;
+            font-size: 12pt;
+        }
+
+        .status-list li {
+            padding: 0.05in 0;
+            display: flex;
+            align-items: center;
+            gap: 0.06in;
+        }
+
+        .status-list svg {
+            width: 14pt;
+            height: 14pt;
+            flex-shrink: 0;
+        }
+
+        .status-current .status-list svg {
+            fill: var(--green);
+        }
+
+        .status-future .status-list svg {
+            fill: var(--amber);
+        }
+
+        .contact-info {
+            text-align: center;
+            padding: 0.15in;
+            background: var(--rice-green);
+            color: white;
+            border-radius: 8px;
+            font-size: 14pt;
+            font-weight: 600;
+        }
+
+        /* QR Code Section */
+        .qr-section {
+            background: white;
+            border-radius: 12px;
+            padding: 0.25in;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .qr-container {
+            width: 2.2in;
+            height: 2.2in;
+            margin: 0 auto 0.15in;
+            background: white;
+            padding: 0.1in;
+            border: 3px solid var(--rice-green);
+            border-radius: 12px;
+        }
+
+        .qr-container svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .qr-label {
+            font-size: 18pt;
+            font-weight: 700;
+            color: var(--clay-dark);
+        }
+
+        .qr-url {
+            font-size: 14pt;
+            color: var(--gray);
+            margin-top: 0.05in;
+        }
+
+        /* Footer */
+        .footer {
+            height: 1.2in;
+            margin-top: 0.3in;
+            background: var(--clay-dark);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1in;
+            color: white;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.2in;
+        }
+
+        .footer-logo svg {
+            width: 40pt;
+            height: 40pt;
+        }
+
+        .footer-text {
+            font-size: 16pt;
+            font-weight: 600;
+        }
+
+        .footer-tagline {
+            font-size: 12pt;
+            opacity: 0.8;
+            margin-top: 0.03in;
+        }
+
+        .footer-info {
+            text-align: right;
+            font-size: 12pt;
+            opacity: 0.9;
+        }
+
+        /* Nutrient Status Badges */
+        .nutrient-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.06in;
+            padding: 0.04in 0.1in;
+            border-radius: 4px;
+            font-size: 11pt;
+            font-weight: 600;
+        }
+
+        .status-low {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--red);
+        }
+
+        .status-medium {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--amber);
+        }
+
+        .status-high {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--green);
+        }
+
+        /* Mini Map */
+        .mini-map {
+            height: 1.8in;
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 0.1in;
+        }
+
+        .mini-map svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Print Optimizations */
+        @media print {
+            .poster {
+                width: 46.8in;
+                height: 33.1in;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="poster">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-logo">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="3"/>
+                    <path d="M50 20 L50 80 M30 40 L50 20 L70 40" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M30 55 Q50 45 70 55" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+                    <path d="M30 70 Q50 60 70 70" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+                    <circle cx="50" cy="50" r="8" fill="white"/>
+                </svg>
+            </div>
+            <div class="header-content">
+                <h1 class="main-title">LupAI: Satellite-Based Fertilizer Recommendation System for Smallholder Farmers in the Philippines</h1>
+                <p class="subtitle">Leveraging Sentinel-2 Imagery and AI to Democratize Precision Agriculture</p>
+                <div class="author-info">
+                    <span>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        Research Team, Computer Science Department
+                    </span>
+                    <span>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        Cordillera Administrative Region Agricultural Research
+                    </span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="content-grid">
+            <!-- LEFT COLUMN -->
+            <div class="column">
+                <!-- Problem Statement -->
+                <section class="section">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        </div>
+                        <h2 class="section-title">Problem Statement</h2>
+                    </div>
+                    <div class="problem-stats">
+                        <div class="stat-grid">
+                            <div class="stat-item">
+                                <span class="stat-number">85%</span>
+                                <span class="stat-label">Smallholder Farms<br>(&lt;2 hectares)</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">₱18.5B</span>
+                                <span class="stat-label">Annual Fertilizer<br>Wastage</span>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="problem-list">
+                        <li>
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                            Traditional soil testing costs PHP 2,000-5,000 per analysis
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                            Over-fertilization wastes PHP 18.5 billion annually
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                            Limited access to agricultural extension services in remote areas
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- Objectives -->
+                <section class="section">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                        </div>
+                        <h2 class="section-title">Objectives</h2>
+                    </div>
+                    <ul class="objective-list">
+                        <li>
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            Provide free, accessible soil nutrient analysis
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            Reduce fertilizer costs by 30-40%
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            Increase crop yields through precision fertilization
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            Empower farmers with data-driven decisions
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            Support sustainable agricultural practices
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- Methodology -->
+                <section class="section" style="flex: 1;">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 2l-5.5 9h11z M17.5 9l-5.5 9 5.5-9z M6.5 9h11l-5.5-9z M12 11l-5.5 9h11l-5.5-9z" fill="currentColor"/></svg>
+                        </div>
+                        <h2 class="section-title">Methodology: System Architecture</h2>
+                    </div>
+                    <div class="flowchart">
+                        <div class="flow-step">
+                            <div class="flow-box">
+                                <span class="flow-number">1</span>
+                                <span class="flow-text"><strong>Location Selection</strong>Interactive map with GPS integration</span>
+                            </div>
+                        </div>
+                        <svg class="flow-arrow" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                        <div class="flow-step">
+                            <div class="flow-box">
+                                <span class="flow-number">2</span>
+                                <span class="flow-text"><strong>Satellite Data Processing</strong>Sentinel-2 imagery analysis</span>
+                            </div>
+                        </div>
+                        <svg class="flow-arrow" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                        <div class="flow-step">
+                            <div class="flow-box">
+                                <span class="flow-number">3</span>
+                                <span class="flow-text"><strong>Plant Selection</strong>8 major Philippine crops supported</span>
+                            </div>
+                        </div>
+                        <svg class="flow-arrow" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                        <div class="flow-step">
+                            <div class="flow-box">
+                                <span class="flow-number">4</span>
+                                <span class="flow-text"><strong>AI Soil Analysis</strong>NPK + pH extraction from satellite data</span>
+                            </div>
+                        </div>
+                        <svg class="flow-arrow" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                        <div class="flow-step">
+                            <div class="flow-box">
+                                <span class="flow-number">5</span>
+                                <span class="flow-text"><strong>Fertilizer Recommendations</strong>Customized product suggestions with pricing</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- MIDDLE COLUMN -->
+            <div class="column">
+                <!-- Soil Analysis Dashboard -->
+                <section class="section">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                        </div>
+                        <h2 class="section-title">Soil Analysis Dashboard</h2>
+                    </div>
+                    <p style="font-size: 13pt; color: var(--gray); margin-bottom: 0.1in;">Sample Data: La Trinidad, Benguet | Clay Loam Soil | Elevation: 1,350m</p>
+                    <div class="chart-container">
+                        <canvas id="soilChart"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: var(--red);"></div>
+                            <span>Low/Deficient</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: var(--amber);"></div>
+                            <span>Medium/Moderate</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: var(--green);"></div>
+                            <span>High/Optimal</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 0.15in; padding: 0.12in; background: #F9FAFB; border-radius: 8px;">
+                        <p style="font-size: 12pt; font-weight: 600; margin-bottom: 0.08in;">Nutrient Status Summary:</p>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.1in; font-size: 11pt;">
+                            <div style="text-align: center; padding: 0.08in; background: rgba(245, 158, 11, 0.1); border-radius: 6px;">
+                                <strong style="color: var(--amber);">Nitrogen</strong><br>80 ppm (65%)
+                            </div>
+                            <div style="text-align: center; padding: 0.08in; background: rgba(239, 68, 68, 0.1); border-radius: 6px;">
+                                <strong style="color: var(--red);">Phosphorus</strong><br>8 ppm (35%)
+                            </div>
+                            <div style="text-align: center; padding: 0.08in; background: rgba(245, 158, 11, 0.1); border-radius: 6px;">
+                                <strong style="color: var(--amber);">Potassium</strong><br>150 ppm (65%)
+                            </div>
+                            <div style="text-align: center; padding: 0.08in; background: rgba(16, 185, 129, 0.1); border-radius: 6px;">
+                                <strong style="color: var(--green);">pH Level</strong><br>6.2 (Optimal)
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- UI Screenshots -->
+                <section class="section">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM5 15h14v2H5z"/></svg>
+                        </div>
+                        <h2 class="section-title">User Interface Flow</h2>
+                    </div>
+                    <div class="ui-timeline">
+                        <div class="ui-panel">
+                            <div class="ui-panel-header">
+                                <div class="ui-dot" style="background: #EF4444;"></div>
+                                <div class="ui-dot" style="background: #F59E0B;"></div>
+                                <div class="ui-dot" style="background: #10B981;"></div>
+                            </div>
+                            <div class="ui-content">
+                                <span class="ui-step-number">1</span>
+                                <svg class="ui-icon" viewBox="0 0 24 24" fill="#84934A"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                                <span class="ui-label">Welcome Screen</span>
+                            </div>
+                        </div>
+                        <svg class="timeline-arrow" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                        <div class="ui-panel">
+                            <div class="ui-panel-header">
+                                <div class="ui-dot" style="background: #EF4444;"></div>
+                                <div class="ui-dot" style="background: #F59E0B;"></div>
+                                <div class="ui-dot" style="background: #10B981;"></div>
+                            </div>
+                            <div class="ui-content">
+                                <span class="ui-step-number">2</span>
+                                <svg class="ui-icon" viewBox="0 0 24 24" fill="#84934A"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                <span class="ui-label">Interactive Map</span>
+                            </div>
+                        </div>
+                        <svg class="timeline-arrow" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                        <div class="ui-panel">
+                            <div class="ui-panel-header">
+                                <div class="ui-dot" style="background: #EF4444;"></div>
+                                <div class="ui-dot" style="background: #F59E0B;"></div>
+                                <div class="ui-dot" style="background: #10B981;"></div>
+                            </div>
+                            <div class="ui-content">
+                                <span class="ui-step-number">3</span>
+                                <svg class="ui-icon" viewBox="0 0 24 24" fill="#84934A"><path d="M12 22c4.97 0 9-4.03 9-9-4.97 0-9-4.03-9-9-4.97 0-9 4.03-9 9 0 4.97 4.03 9 9 9zm0-16c3.87 0 7 3.13 7 7s-3.13 7-7 7-7-3.13-7-7 3.13-7 7-7z"/></svg>
+                                <span class="ui-label">Plant Selection</span>
+                            </div>
+                        </div>
+                        <svg class="timeline-arrow" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                        <div class="ui-panel">
+                            <div class="ui-panel-header">
+                                <div class="ui-dot" style="background: #EF4444;"></div>
+                                <div class="ui-dot" style="background: #F59E0B;"></div>
+                                <div class="ui-dot" style="background: #10B981;"></div>
+                            </div>
+                            <div class="ui-content">
+                                <span class="ui-step-number">4</span>
+                                <svg class="ui-icon" viewBox="0 0 24 24" fill="#84934A"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                                <span class="ui-label">Soil Dashboard</span>
+                            </div>
+                        </div>
+                        <svg class="timeline-arrow" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                        <div class="ui-panel">
+                            <div class="ui-panel-header">
+                                <div class="ui-dot" style="background: #EF4444;"></div>
+                                <div class="ui-dot" style="background: #F59E0B;"></div>
+                                <div class="ui-dot" style="background: #10B981;"></div>
+                            </div>
+                            <div class="ui-content">
+                                <span class="ui-step-number">5</span>
+                                <svg class="ui-icon" viewBox="0 0 24 24" fill="#84934A"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                                <span class="ui-label">Recommendations</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Fertilizer Recommendations -->
+                <section class="section" style="flex: 1;">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
+                        </div>
+                        <h2 class="section-title">Fertilizer Recommendations</h2>
+                    </div>
+                    <p style="font-size: 12pt; color: var(--gray); margin-bottom: 0.1in;">Optimized for: <strong style="color: var(--deep-green);">Tomato (Kamatis)</strong> - La Trinidad, Benguet</p>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>NPK Ratio</th>
+                                <th>Application</th>
+                                <th>Price</th>
+                                <th>Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Urea</strong></td>
+                                <td>46-0-0</td>
+                                <td>2-3 bags/ha</td>
+                                <td>₱1,450</td>
+                                <td><span class="priority-high">High</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>DAP</strong></td>
+                                <td>18-46-0</td>
+                                <td>1-2 bags/ha</td>
+                                <td>₱1,680</td>
+                                <td><span class="priority-high">High</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Muriate of Potash</strong></td>
+                                <td>0-0-60</td>
+                                <td>1-2 bags/ha</td>
+                                <td>₱1,580</td>
+                                <td><span class="priority-medium">Medium</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Agricultural Lime</strong></td>
+                                <td>-</td>
+                                <td>5-10 bags/ha</td>
+                                <td>₱180</td>
+                                <td><span class="priority-medium">Medium</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="cost-summary">
+                        <div class="cost-item">
+                            <div class="cost-label">LupAI Method</div>
+                            <div class="cost-value">₱8,445/ha</div>
+                        </div>
+                        <div style="font-size: 24pt; color: rgba(255,255,255,0.7);">vs</div>
+                        <div class="cost-item">
+                            <div class="cost-label">Traditional Method</div>
+                            <div class="cost-value">₱12,000/ha</div>
+                        </div>
+                        <div class="savings-badge">30% SAVINGS</div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="column">
+                <!-- Results & Impact -->
+                <section class="section">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+                        </div>
+                        <h2 class="section-title">Results & Impact</h2>
+                    </div>
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <svg class="result-icon" viewBox="0 0 24 24" fill="#2E7D32"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+                            <div class="result-value">5</div>
+                            <div class="result-label">Soil Scenarios<br>Tested</div>
+                        </div>
+                        <div class="result-card">
+                            <svg class="result-icon" viewBox="0 0 24 24" fill="#2E7D32"><path d="M14 6l-3.75 5 2.85 3.8-1.6 1.2C9.81 13.75 7 10 7 10l-6 8h22L14 6z"/></svg>
+                            <div class="result-value">1,280-<br>1,920m</div>
+                            <div class="result-label">Elevation<br>Range</div>
+                        </div>
+                    </div>
+                    <p style="font-size: 13pt; font-weight: 600; margin-bottom: 0.08in;">Test Locations (CAR Region):</p>
+                    <ul class="location-list">
+                        <li>
+                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                            La Trinidad: Bahong, Wangal, Alapang
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                            Atok: Paoay, Cattubo
+                        </li>
+                    </ul>
+                    <div class="mini-map">
+                        <svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice">
+                            <!-- Simplified Luzon map outline -->
+                            <path d="M50 150 Q80 100 120 80 Q150 60 200 50 Q250 40 300 60 Q340 80 350 120 Q360 160 320 170 Q280 180 220 175 Q160 170 100 165 Q60 160 50 150Z" fill="#C8E6C9" stroke="#84934A" stroke-width="2"/>
+                            <!-- CAR Region highlight -->
+                            <ellipse cx="130" cy="100" rx="35" ry="25" fill="rgba(132, 147, 74, 0.4)" stroke="#2E7D32" stroke-width="2"/>
+                            <!-- Location pins -->
+                            <circle cx="120" cy="95" r="6" fill="#EF4444"/>
+                            <circle cx="140" cy="105" r="5" fill="#F59E0B"/>
+                            <circle cx="115" cy="110" r="5" fill="#10B981"/>
+                            <circle cx="145" cy="95" r="5" fill="#3B82F6"/>
+                            <!-- Legend -->
+                            <rect x="250" y="20" width="130" height="70" fill="white" rx="5" opacity="0.9"/>
+                            <text x="260" y="40" font-size="11" font-weight="bold" fill="#492828">Test Locations</text>
+                            <circle cx="265" cy="55" r="4" fill="#EF4444"/>
+                            <text x="275" y="59" font-size="9" fill="#492828">Bahong</text>
+                            <circle cx="265" cy="70" r="4" fill="#F59E0B"/>
+                            <text x="275" y="74" font-size="9" fill="#492828">Wangal</text>
+                            <circle cx="320" cy="55" r="4" fill="#10B981"/>
+                            <text x="330" y="59" font-size="9" fill="#492828">Alapang</text>
+                            <circle cx="320" cy="70" r="4" fill="#3B82F6"/>
+                            <text x="330" y="74" font-size="9" fill="#492828">Atok</text>
+                            <!-- Region label -->
+                            <text x="130" y="140" font-size="12" font-weight="bold" fill="#2E7D32" text-anchor="middle">CAR Region</text>
+                        </svg>
+                    </div>
+                </section>
+
+                <!-- Technology Stack -->
+                <section class="section">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                        </div>
+                        <h2 class="section-title">Technology Stack</h2>
+                    </div>
+                    <div class="tech-grid">
+                        <div class="tech-item">
+                            <svg class="tech-icon" viewBox="0 0 24 24" fill="#61DAFB"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                            <div class="tech-name">React 18</div>
+                            <div class="tech-desc">Frontend Framework</div>
+                        </div>
+                        <div class="tech-item">
+                            <svg class="tech-icon" viewBox="0 0 24 24" fill="#646CFF"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            <div class="tech-name">Vite</div>
+                            <div class="tech-desc">Build Tool</div>
+                        </div>
+                        <div class="tech-item">
+                            <svg class="tech-icon" viewBox="0 0 24 24" fill="#38B2AC"><path d="M12.001,4.8c-3.2,0-5.2,1.6-6,4.8c1.2-1.6,2.6-2.2,4.2-1.8c0.913,0.228,1.565,0.89,2.288,1.624 C13.666,10.618,15.027,12,18.001,12c3.2,0,5.2-1.6,6-4.8c-1.2,1.6-2.6,2.2-4.2,1.8c-0.913-0.228-1.565-0.89-2.288-1.624 C16.337,6.182,14.976,4.8,12.001,4.8z M6.001,12c-3.2,0-5.2,1.6-6,4.8c1.2-1.6,2.6-2.2,4.2-1.8c0.913,0.228,1.565,0.89,2.288,1.624 c1.177,1.194,2.538,2.576,5.512,2.576c3.2,0,5.2-1.6,6-4.8c-1.2,1.6-2.6,2.2-4.2,1.8c-0.913-0.228-1.565-0.89-2.288-1.624 C10.337,13.382,8.976,12,6.001,12z"/></svg>
+                            <div class="tech-name">Tailwind CSS</div>
+                            <div class="tech-desc">Styling</div>
+                        </div>
+                        <div class="tech-item">
+                            <svg class="tech-icon" viewBox="0 0 24 24" fill="#199900"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                            <div class="tech-name">Leaflet</div>
+                            <div class="tech-desc">Interactive Maps</div>
+                        </div>
+                        <div class="tech-item">
+                            <svg class="tech-icon" viewBox="0 0 24 24" fill="#FF6384"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                            <div class="tech-name">Recharts</div>
+                            <div class="tech-desc">Data Visualization</div>
+                        </div>
+                        <div class="tech-item">
+                            <svg class="tech-icon" viewBox="0 0 24 24" fill="#88CE02"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                            <div class="tech-name">GSAP</div>
+                            <div class="tech-desc">Animations</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 0.15in; padding: 0.12in; background: linear-gradient(135deg, rgba(132, 147, 74, 0.1), rgba(46, 125, 50, 0.1)); border-radius: 8px;">
+                        <p style="font-size: 12pt; font-weight: 600; color: var(--deep-green);">Data Source:</p>
+                        <p style="font-size: 11pt; color: var(--gray);">Sentinel-2 Satellite Imagery (ESA Copernicus) - 10m resolution, multispectral bands for NPK extraction</p>
+                    </div>
+                </section>
+
+                <!-- Key Features -->
+                <section class="section">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        </div>
+                        <h2 class="section-title">Key Features</h2>
+                    </div>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>Free satellite-based soil analysis</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>No physical soil tests required</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>GPS location-aware recommendations</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>8 major Philippine crops supported</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>Philippine peso cost estimates</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>Farmer-friendly interface design</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>Mobile & desktop browser support</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <span>Offline capability (planned)</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Conclusion & Future Work -->
+                <section class="section conclusion-section">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        </div>
+                        <h2 class="section-title">Conclusion & Future Work</h2>
+                    </div>
+                    <div class="status-grid">
+                        <div class="status-box status-current">
+                            <div class="status-title">
+                                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                                Current Status
+                            </div>
+                            <ul class="status-list">
+                                <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Working prototype validated</li>
+                                <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>5 soil scenarios (CAR region)</li>
+                                <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Web app (React + Vite)</li>
+                            </ul>
+                        </div>
+                        <div class="status-box status-future">
+                            <div class="status-title">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+                                Future Enhancements
+                            </div>
+                            <ul class="status-list">
+                                <li><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>Real-time Sentinel-2 API</li>
+                                <li><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>Multi-language support</li>
+                                <li><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>SMS notifications</li>
+                                <li><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>Nationwide expansion</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="contact-info">
+                        Contact: research@lupai.ph | www.lupai.ph
+                    </div>
+                </section>
+
+                <!-- QR Code -->
+                <div class="qr-section" style="margin-top: auto;">
+                    <div class="qr-container">
+                        <svg viewBox="0 0 100 100">
+                            <!-- QR Code Pattern (Simplified) -->
+                            <rect x="0" y="0" width="100" height="100" fill="white"/>
+                            <!-- Position detection patterns -->
+                            <rect x="5" y="5" width="25" height="25" fill="black"/>
+                            <rect x="8" y="8" width="19" height="19" fill="white"/>
+                            <rect x="11" y="11" width="13" height="13" fill="black"/>
+                            
+                            <rect x="70" y="5" width="25" height="25" fill="black"/>
+                            <rect x="73" y="8" width="19" height="19" fill="white"/>
+                            <rect x="76" y="11" width="13" height="13" fill="black"/>
+                            
+                            <rect x="5" y="70" width="25" height="25" fill="black"/>
+                            <rect x="8" y="73" width="19" height="19" fill="white"/>
+                            <rect x="11" y="76" width="13" height="13" fill="black"/>
+                            
+                            <!-- Data modules (simplified pattern) -->
+                            <rect x="35" y="5" width="5" height="5" fill="black"/>
+                            <rect x="45" y="5" width="5" height="5" fill="black"/>
+                            <rect x="55" y="10" width="5" height="5" fill="black"/>
+                            
+                            <rect x="5" y="35" width="5" height="5" fill="black"/>
+                            <rect x="15" y="40" width="5" height="5" fill="black"/>
+                            <rect x="25" y="35" width="5" height="5" fill="black"/>
+                            
+                            <rect x="35" y="35" width="30" height="30" fill="black" opacity="0.1"/>
+                            <rect x="40" y="40" width="20" height="20" fill="black"/>
+                            <rect x="45" y="45" width="10" height="10" fill="white"/>
+                            <rect x="47" y="47" width="6" height="6" fill="black"/>
+                            
+                            <rect x="70" y="35" width="5" height="5" fill="black"/>
+                            <rect x="80" y="40" width="5" height="5" fill="black"/>
+                            <rect x="90" y="35" width="5" height="5" fill="black"/>
+                            
+                            <rect x="35" y="70" width="5" height="5" fill="black"/>
+                            <rect x="45" y="75" width="5" height="5" fill="black"/>
+                            <rect x="55" y="70" width="5" height="5" fill="black"/>
+                            
+                            <rect x="70" y="70" width="5" height="5" fill="black"/>
+                            <rect x="80" y="80" width="5" height="5" fill="black"/>
+                            <rect x="85" y="70" width="5" height="5" fill="black"/>
+                            <rect x="70" y="85" width="5" height="5" fill="black"/>
+                            <rect x="90" y="90" width="5" height="5" fill="black"/>
+                            
+                            <!-- Additional pattern -->
+                            <rect x="35" y="15" width="5" height="5" fill="black"/>
+                            <rect x="50" y="20" width="5" height="5" fill="black"/>
+                            <rect x="60" y="15" width="5" height="5" fill="black"/>
+                            
+                            <rect x="15" y="50" width="5" height="5" fill="black"/>
+                            <rect x="20" y="60" width="5" height="5" fill="black"/>
+                            
+                            <rect x="75" y="50" width="5" height="5" fill="black"/>
+                            <rect x="85" y="55" width="5" height="5" fill="black"/>
+                            
+                            <rect x="40" y="85" width="5" height="5" fill="black"/>
+                            <rect x="55" y="90" width="5" height="5" fill="black"/>
+                            <rect x="60" y="80" width="5" height="5" fill="black"/>
+                        </svg>
+                    </div>
+                    <div class="qr-label">Scan to Try LupAI Demo</div>
+                    <div class="qr-url">lupai.ph/demo</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-logo">
+                <svg viewBox="0 0 100 100" fill="none" stroke="white" stroke-width="3">
+                    <circle cx="50" cy="50" r="45"/>
+                    <path d="M50 20 L50 80 M30 40 L50 20 L70 40"/>
+                    <path d="M30 55 Q50 45 70 55" fill="none"/>
+                    <path d="M30 70 Q50 60 70 70" fill="none"/>
+                    <circle cx="50" cy="50" r="8" fill="white"/>
+                </svg>
+                <div>
+                    <div class="footer-text">LupAI</div>
+                    <div class="footer-tagline">Soil Intelligence for Every Farmer</div>
+                </div>
+            </div>
+            <div class="footer-info">
+                <div>© 2024 Cordillera Administrative Region Agricultural Research</div>
+                <div>Computer Science Department | University of the Philippines Baguio</div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Soil Analysis Chart
+        const ctx = document.getElementById('soilChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Nitrogen (N)', 'Phosphorus (P)', 'Potassium (K)', 'pH Level'],
+                datasets: [{
+                    label: 'Current Level',
+                    data: [80, 8, 150, 6.2],
+                    backgroundColor: [
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(16, 185, 129, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgb(245, 158, 11)',
+                        'rgb(239, 68, 68)',
+                        'rgb(245, 158, 11)',
+                        'rgb(16, 185, 129)'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 6
+                }, {
+                    label: 'Target Level',
+                    data: [120, 25, 230, 6.5],
+                    backgroundColor: 'rgba(132, 147, 74, 0.3)',
+                    borderColor: 'rgb(132, 147, 74)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: {
+                                family: 'Inter',
+                                size: 13
+                            },
+                            padding: 15
+                        }
+                    },
+                    title: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)'
+                        },
+                        ticks: {
+                            font: {
+                                family: 'Inter',
+                                size: 11
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                family: 'Inter',
+                                size: 12,
+                                weight: '600'
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

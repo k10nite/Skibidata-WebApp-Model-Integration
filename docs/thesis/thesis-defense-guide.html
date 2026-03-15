@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Thesis Defense Guide - Satellite Remote Sensing for Soil Nutrient Analysis</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #059669;
+            --accent: #d97706;
+            --bg-dark: #1e293b;
+            --bg-light: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.7; color: var(--text-dark); background: var(--bg-light); }
+
+        .nav { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: var(--bg-dark); color: white; overflow-y: auto; padding: 15px 0; z-index: 1000; font-size: 0.85rem; }
+        .nav-header { padding: 10px 15px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
+        .nav-header h1 { font-size: 1.1rem; color: #60a5fa; }
+        .nav-header p { font-size: 0.75rem; color: #94a3b8; margin-top: 5px; }
+        .nav-section { margin-bottom: 5px; }
+        .nav-section-title { padding: 8px 15px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; font-weight: 700; background: rgba(0,0,0,0.2); }
+        .nav a { display: block; padding: 6px 15px; color: #cbd5e1; text-decoration: none; font-size: 0.8rem; border-left: 2px solid transparent; transition: all 0.2s; }
+        .nav a:hover { background: rgba(255,255,255,0.05); color: white; border-left-color: var(--primary); }
+
+        .mobile-hint { display: none; font-size: 0.7rem; font-weight: normal; opacity: 0.7; }
+
+        .main { margin-left: 260px; padding: 30px 50px; max-width: 1100px; }
+
+        .hero { background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%); color: white; padding: 40px; border-radius: 16px; margin-bottom: 30px; }
+        .hero h1 { font-size: 1.8rem; margin-bottom: 10px; }
+        .hero p { opacity: 0.9; font-size: 1rem; }
+        .hero-stats { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+        .hero-stat { background: rgba(255,255,255,0.15); padding: 10px 15px; border-radius: 8px; text-align: center; }
+        .hero-stat .num { font-size: 1.5rem; font-weight: 700; }
+        .hero-stat .label { font-size: 0.7rem; opacity: 0.8; }
+
+        section { background: white; border-radius: 12px; padding: 30px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        section h2 { color: var(--primary); font-size: 1.4rem; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+        section h3 { color: var(--text-dark); font-size: 1.1rem; margin: 20px 0 12px; }
+        section h4 { color: var(--secondary); font-size: 1rem; margin: 15px 0 8px; }
+        p { margin-bottom: 12px; }
+        ul, ol { margin: 10px 0 15px 20px; }
+        li { margin-bottom: 6px; }
+
+        .highlight { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 4px solid var(--primary); padding: 20px; border-radius: 0 8px 8px 0; margin: 15px 0; }
+        .highlight h4 { margin-top: 0; color: var(--primary); }
+
+        .warning { background: #fef2f2; border-left: 4px solid var(--danger); padding: 15px; border-radius: 0 8px 8px 0; margin: 15px 0; }
+        .success { background: #ecfdf5; border-left: 4px solid var(--secondary); padding: 15px; border-radius: 0 8px 8px 0; margin: 15px 0; }
+        .info { background: #fefce8; border-left: 4px solid var(--accent); padding: 15px; border-radius: 0 8px 8px 0; margin: 15px 0; }
+
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9rem; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: var(--bg-dark); color: white; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
+        tr:hover { background: #f8fafc; }
+
+        .formula { background: #1e293b; color: #e2e8f0; padding: 15px 20px; border-radius: 8px; font-family: 'Consolas', monospace; margin: 10px 0; overflow-x: auto; }
+        .formula .comment { color: #64748b; }
+
+        .qa-item { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 15px; overflow: hidden; }
+        .qa-q { background: var(--bg-dark); color: white; padding: 15px 20px; font-weight: 600; font-size: 0.95rem; }
+        .qa-a { padding: 20px; background: white; }
+        .qa-a h5 { color: var(--secondary); margin-bottom: 8px; font-size: 0.85rem; }
+
+        .tip { background: #ecfdf5; border: 1px solid #a7f3d0; padding: 12px 15px; border-radius: 8px; margin: 12px 0; font-size: 0.9rem; }
+        .tip::before { content: 'TIP: '; font-weight: 700; color: var(--secondary); }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 15px 0; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 15px 0; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 15px 0; }
+
+        .card { border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+        .card h4 { margin-top: 0; color: var(--primary); }
+        .card.primary { border-color: var(--primary); background: #eff6ff; }
+        .card.success { border-color: var(--secondary); background: #ecfdf5; }
+
+        .stat-box { background: linear-gradient(135deg, #f8fafc, #e2e8f0); padding: 20px; border-radius: 10px; text-align: center; }
+        .stat-box .number { font-size: 2rem; font-weight: 700; color: var(--primary); }
+        .stat-box .label { font-size: 0.8rem; color: var(--text-light); }
+
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .badge-blue { background: #dbeafe; color: var(--primary); }
+        .badge-green { background: #d1fae5; color: var(--secondary); }
+        .badge-yellow { background: #fef3c7; color: var(--accent); }
+
+        .toc-section { columns: 2; column-gap: 30px; }
+        .toc-section a { display: block; padding: 5px 0; color: var(--primary); text-decoration: none; font-size: 0.9rem; }
+
+        @media (max-width: 1024px) {
+            .nav { width: 220px; }
+            .main { margin-left: 220px; padding: 20px 30px; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .nav {
+                position: fixed;
+                width: 100%;
+                height: auto;
+                max-height: 55px;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+                z-index: 1000;
+            }
+            .nav.expanded, .nav:focus-within {
+                max-height: 85vh;
+                overflow-y: auto;
+            }
+            .nav-header { padding: 12px 15px; cursor: pointer; }
+            .nav-header h1 { font-size: 0.95rem; display: flex; justify-content: space-between; align-items: center; }
+            .nav-header p { display: none; }
+            .mobile-hint { display: inline; }
+            .nav-section-title { padding: 6px 15px; font-size: 0.6rem; }
+            .nav a { padding: 8px 15px; font-size: 0.85rem; }
+
+            .main {
+                margin-left: 0;
+                margin-top: 60px;
+                padding: 15px 12px;
+            }
+
+            .hero { padding: 20px 15px; border-radius: 10px; }
+            .hero h1 { font-size: 1.3rem; line-height: 1.3; }
+            .hero p { font-size: 0.9rem; }
+            .hero-stats { gap: 8px; }
+            .hero-stat { padding: 8px 10px; flex: 1 1 45%; }
+            .hero-stat .num { font-size: 1.2rem; }
+            .hero-stat .label { font-size: 0.65rem; }
+
+            section { padding: 20px 15px; margin-bottom: 15px; border-radius: 10px; }
+            section h2 { font-size: 1.2rem; margin-bottom: 15px; }
+            section h3 { font-size: 1rem; margin: 15px 0 10px; }
+            section h4 { font-size: 0.95rem; }
+
+            table { font-size: 0.8rem; display: block; overflow-x: auto; white-space: nowrap; }
+            th, td { padding: 8px 10px; }
+
+            .formula { font-size: 0.75rem; padding: 12px; overflow-x: auto; }
+
+            .highlight, .warning, .success, .info { padding: 12px; margin: 12px 0; }
+            .tip { padding: 10px 12px; font-size: 0.85rem; }
+
+            .qa-q { padding: 12px 15px; font-size: 0.9rem; }
+            .qa-a { padding: 15px; }
+            .qa-a h5 { font-size: 0.8rem; }
+
+            .card { padding: 15px; margin-bottom: 10px; }
+            .stat-box { padding: 15px 10px; }
+            .stat-box .number { font-size: 1.5rem; }
+            .stat-box .label { font-size: 0.7rem; }
+
+            .grid-2, .grid-3, .grid-4 { gap: 10px; }
+
+            ul, ol { margin-left: 15px; }
+            li { margin-bottom: 8px; font-size: 0.9rem; }
+            p { font-size: 0.9rem; }
+        }
+
+        @media (max-width: 480px) {
+            .main { padding: 10px 8px; margin-top: 55px; }
+            .hero { padding: 15px 12px; }
+            .hero h1 { font-size: 1.1rem; }
+            .hero-stat { flex: 1 1 100%; }
+            section { padding: 15px 12px; }
+            section h2 { font-size: 1.1rem; }
+            table { font-size: 0.75rem; }
+            th, td { padding: 6px 8px; }
+            .formula { font-size: 0.7rem; padding: 10px; }
+            .qa-q { font-size: 0.85rem; padding: 10px 12px; }
+            .qa-a { padding: 12px; }
+        }
+
+        @media print {
+            .nav { display: none; }
+            .main { margin-left: 0; margin-top: 0; }
+            section { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+    <div class="nav-header" onclick="this.parentElement.classList.toggle('expanded')">
+        <h1>Thesis Defense Guide <span class="mobile-hint">▼ Tap to navigate</span></h1>
+        <p>Satellite Remote Sensing for Soil NPK Analysis - CAR Philippines</p>
+    </div>
+
+    <div class="nav-section">
+        <div class="nav-section-title">Part 1: Foundation</div>
+        <a href="#overview">Research Overview</a>
+        <a href="#problem">Problem & Objectives</a>
+        <a href="#car-stats">CAR 2024 Statistics</a>
+        <a href="#soil-science">Soil Science & NPK</a>
+    </div>
+
+    <div class="nav-section">
+        <div class="nav-section-title">Part 2: Technical</div>
+        <a href="#remote-sensing">Remote Sensing Basics</a>
+        <a href="#satellites">Sentinel-2 & Landsat-8</a>
+        <a href="#spectral-indices">Spectral Indices Deep Dive</a>
+        <a href="#ml-models">Machine Learning Models</a>
+        <a href="#spatial-cv">Spatial Cross-Validation</a>
+    </div>
+
+    <div class="nav-section">
+        <div class="nav-section-title">Part 3: Methodology</div>
+        <a href="#data-collection">Data Collection</a>
+        <a href="#preprocessing">Preprocessing Pipeline</a>
+        <a href="#model-dev">Model Development</a>
+        <a href="#fertilizer">Fertilizer Algorithm</a>
+        <a href="#validation">Validation Strategy</a>
+    </div>
+
+    <div class="nav-section">
+        <div class="nav-section-title">Part 4: Context</div>
+        <a href="#ph-policy">PH Policy & DOST Alignment</a>
+        <a href="#literature">Literature Review</a>
+        <a href="#benchmarks">Accuracy Benchmarks</a>
+    </div>
+
+    <div class="nav-section">
+        <div class="nav-section-title">Part 5: Defense Q&A</div>
+        <a href="#qa-general">General Questions</a>
+        <a href="#qa-technical">Technical Questions</a>
+        <a href="#qa-methodology">Methodology Questions</a>
+        <a href="#qa-ml">ML-Specific Questions</a>
+        <a href="#qa-challenges">Challenges & Limitations</a>
+        <a href="#qa-impact">Impact & Future Work</a>
+    </div>
+
+    <div class="nav-section">
+        <div class="nav-section-title">Part 6: Reference</div>
+        <a href="#glossary">Glossary</a>
+        <a href="#formulas">Key Formulas</a>
+        <a href="#quick-facts">Quick Facts Cheatsheet</a>
+    </div>
+</nav>
+
+<main class="main">
+
+<!-- HERO -->
+<div class="hero">
+    <h1>Satellite Remote Sensing for Soil Nutrient Analysis and Fertilizer Recommendations in CAR</h1>
+    <p>Complete thesis defense preparation guide with technical concepts, Q&A, and quick reference materials.</p>
+    <div class="hero-stats">
+        <div class="hero-stat"><div class="num">432K</div><div class="label">MT Vegetables (CAR 2024)</div></div>
+        <div class="hero-stat"><div class="num">300+</div><div class="label">Soil Samples</div></div>
+        <div class="hero-stat"><div class="num">50+</div><div class="label">Features/Sample</div></div>
+        <div class="hero-stat"><div class="num">R2 0.65+</div><div class="label">Target Accuracy</div></div>
+        <div class="hero-stat"><div class="num">7</div><div class="label">Crop Types</div></div>
+    </div>
+</div>
+
+<!-- OVERVIEW -->
+<section id="overview">
+    <h2>1. Research Overview</h2>
+
+    <div class="success">
+        <strong>Simple Explanation:</strong> Imagine if your phone camera could look at a farm from space and tell you exactly what vitamins the soil is missing — that's essentially what we're building. Instead of expensive lab tests, we use free satellite photos + smart computer programs to diagnose soil health instantly.
+    </div>
+
+    <p>This research develops a <strong>satellite-based soil nutrient assessment system</strong> using multispectral imagery from Sentinel-2 and Landsat-8 combined with <strong>ML (Machine Learning)</strong> to predict soil <strong>NPK — Nitrogen (N), Phosphorus (P), Potassium (K)</strong> — and pH in highland vegetable farms of the <strong>CAR (Cordillera Administrative Region)</strong>, Philippines.</p>
+
+    <div class="highlight">
+        <h4>The Innovation</h4>
+        <ul>
+            <li><strong>Input:</strong> Free satellite imagery + terrain data + local soil samples</li>
+            <li><strong>Process:</strong> ML models — <strong>RF (Random Forest)</strong>, <strong>XGBoost (Extreme Gradient Boosting)</strong>, <strong>SVR (Support Vector Regression)</strong> — trained on spectral-soil correlations</li>
+            <li><strong>Output:</strong> 10m resolution soil fertility maps + crop-specific fertilizer recommendations</li>
+            <li><strong>Delivery:</strong> Web-based decision support system for farmers and extension agents</li>
+        </ul>
+    </div>
+
+    <h3>Why This Matters</h3>
+    <div class="grid-4">
+        <div class="stat-box"><div class="number">80%</div><div class="label">PH farmlands low fertility</div></div>
+        <div class="stat-box"><div class="number">85.9%</div><div class="label">CAR vegetables from Benguet</div></div>
+        <div class="stat-box"><div class="number">15-25%</div><div class="label">Potential cost savings</div></div>
+        <div class="stat-box"><div class="number">P9.5B</div><div class="label">2024 fertilizer subsidies</div></div>
+    </div>
+
+    <h3>Research Gap Addressed</h3>
+    <table>
+        <tr><th>Current Problem</th><th>This Research's Solution</th></tr>
+        <tr><td>Lab testing expensive (P500-1500/sample)</td><td>Free satellite data with ML prediction</td></tr>
+        <tr><td>Results take days/weeks</td><td>Near real-time predictions</td></tr>
+        <tr><td>Not site-specific</td><td>10-meter spatial resolution maps</td></tr>
+        <tr><td>Inaccessible to remote farms</td><td>Web-based system via any browser</td></tr>
+        <tr><td>Most RS studies on temperate lowlands</td><td>Calibrated for tropical highlands</td></tr>
+    </table>
+
+    <h3>Why 2025 is the Perfect Time for This Research</h3>
+    <div class="highlight">
+        <h4>Recent Developments Supporting Our Approach</h4>
+        <ul>
+            <li><strong>Sentinel-2A has 10 years of FREE data (2015-2025)</strong> — publicly accessible, no cost, with global coverage every 5 days</li>
+            <li><strong>405 EO satellites launched 2022-2025</strong> — tenfold increase in earth observation infrastructure</li>
+            <li><strong>DOST-PCAARRD (Department of Science and Technology - Philippine Council for Agriculture, Aquatic and Natural Resources Research and Development) SARAi (Smarter Approaches to Reinvigorate Agriculture as an Industry) Program</strong> — actively promotes satellite remote sensing + ML for Philippine agriculture</li>
+            <li><strong>DOST Soil Health Enhancement Program (March 2025)</strong> — prioritizes site-specific fertilizer management (exactly what we provide)</li>
+            <li><strong>AgroLens Project (2025)</strong> — peer-reviewed validation of ML + Sentinel-2 for soil nutrients without lab tests</li>
+            <li><strong>XGBoost proven effective</strong> — 2025 studies show R² = 0.73-0.75 for soil predictions</li>
+        </ul>
+    </div>
+
+    <div class="info">
+        <strong>DOST-CAR Regional Director Nancy Bantog (August 2025):</strong> "The agency is actively implementing SARAI, a four-year program promoting science-based tools and technologies." — Our research directly aligns with this national initiative.
+    </div>
+</section>
+
+<!-- PROBLEM & OBJECTIVES -->
+<section id="problem">
+    <h2>2. Problem Statement & Objectives</h2>
+
+    <div class="warning">
+        <strong>Core Problem:</strong> Current soil nutrient management in Philippine agriculture is constrained by poor access to accurate, timely, and site-specific diagnostic information, resulting in costly, inefficient, and environmentally problematic fertilizer application.
+    </div>
+
+    <h3>General Objective</h3>
+    <p>To develop a satellite-based soil nutrient assessment system that estimates soil NPK and pH and generates crop-specific fertilizer recommendations for highland vegetable farms in CAR.</p>
+
+    <h3>Specific Objectives</h3>
+    <div class="grid-2">
+        <div class="card">
+            <h4>1. Data Integration</h4>
+            <p>Collect, preprocess, and integrate Sentinel-2/Landsat-8 imagery, DEM terrain attributes, and 300+ lab-analyzed soil samples.</p>
+            <span class="badge badge-blue">Jan-Mar 2026</span>
+        </div>
+        <div class="card">
+            <h4>2. Model Development</h4>
+            <p>Develop and optimize RF, XGBoost, and SVR models for NPK/pH prediction; create fertilizer recommendation algorithms.</p>
+            <span class="badge badge-yellow">Apr-May 2026</span>
+        </div>
+        <div class="card">
+            <h4>3. Web System</h4>
+            <p>Build web-based decision support system integrating prediction models for end-user functionality.</p>
+            <span class="badge badge-yellow">Apr-May 2026</span>
+        </div>
+        <div class="card">
+            <h4>4. Validation</h4>
+            <p>Validate using holdout data, spatial CV, field trials, and TAM survey with 65 farmers.</p>
+            <span class="badge badge-green">Mid-May 2026</span>
+        </div>
+    </div>
+</section>
+
+<!-- CAR 2024 STATISTICS -->
+<section id="car-stats">
+    <h2>3. CAR 2024 Agricultural Statistics</h2>
+    <p><em>Source: <a href="https://rssocar.psa.gov.ph/content/cy-2024-cordillera-vegetables-situationer" target="_blank">Philippine Statistics Authority - CY 2024 Cordillera Vegetables Situationer</a></em></p>
+
+    <div class="highlight">
+        <h4>2024 Production Highlights</h4>
+        <ul>
+            <li>Total CAR vegetable production: <strong>432,068.1 MT</strong> (+4.6% from 2023)</li>
+            <li>Total harvested area: <strong>25,824.5 hectares</strong></li>
+            <li>CAR is one of only 2 regions with positive growth in 2024 (+2.4%)</li>
+        </ul>
+    </div>
+
+    <h3>Provincial Breakdown</h3>
+    <table>
+        <tr><th>Province</th><th>Production (MT)</th><th>Share (%)</th><th>Area (ha)</th></tr>
+        <tr><td><strong>Benguet</strong></td><td>371,151.5</td><td>85.9%</td><td>18,910.0</td></tr>
+        <tr><td>Mountain Province</td><td>31,896.3</td><td>7.4%</td><td>3,152.7</td></tr>
+        <tr><td>Apayao</td><td>14,687.4</td><td>3.4%</td><td>-</td></tr>
+        <tr><td>Ifugao</td><td>8,207.2</td><td>1.9%</td><td>-</td></tr>
+        <tr><td>Abra</td><td>3,459.5</td><td>0.8%</td><td>-</td></tr>
+        <tr><td>Kalinga</td><td>1,666.9</td><td>0.4%</td><td>348.9</td></tr>
+    </table>
+
+    <h3>Study Site Municipalities</h3>
+    <table>
+        <tr><th>Municipality</th><th>Province</th><th>Key Characteristics</th></tr>
+        <tr><td>La Trinidad</td><td>Benguet</td><td>Valley farms, trading center, high production volume</td></tr>
+        <tr><td>Atok</td><td>Benguet</td><td>Highest elevation (2,200m+), cool-climate vegetables</td></tr>
+        <tr><td>Kibungan</td><td>Benguet</td><td>Steep terrain, remote, mixed farming systems</td></tr>
+        <tr><td>Tinoc</td><td>Ifugao</td><td>Highland terraces, indigenous farming practices</td></tr>
+        <tr><td>Bauko</td><td>Mt. Province</td><td>Traditional highland agriculture, potato dominant</td></tr>
+    </table>
+
+    <h3>Target Crops & Their Nutrient Needs</h3>
+    <table>
+        <tr><th>Crop</th><th>Primary Need</th><th>Key Nutrient Notes</th></tr>
+        <tr><td>Cabbage</td><td>High N</td><td>Heavy nitrogen feeder for leaf development; sensitive to boron deficiency</td></tr>
+        <tr><td>Potato</td><td>High K</td><td>Potassium critical for tuber quality and disease resistance</td></tr>
+        <tr><td>Carrot</td><td>Balanced NPK</td><td>Excess N causes forking; needs consistent P for root development</td></tr>
+        <tr><td>Lettuce</td><td>Moderate N</td><td>Quick-growing; sensitive to pH extremes</td></tr>
+        <tr><td>Broccoli</td><td>High N, K</td><td>Heavy feeder; needs sulfur for head formation</td></tr>
+        <tr><td>Snap Bean</td><td>Low N, High P/K</td><td>Legume fixes own nitrogen; P critical for nodulation</td></tr>
+        <tr><td>Tomato</td><td>High K</td><td>Potassium for fruit quality; calcium prevents blossom end rot</td></tr>
+    </table>
+</section>
+
+<!-- SOIL SCIENCE -->
+<section id="soil-science">
+    <h2>4. Soil Science Fundamentals: NPK & pH</h2>
+
+    <h3>The Macronutrients Explained</h3>
+
+    <div class="grid-3">
+        <div class="card">
+            <h4>Nitrogen (N)</h4>
+            <p><strong>Role:</strong> Chlorophyll production, protein synthesis, vegetative growth</p>
+            <p><strong>Plant uptake forms:</strong> NO3- (nitrate) and NH4+ (ammonium)</p>
+            <p><strong>Deficiency signs:</strong> Yellowing of older leaves, stunted growth</p>
+            <p><strong>Excess effects:</strong> Excessive foliage, delayed maturity, disease susceptibility</p>
+        </div>
+        <div class="card">
+            <h4>Phosphorus (P)</h4>
+            <p><strong>Role:</strong> Energy transfer (ATP), root development, flowering/fruiting</p>
+            <p><strong>Plant uptake form:</strong> H2PO4- and HPO42- (phosphate ions)</p>
+            <p><strong>Deficiency signs:</strong> Purple/red leaves, poor root growth, delayed maturity</p>
+            <p><strong>pH sensitivity:</strong> Most available at pH 6.0-7.0; locks up in acidic soils</p>
+        </div>
+        <div class="card">
+            <h4>Potassium (K)</h4>
+            <p><strong>Role:</strong> Water regulation, disease resistance, fruit quality, enzyme activation</p>
+            <p><strong>Plant uptake form:</strong> K+ (potassium ion)</p>
+            <p><strong>Deficiency signs:</strong> Leaf edge browning, weak stems, poor fruit quality</p>
+            <p><strong>Mobility:</strong> Highly mobile in sandy soils; leaches with heavy rain</p>
+        </div>
+    </div>
+
+    <h3>Soil pH and Nutrient Availability</h3>
+
+    <div class="info">
+        <strong>Critical for CAR:</strong> Local studies show pH 4.49-5.2 (strongly acidic) due to continuous ammonium fertilizer use and heavy rainfall. At this pH, phosphorus becomes unavailable and aluminum toxicity occurs.
+    </div>
+
+    <table>
+        <tr><th>pH Range</th><th>Classification</th><th>Nutrient Availability</th></tr>
+        <tr><td>&lt; 4.5</td><td>Extremely acidic</td><td>Al/Mn toxicity; P, Ca, Mg severely limited</td></tr>
+        <tr><td>4.5 - 5.5</td><td>Strongly acidic</td><td>P fixation; reduced N, K availability</td></tr>
+        <tr><td>5.5 - 6.5</td><td>Moderately acidic</td><td>Good for most vegetables; optimal P availability</td></tr>
+        <tr><td>6.5 - 7.5</td><td>Neutral</td><td>Maximum nutrient availability range</td></tr>
+        <tr><td>&gt; 7.5</td><td>Alkaline</td><td>Fe, Mn, Zn, Cu deficiencies; P precipitation</td></tr>
+    </table>
+
+    <h3>Why Spectral Remote Sensing Can Detect Soil Nutrients</h3>
+    <p>Soil nutrients affect spectral reflectance through multiple mechanisms:</p>
+    <ul>
+        <li><strong>Direct effects:</strong> Mineral composition affects SWIR reflectance; organic matter absorbs visible light</li>
+        <li><strong>Indirect effects (vegetation):</strong> N status affects chlorophyll → changes red/NIR reflectance; K affects water content → SWIR changes</li>
+        <li><strong>Soil color:</strong> Iron oxides, organic matter, moisture all create distinct spectral signatures</li>
+    </ul>
+</section>
+
+<!-- REMOTE SENSING -->
+<section id="remote-sensing">
+    <h2>5. Remote Sensing Fundamentals</h2>
+
+    <h3>How Satellites "See" Soil Properties</h3>
+    <div class="formula">
+Sunlight → Hits Earth surface → Differentially absorbed/reflected based on surface properties
+→ Satellite sensor captures reflectance at specific wavelengths → Creates multispectral image
+→ ML models correlate spectral patterns with measured soil properties
+    </div>
+
+    <h3>Electromagnetic Spectrum Regions</h3>
+    <table>
+        <tr><th>Region</th><th>Wavelength</th><th>What It Detects</th><th>Soil/Vegetation Relevance</th></tr>
+        <tr><td>Blue</td><td>450-520 nm</td><td>Atmospheric scattering</td><td>Water depth, soil moisture</td></tr>
+        <tr><td>Green</td><td>520-600 nm</td><td>Vegetation reflectance peak</td><td>Plant vigor, chlorophyll</td></tr>
+        <tr><td>Red</td><td>630-690 nm</td><td>Chlorophyll absorption</td><td>Vegetation health, soil color</td></tr>
+        <tr><td><strong>Red Edge</strong></td><td>705-783 nm</td><td>Chlorophyll transition zone</td><td><strong>N (Nitrogen) status, vegetation stress</strong></td></tr>
+        <tr><td><strong>NIR (Near Infrared)</strong></td><td>785-900 nm</td><td>Cell structure reflection</td><td>Biomass, LAI (Leaf Area Index), moisture</td></tr>
+        <tr><td><strong>SWIR-1 (Shortwave Infrared)</strong></td><td>1550-1750 nm</td><td>Moisture, minerals</td><td><strong>Soil mineralogy, NPK correlation</strong></td></tr>
+        <tr><td><strong>SWIR-2 (Shortwave Infrared)</strong></td><td>2080-2350 nm</td><td>Clay minerals, carbonates</td><td><strong>Strongest NPK/pH predictor</strong></td></tr>
+    </table>
+
+    <div class="success">
+        <strong>Key Finding from Literature:</strong> SWIR bands (Sentinel-2 B11 at 1610nm and B12 at 2190nm) show the <strong>strongest predictive relevance</strong> for soil nutrients and pH (Kammerlander et al., 2025; Zhang et al., 2023).
+    </div>
+</section>
+
+<!-- SATELLITES -->
+<section id="satellites">
+    <h2>6. Sentinel-2 & Landsat-8 Specifications</h2>
+
+    <div class="success">
+        <strong>Why This Matters:</strong> Sentinel-2 data is <strong>100% FREE forever</strong> — funded by European taxpayers through <strong>ESA's (European Space Agency)</strong> Copernicus program. This means our system costs nothing to run, making precision agriculture accessible to even the poorest farmers. Commercial satellite data costs $10-50 per km² — we pay $0.
+    </div>
+
+    <div class="highlight">
+        <h4>Sentinel-2A Data Availability</h4>
+        <table>
+            <tr><th>Feature</th><th>Details</th></tr>
+            <tr><td>Launch Date</td><td>June 23, 2015</td></tr>
+            <tr><td>Historical Archive</td><td><strong>10 years</strong> of continuous global data</td></tr>
+            <tr><td>Cost</td><td><strong>FREE</strong> — open access for everyone</td></tr>
+            <tr><td>Coverage</td><td>Global (83°N to 56°S)</td></tr>
+            <tr><td>Revisit Time</td><td>Every 5 days (2A + 2B combined)</td></tr>
+            <tr><td>Access Points</td><td>Copernicus Data Space, USGS, AWS, Google Earth Engine</td></tr>
+        </table>
+    </div>
+
+    <h3>Sentinel-2 (Primary Data Source)</h3>
+    <table>
+        <tr><th>Band</th><th>Name</th><th>Wavelength (nm)</th><th>Resolution</th><th>Use in Study</th></tr>
+        <tr><td>B1</td><td>Coastal Aerosol</td><td>443</td><td>60m</td><td>Atmospheric correction</td></tr>
+        <tr><td>B2</td><td>Blue</td><td>490</td><td>10m</td><td>BSI calculation, moisture</td></tr>
+        <tr><td>B3</td><td>Green</td><td>560</td><td>10m</td><td>Vegetation indices</td></tr>
+        <tr><td>B4</td><td>Red</td><td>665</td><td>10m</td><td>NDVI, chlorophyll</td></tr>
+        <tr><td>B5</td><td>Red Edge 1</td><td>705</td><td>20m</td><td><strong>N estimation via NDRE</strong></td></tr>
+        <tr><td>B6</td><td>Red Edge 2</td><td>740</td><td>20m</td><td>Vegetation stress</td></tr>
+        <tr><td>B7</td><td>Red Edge 3</td><td>783</td><td>20m</td><td>LAI estimation</td></tr>
+        <tr><td>B8</td><td>NIR</td><td>842</td><td>10m</td><td>NDVI, SAVI, biomass</td></tr>
+        <tr><td>B8A</td><td>NIR Narrow</td><td>865</td><td>20m</td><td>Vegetation indices</td></tr>
+        <tr><td>B11</td><td><strong>SWIR-1</strong></td><td>1610</td><td>20m</td><td><strong>Key: NPK/pH prediction</strong></td></tr>
+        <tr><td>B12</td><td><strong>SWIR-2</strong></td><td>2190</td><td>20m</td><td><strong>Key: NPK/pH prediction</strong></td></tr>
+    </table>
+
+    <h3>Why Level-2A Products?</h3>
+    <div class="highlight">
+        <h4>Atmospheric Correction Already Applied</h4>
+        <p><strong>Level-2A</strong> = Surface reflectance (Bottom-of-Atmosphere, BOA) with atmospheric effects removed. This means:</p>
+        <ul>
+            <li>No additional atmospheric correction processing needed</li>
+            <li>Reflectance values directly usable for quantitative analysis</li>
+            <li>Consistent across dates and locations</li>
+            <li>Processed using Sen2Cor algorithm by ESA</li>
+        </ul>
+    </div>
+
+    <h3>Sentinel-2 vs Landsat-8 Comparison</h3>
+    <table>
+        <tr><th>Feature</th><th>Sentinel-2</th><th>Landsat-8</th><th>Combined Advantage</th></tr>
+        <tr><td>Resolution</td><td>10m/20m/60m</td><td>30m</td><td>Use S2 for detail, L8 for validation</td></tr>
+        <tr><td>Revisit time</td><td>5 days</td><td>16 days</td><td>More cloud-free opportunities</td></tr>
+        <tr><td>Spectral bands</td><td>13 bands</td><td>11 bands</td><td>S2 has red-edge bands</td></tr>
+        <tr><td>Archive</td><td>Since 2015</td><td>Since 2013</td><td>Temporal consistency checks</td></tr>
+        <tr><td>Cost</td><td>Free</td><td>Free</td><td>Both open access</td></tr>
+    </table>
+
+    <div class="success">
+        <strong>Multi-sensor fusion benefit:</strong> Chen et al. (2024) found that combining Sentinel-2 and Landsat-8 improves R² by <strong>8-12%</strong> compared to single-satellite approaches.
+    </div>
+</section>
+
+<!-- SPECTRAL INDICES -->
+<section id="spectral-indices">
+    <h2>7. Spectral Indices Deep Dive</h2>
+
+    <h3>NDVI — Normalized Difference Vegetation Index</h3>
+    <p><em>Measures plant health. Healthy plants absorb red light and reflect NIR (Near Infrared).</em></p>
+    <div class="formula">
+NDVI = (NIR - Red) / (NIR + Red)
+<span class="comment">// Sentinel-2: (B8 - B4) / (B8 + B4)</span>
+<span class="comment">// Range: -1 to +1</span>
+<span class="comment">// Healthy vegetation: 0.2 to 0.8</span>
+<span class="comment">// Bare soil: ~0.1</span>
+<span class="comment">// Water: negative values</span>
+    </div>
+    <p><strong>Principle:</strong> Healthy plants absorb red light (chlorophyll) and strongly reflect NIR (cell structure). The ratio normalizes for illumination differences.</p>
+    <p><strong>Limitation:</strong> Saturates at high biomass (>0.7); affected by soil background in sparse vegetation.</p>
+
+    <h3>SAVI — Soil Adjusted Vegetation Index</h3>
+    <p><em>Like NDVI but corrects for soil brightness. Better for sparse vegetation or early crop stages.</em></p>
+    <div class="formula">
+SAVI = ((NIR - Red) / (NIR + Red + L)) × (1 + L)
+<span class="comment">// L = soil brightness correction factor</span>
+<span class="comment">// L = 0.5 for most conditions (moderate vegetation)</span>
+<span class="comment">// L = 1.0 for low vegetation cover</span>
+<span class="comment">// L = 0 reduces to NDVI</span>
+    </div>
+    <p><strong>When to use:</strong> Sparse vegetation, early crop stages, arid regions. Critical for CAR highland farms with partial crop cover.</p>
+
+    <h3>EVI — Enhanced Vegetation Index</h3>
+    <p><em>Improved NDVI that reduces atmospheric noise. Best for dense vegetation areas.</em></p>
+    <div class="formula">
+EVI = 2.5 × ((NIR - Red) / (NIR + 6×Red - 7.5×Blue + 1))
+<span class="comment">// Reduces atmospheric and canopy background noise</span>
+<span class="comment">// Better for high-biomass areas</span>
+    </div>
+
+    <h3>BSI — Bare Soil Index</h3>
+    <p><em>Detects exposed soil without vegetation. Higher values = more bare soil visible.</em></p>
+    <div class="formula">
+BSI = ((SWIR1 + Red) - (NIR + Blue)) / ((SWIR1 + Red) + (NIR + Blue))
+<span class="comment">// Higher values = more exposed soil</span>
+<span class="comment">// Essential for identifying bare soil areas for direct soil analysis</span>
+    </div>
+
+    <h3>NDRE — Normalized Difference Red Edge</h3>
+    <p><em>Uses the "red edge" band (705nm) which is super sensitive to nitrogen status in plants.</em></p>
+    <div class="formula">
+NDRE = (NIR - RedEdge) / (NIR + RedEdge)
+<span class="comment">// Sentinel-2: (B8 - B5) / (B8 + B5)</span>
+<span class="comment">// More sensitive to chlorophyll variations than NDVI</span>
+<span class="comment">// Better for detecting N (Nitrogen) stress in crops</span>
+    </div>
+    <p><strong>Key advantage:</strong> Less saturation than NDVI in dense canopies; more sensitive to subtle N deficiency.</p>
+
+    <h3>SSRI — Standardized Spectral Reflectance Index</h3>
+    <p><em>Novel index created using PCA (Principal Component Analysis) to combine multiple bands optimally.</em></p>
+    <div class="formula">
+SSRI = Derived from Principal Component Analysis (PCA) of Sentinel-2 bands
+<span class="comment">// Novel index from Li et al. (2025)</span>
+<span class="comment">// Achieved R² > 0.68 for nitrogen prediction</span>
+<span class="comment">// Reduces multicollinearity between correlated bands</span>
+    </div>
+</section>
+
+<!-- ML MODELS -->
+<section id="ml-models">
+    <h2>8. Machine Learning Models</h2>
+
+    <div class="success">
+        <strong>Simple Analogy:</strong> Teaching ML to predict soil nutrients is like teaching someone to identify ripe mangoes. You show them 300 mangoes with lab-confirmed ripeness levels. They learn patterns: "yellow color + sweet smell + slight softness = ripe." Now they can predict ripeness of NEW mangoes without cutting them open. We do the same — show the computer 300+ satellite images with lab-confirmed soil nutrients, it learns the patterns, then predicts nutrients for any farm.
+    </div>
+
+    <div class="grid-3">
+        <div class="card primary">
+            <h4>Random Forest (RF)</h4>
+            <p><strong>Type:</strong> Ensemble of decision trees</p>
+            <p><strong>How it works:</strong> Builds many trees on random subsets of data/features; averages predictions</p>
+            <p><strong>Strengths:</strong></p>
+            <ul>
+                <li>Handles 50+ features well</li>
+                <li>Built-in feature importance</li>
+                <li>Robust to outliers</li>
+                <li>Resistant to overfitting</li>
+            </ul>
+            <p><strong>Best for:</strong> High-dimensional spectral data; provides interpretable importance rankings</p>
+        </div>
+        <div class="card success">
+            <h4>XGBoost</h4>
+            <p><strong>Type:</strong> Gradient boosted trees</p>
+            <p><strong>How it works:</strong> Sequentially builds trees, each correcting errors of previous</p>
+            <p><strong>Strengths:</strong></p>
+            <ul>
+                <li>Often highest accuracy</li>
+                <li>Fast training (GPU support)</li>
+                <li>Handles missing values</li>
+                <li>Regularization built-in</li>
+            </ul>
+            <p><strong>Best for:</strong> When maximum prediction accuracy is priority</p>
+        </div>
+        <div class="card">
+            <h4>SVR (Support Vector Regression)</h4>
+            <p><strong>Type:</strong> Kernel-based regression</p>
+            <p><strong>How it works:</strong> Maps data to high-dimensional space; finds optimal hyperplane</p>
+            <p><strong>Strengths:</strong></p>
+            <ul>
+                <li>Works well with smaller datasets</li>
+                <li>Effective in high dimensions</li>
+                <li>Memory efficient</li>
+                <li>Flexible kernels (RBF, linear)</li>
+            </ul>
+            <p><strong>Best for:</strong> When sample size is limited; soil pH prediction</p>
+        </div>
+    </div>
+
+    <h3>Literature Performance Comparison</h3>
+    <table>
+        <tr><th>Study</th><th>Algorithm</th><th>Target</th><th>R²</th><th>Notes</th></tr>
+        <tr><td>Zhang et al. (2023)</td><td>Multivariate regression</td><td>N, P, K</td><td>0.78, 0.74, 0.84</td><td>Alpine grasslands</td></tr>
+        <tr><td>Li et al. (2025)</td><td>RF with SSRI</td><td>Nitrogen</td><td>>0.68</td><td>PCA-based index</td></tr>
+        <tr><td>Meng et al. (2023)</td><td>RF vs SVM vs ANN</td><td>SOC</td><td>RF best</td><td>High-dimensional data</td></tr>
+        <tr><td>2024 SOC Study</td><td>XGBoost</td><td>SOC</td><td>0.75</td><td>Highest among tested</td></tr>
+        <tr><td>2025 Nitrogen Study</td><td>XGBoost</td><td>Total N</td><td>0.73</td><td>Orchards, 10m resolution</td></tr>
+    </table>
+
+    <div class="tip">Different algorithms may perform best for different nutrients. The study trains separate models per target (N, P, K, pH) and selects the best performer for each.</div>
+</section>
+
+<!-- SPATIAL CV -->
+<section id="spatial-cv">
+    <h2>9. Spatial Cross-Validation Explained</h2>
+
+    <h3>The Problem: Spatial Autocorrelation</h3>
+    <div class="warning">
+        <strong>What is it?</strong> Nearby soil samples tend to have similar values ("everything is related to everything else, but near things are more related" - Tobler's First Law of Geography).
+        <br><br>
+        <strong>Why it matters:</strong> Standard K-fold CV randomly splits data, so training and test sets contain nearby points. The model appears accurate but is partially "memorizing" local patterns rather than learning generalizable relationships.
+    </div>
+
+    <h3>The Solution: Spatial CV</h3>
+    <p>Ensure <strong>geographic separation</strong> between training and test sets:</p>
+    <ul>
+        <li><strong>Leave-one-site-out:</strong> Train on 4 municipalities, test on the 5th</li>
+        <li><strong>Spatial blocking:</strong> Divide study area into geographic blocks; each block serves as test set once</li>
+        <li><strong>Buffer exclusion:</strong> Exclude points within X meters of test points from training</li>
+    </ul>
+
+    <div class="highlight">
+        <h4>This Study's Approach</h4>
+        <p><strong>5-fold spatial cross-validation:</strong></p>
+        <ul>
+            <li>Data stratified by municipality AND elevation zone</li>
+            <li>Each fold represents distinct geographic area</li>
+            <li>Model trains on 4 folds, validates on 1</li>
+            <li>Final metrics = average across all 5 folds</li>
+        </ul>
+    </div>
+
+    <h3>Hybrid Approaches in Literature</h3>
+    <p>Recent research shows combining ML with geostatistics improves accuracy:</p>
+    <div class="formula">
+RFOK (Random Forest + Ordinary Kriging):
+1. RF predicts soil property based on covariates
+2. Calculate prediction residuals (actual - predicted)
+3. Interpolate residuals using kriging
+4. Final prediction = RF prediction + kriged residual
+
+<span class="comment">// Result: RMSE decreased by 62.2% vs RF alone (2025 study)</span>
+    </div>
+</section>
+
+<!-- DATA COLLECTION -->
+<section id="data-collection">
+    <h2>10. Data Collection Strategy</h2>
+
+    <h3>Sampling Design</h3>
+    <table>
+        <tr><th>Parameter</th><th>Specification</th><th>Rationale</th></tr>
+        <tr><td>Total samples</td><td>300+</td><td>10 samples per feature minimum; stratification needs</td></tr>
+        <tr><td>Depth</td><td>0-20 cm</td><td>Root zone for vegetables</td></tr>
+        <tr><td>Timing</td><td>Jan-Mar 2026</td><td>Dry season = less clouds + bare/early soil</td></tr>
+        <tr><td>Farm criteria</td><td>≥0.5 ha, documented history</td><td>Sufficient size for pixel matching</td></tr>
+        <tr><td>GPS accuracy</td><td>±10m buffer</td><td>Match to satellite pixel</td></tr>
+    </table>
+
+    <h3>Stratification Factors</h3>
+    <div class="grid-3">
+        <div class="card">
+            <h4>Elevation Zones</h4>
+            <ul>
+                <li>Low: &lt;1,600m</li>
+                <li>Mid: 1,600-1,800m</li>
+                <li>High: &gt;1,800m</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h4>Slope Positions</h4>
+            <ul>
+                <li>Upper slope</li>
+                <li>Middle slope</li>
+                <li>Lower slope</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h4>5 Municipalities</h4>
+            <ul>
+                <li>La Trinidad, Atok, Kibungan (Benguet)</li>
+                <li>Tinoc (Ifugao)</li>
+                <li>Bauko (Mt. Province)</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>Laboratory Analysis Methods</h3>
+    <table>
+        <tr><th>Property</th><th>Method</th><th>Description</th></tr>
+        <tr><td>Nitrogen (N)</td><td>Kjeldahl</td><td>Acid digestion releases N as NH3; distillation and titration</td></tr>
+        <tr><td>Phosphorus (P)</td><td>Olsen</td><td>NaHCO3 extraction; colorimetric measurement</td></tr>
+        <tr><td>Potassium (K)</td><td>NH4OAc + Flame Photometry</td><td>Ammonium acetate extraction; emission spectrometry</td></tr>
+        <tr><td>pH</td><td>1:1 soil-water</td><td>Potentiometric measurement with pH meter</td></tr>
+        <tr><td>Lime requirement</td><td>Buffer pH</td><td>For soils with pH &lt;5.0</td></tr>
+    </table>
+</section>
+
+<!-- PREPROCESSING -->
+<section id="preprocessing">
+    <h2>11. Preprocessing Pipeline</h2>
+
+    <h3>Feature Space: 50+ Variables</h3>
+    <table>
+        <tr><th>Category</th><th>Count</th><th>Variables</th></tr>
+        <tr><td>Sentinel-2 bands</td><td>13</td><td>B1-B12, B8A raw reflectance</td></tr>
+        <tr><td>Spectral indices</td><td>8</td><td>NDVI, SAVI, EVI, BSI, NDRE, OSAVI, SSRI, NDMI</td></tr>
+        <tr><td>Landsat-8 bands</td><td>6</td><td>Blue, Green, Red, NIR, SWIR1, SWIR2</td></tr>
+        <tr><td>Terrain (DEM)</td><td>5</td><td>Elevation, Slope, Aspect, Curvature, TPI</td></tr>
+        <tr><td>Agronomic</td><td>3</td><td>Crop type, Previous crop, Farm history</td></tr>
+        <tr><td>Environmental</td><td>3</td><td>Temperature, Humidity, Rainfall</td></tr>
+    </table>
+
+    <h3>Processing Steps</h3>
+    <ol>
+        <li><strong>Band harmonization:</strong> Resample to 30m common grid (cubic convolution — a smoothing method for resizing images)</li>
+        <li><strong>Temporal matching:</strong> Satellite scenes ±5 days of soil sampling</li>
+        <li><strong>Spatial matching:</strong> GPS coordinates to pixel using ±10m buffer; extract mean reflectance</li>
+        <li><strong>Cloud masking:</strong> Remove cloud-affected pixels using SCL (Scene Classification Layer) band</li>
+        <li><strong>Outlier removal:</strong> IQR (Interquartile Range) method — removes extreme values that are &gt;1.5× the middle 50% spread</li>
+        <li><strong>Normalization:</strong> Min-max scaling to [0,1] range</li>
+        <li><strong>Missing imputation:</strong> KNN (K-Nearest Neighbors) with K=5 — fills missing values using the average of 5 most similar data points</li>
+    </ol>
+</section>
+
+<!-- MODEL DEVELOPMENT -->
+<section id="model-dev">
+    <h2>12. Model Development Process</h2>
+
+    <h3>Training Configuration</h3>
+    <table>
+        <tr><th>Parameter</th><th>Value</th><th>Rationale</th></tr>
+        <tr><td>Train/Test split</td><td>70/30</td><td>Stratified by municipality + elevation</td></tr>
+        <tr><td>Cross-validation</td><td>5-fold spatial CV (Cross-Validation) — tests model on 5 different geographic splits</td><td>Accounts for spatial autocorrelation</td></tr>
+        <tr><td>Hyperparameter tuning</td><td>Bayesian optimization</td><td>100 iterations; more efficient than grid search</td></tr>
+        <tr><td>Environment</td><td>Google Colab Pro (GPU)</td><td>Faster XGBoost training</td></tr>
+        <tr><td>Target R² threshold</td><td>≥0.65</td><td>Literature benchmark for satellite-only models</td></tr>
+    </table>
+
+    <h3>Evaluation Metrics — What They Actually Mean</h3>
+
+    <div class="highlight">
+        <h4>R² (R-squared) — "How much does your model explain?"</h4>
+        <p>If soil nitrogen varies across 100 farms, R² tells you what percentage of that variation your model correctly predicts.</p>
+        <ul>
+            <li><strong>R² = 0.00</strong> — Model explains nothing (just guessing randomly)</li>
+            <li><strong>R² = 0.50</strong> — Model explains 50% of variation (okay)</li>
+            <li><strong>R² = 0.65</strong> — Model explains 65% of variation (<strong>our target</strong>)</li>
+            <li><strong>R² = 0.80</strong> — Model explains 80% of variation (excellent)</li>
+            <li><strong>R² = 1.00</strong> — Perfect prediction (never happens in real data)</li>
+        </ul>
+        <p><em>Think of it as a grade: 0.65 = 65% = passing. Higher is better.</em></p>
+    </div>
+
+    <div class="formula">
+R² = 1 - (SS_residual / SS_total)
+<span class="comment">// SS_residual = sum of squared errors (how wrong we were)</span>
+<span class="comment">// SS_total = total variance in data (how much values vary)</span>
+<span class="comment">// Result: 0 to 1 scale; higher = better</span>
+
+RMSE (Root Mean Square Error) = √(Σ(predicted - actual)² / n)
+<span class="comment">// Average size of prediction errors in original units (e.g., kg/ha for nitrogen)</span>
+<span class="comment">// Lower = better. RMSE = 5 means "we're typically off by about 5 units"</span>
+
+MAE (Mean Absolute Error) = Σ|predicted - actual| / n
+<span class="comment">// Similar to RMSE but less affected by outliers (extreme errors)</span>
+<span class="comment">// Lower = better</span>
+    </div>
+
+    <h3>SHAP for Interpretability</h3>
+    <p><strong>SHapley Additive exPlanations:</strong> Explains which features contributed most to each prediction.</p>
+    <ul>
+        <li>Validates model reasoning aligns with domain knowledge</li>
+        <li>Builds trust with end-users</li>
+        <li>Identifies unexpected feature importance (potential data issues)</li>
+    </ul>
+</section>
+
+<!-- FERTILIZER ALGORITHM -->
+<section id="fertilizer">
+    <h2>13. Fertilizer Recommendation Algorithm</h2>
+
+    <div class="formula">
+Input: Predicted N, P, K, pH from best ML model
+       + Crop type + Previous crop + Target yield
+
+Step 1: Compare predicted vs optimal nutrient levels for crop
+Step 2: Calculate deficiency = optimal - predicted
+Step 3: Apply pH correction factors (availability adjustment)
+Step 4: Apply rotation credits (e.g., -20% N after legumes)
+Step 5: Convert nutrient needs to fertilizer rates
+
+Output: kg/ha of specific fertilizer products + lime if needed
+    </div>
+
+    <h3>Algorithm Components</h3>
+    <table>
+        <tr><th>Component</th><th>Function</th></tr>
+        <tr><td>Nutrient deficiency assessment</td><td>Compare predicted levels to crop-specific targets</td></tr>
+        <tr><td>pH correction</td><td>Adjust availability based on pH; recommend lime if pH &lt;5.5</td></tr>
+        <tr><td>Rotation credits</td><td>Reduce N by 20-30% after legumes (snap bean)</td></tr>
+        <tr><td>Fertilizer type options</td><td>Organic, inorganic, or blended recommendations</td></tr>
+        <tr><td>Application timing</td><td>Basal vs side-dress scheduling</td></tr>
+    </table>
+
+    <div class="success">
+        <strong>Alignment with Standards:</strong> Based on DA-PhilRice soil test-based nutrient management guidelines and Dobermann et al. (2002) SSNM principles.
+    </div>
+</section>
+
+<!-- VALIDATION -->
+<section id="validation">
+    <h2>14. Validation Strategy</h2>
+
+    <div class="grid-3">
+        <div class="card">
+            <h4>Model Validation</h4>
+            <ul>
+                <li>20% independent holdout test set</li>
+                <li>Metrics: R², RMSE, MAE</li>
+                <li>Leave-one-site-out validation</li>
+                <li>Temporal stability (dry vs wet season)</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h4>Field Validation</h4>
+            <ul>
+                <li>RCBD (Randomized Complete Block Design) — standard experimental layout that controls for field variability</li>
+                <li>3 crops × 3 elevations × 2 seasons</li>
+                <li>Compare: Farmer practice vs STK (Soil Test Kit — traditional lab method) vs Satellite prediction</li>
+                <li>Measure: Yield, input cost, ROI (Return on Investment)</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h4>User Acceptance — TAM (Technology Acceptance Model)</h4>
+            <p><em>Standard framework to measure if users will actually adopt new technology.</em></p>
+            <ul>
+                <li>65 farmers surveyed</li>
+                <li>Perceived usefulness — "Will this help me?"</li>
+                <li>Perceived ease of use — "Can I actually use this?"</li>
+                <li>Intention to adopt — "Will I use this in the future?"</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- PH POLICY -->
+<section id="ph-policy">
+    <h2>15. Philippine Policy Context & DOST Alignment</h2>
+    <p><em>Sources: DBM, DA, DOST-PCAARRD, PSA</em></p>
+
+    <div class="highlight">
+        <h4>Direct Alignment with DOST Programs</h4>
+        <table>
+            <tr><th>DOST Program</th><th>What They Promote</th><th>How Our Research Aligns</th></tr>
+            <tr><td><strong>SARAi Program</strong></td><td>Satellite remote sensing + GIS + ML for crop forecasting</td><td>We use the exact same technologies for soil analysis</td></tr>
+            <tr><td><strong>CL-SEAMS</strong></td><td>Community-level monitoring using NDVI + GIS</td><td>We extend this to include soil nutrient prediction</td></tr>
+            <tr><td><strong>Soil Health Enhancement (2025)</strong></td><td>Site-specific fertilizer management</td><td>Our system provides exactly this — field-level recommendations</td></tr>
+            <tr><td><strong>DATOS Training</strong></td><td>SAR image processing + crop mapping</td><td>Our methodology can be integrated into DOST training programs</td></tr>
+        </table>
+    </div>
+
+    <div class="info">
+        <strong>Key Quote from DOST-PCAARRD (March 2025):</strong> "The Soil Health Enhancement Program aims to address persistent challenges including low productivity, soil degradation, and weak soil health management through site-specific fertilizer management and centralized soil information systems." — This describes our exact research objectives.
+    </div>
+
+    <h3>2024-2025 Government Programs</h3>
+    <table>
+        <tr><th>Program</th><th>Budget</th><th>Description</th></tr>
+        <tr><td>Fertilizer Discount Vouchers</td><td>P9.56 billion</td><td>National Rice Program support</td></tr>
+        <tr><td>Yellow Corn Seeds + Fertilizers</td><td>P2.49 billion</td><td>Corn farmer assistance</td></tr>
+        <tr><td>Agri-Puhunan at Pantawid (APP)</td><td>P3 billion</td><td>Loans + P32,000 direct assistance per farmer</td></tr>
+        <tr><td>Biofertilizer Program</td><td>P1.9 billion</td><td>Organic + biofertilizer integration</td></tr>
+        <tr><td>VISTA Project (IFAD)</td><td>EUR 104M</td><td>350,000 smallholders over 6 years</td></tr>
+    </table>
+
+    <div class="info">
+        <strong>Policy Relevance:</strong> This research supports efficient fertilizer use, potentially reducing subsidy dependence while maintaining/improving yields. Aligns with DA goals for precision agriculture adoption.
+    </div>
+</section>
+
+<!-- LITERATURE -->
+<section id="literature">
+    <h2>16. Key Literature Summary</h2>
+
+    <div class="success">
+        <strong>Why Literature Matters:</strong> We're not inventing from scratch — we're building on proven methods. The studies below show that satellite + ML for soil prediction WORKS. Our contribution is applying it to Philippine highland conditions with local calibration.
+    </div>
+
+    <h3>2025 Breakthrough Studies</h3>
+    <table>
+        <tr><th>Citation</th><th>Key Finding</th><th>Relevance to Study</th></tr>
+        <tr><td><strong>AgroLens (Kammerlander 2025)</strong></td><td>ML predicts soil nutrients from Sentinel-2 WITHOUT lab tests; XGBoost best performer</td><td><strong>Validates our exact approach</strong></td></tr>
+        <tr><td><strong>Sentinel-2 vs Landsat (2025)</strong></td><td>Sentinel-2 achieves R²=0.65 vs Landsat's R²=0.52 for soil carbon</td><td>Justifies Sentinel-2 as primary source</td></tr>
+        <tr><td><strong>Combined Satellite Study (2024)</strong></td><td>Sentinel-2 + Landsat fusion improves accuracy by 8-12%</td><td>Supports our multi-sensor approach</td></tr>
+    </table>
+
+    <h3>Tropical/Asian Studies (Proves Method Works Outside Europe)</h3>
+    <table>
+        <tr><th>Citation</th><th>Location</th><th>Key Finding</th></tr>
+        <tr><td>Zhang et al. (2023)</td><td><strong>China (alpine)</strong></td><td>R²=0.78(N), 0.74(P), 0.84(K) — similar climate to CAR highlands</td></tr>
+        <tr><td>Suihua City Study (2023)</td><td><strong>Northeast China</strong></td><td>RF achieved R²=0.74 for nitrogen using Sentinel-2</td></tr>
+        <tr><td>Zoige Plateau (2024)</td><td><strong>Tibet-China</strong></td><td>XGBoost + Sentinel-1/2 successful for soil carbon in highlands</td></tr>
+        <tr><td>Brazilian Pasture Study (2024)</td><td><strong>Brazil (tropical)</strong></td><td>Sentinel-2 + ML predicted forage quality in tropical pastures</td></tr>
+    </table>
+    <div class="success">
+        <strong>Key Point:</strong> These Asian and tropical studies prove the methodology transfers beyond Europe. The physics is universal — local calibration is what makes it accurate for specific regions.
+    </div>
+
+    <h3>Foundational Studies</h3>
+    <table>
+        <tr><th>Citation</th><th>Key Finding</th><th>Relevance to Study</th></tr>
+        <tr><td>Kammerlander et al. (2025)</td><td>AgroLens: ML predicts soil properties from Sentinel-2; SWIR most predictive</td><td>Methodology foundation (we adapt for PH)</td></tr>
+        <tr><td>Zhang et al. (2023)</td><td>R²=0.78(N), 0.74(P), 0.84(K) in alpine grasslands</td><td>Accuracy benchmarks for highlands</td></tr>
+        <tr><td>Castaldi et al. (2019)</td><td>Sentinel-2 effective for soil pH via red-edge/SWIR</td><td>pH modeling approach</td></tr>
+        <tr><td>Zou et al. (2024)</td><td>DEM variables add 19-65% explanatory power</td><td>Justifies terrain features</td></tr>
+        <tr><td>Chen et al. (2024)</td><td>Multi-sensor fusion improves R² by 8-12%</td><td>Sentinel + Landsat integration</td></tr>
+        <tr><td>Li et al. (2025)</td><td>SSRI index achieves R²>0.68 for nitrogen</td><td>Novel spectral index</td></tr>
+        <tr><td>Dobermann et al. (2002)</td><td>SSNM improves productivity + fertilizer efficiency</td><td>Agronomic framework</td></tr>
+        <tr><td>Anupo (2013)</td><td>CAR soil pH 4.49-5.2 (strongly acidic)</td><td>Local baseline</td></tr>
+        <tr><td>Briones (2024)</td><td>Smallholders sensitive to fertilizer costs; often under-apply</td><td>Socioeconomic context</td></tr>
+    </table>
+</section>
+
+<!-- BENCHMARKS -->
+<section id="benchmarks">
+    <h2>17. Accuracy Benchmarks from Recent Studies</h2>
+
+    <table>
+        <tr><th>Study (Year)</th><th>Target</th><th>Method</th><th>R²</th><th>RMSE</th></tr>
+        <tr><td>Zhang et al. (2023)</td><td>Nitrogen</td><td>Sentinel-2 + regression</td><td>0.78</td><td>-</td></tr>
+        <tr><td>Zhang et al. (2023)</td><td>Phosphorus</td><td>Sentinel-2 + regression</td><td>0.74</td><td>-</td></tr>
+        <tr><td>Zhang et al. (2023)</td><td>Potassium</td><td>Sentinel-2 + regression</td><td>0.84</td><td>-</td></tr>
+        <tr><td>2025 TN Study</td><td>Total Nitrogen</td><td>XGBoost + multi-temporal</td><td>0.73</td><td>-</td></tr>
+        <tr><td>2024 SOC Study</td><td>Soil Organic Carbon</td><td>XGBoost</td><td>0.75</td><td>7.68</td></tr>
+        <tr><td>Li et al. (2025)</td><td>Nitrogen</td><td>RF + SSRI</td><td>>0.68</td><td>-</td></tr>
+        <tr><td>2025 Hybrid Study</td><td>SOC</td><td>RF + Kriging (RFOK)</td><td>0.64</td><td>0.58</td></tr>
+        <tr><td>2025 Forest pH</td><td>Soil pH</td><td>RF + Sentinel-2</td><td>-</td><td>Temporally stable</td></tr>
+    </table>
+
+    <div class="success">
+        <strong>Target for this study:</strong> R² ≥ 0.65 is achievable based on literature. Higher accuracy possible with local calibration and terrain integration.
+    </div>
+</section>
+
+<!-- Q&A GENERAL -->
+<section id="qa-general">
+    <h2>18. Defense Q&A: General Questions</h2>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: Explain your research in simple terms that anyone can understand.</div>
+        <div class="qa-a">
+            <h5>Answer:</h5>
+            <p>"We use satellite images to check soil health without expensive lab tests. The satellite captures light reflected from the earth - different soils reflect light differently based on their nutrient content. We teach a computer to recognize these patterns using actual soil samples, then the computer can predict nutrients for any farm location. Finally, we tell farmers exactly how much fertilizer to apply based on what their soil needs."</p>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: Why is this research important? Why should anyone care?</div>
+        <div class="qa-a">
+            <h5>Answer:</h5>
+            <ul>
+                <li><strong>Food security:</strong> 80% of PH farmlands have low fertility; we help optimize production</li>
+                <li><strong>Farmer economics:</strong> Reduces fertilizer waste by 15-25%, saving thousands of pesos per hectare</li>
+                <li><strong>Environment:</strong> Prevents over-fertilization that pollutes water and releases greenhouse gases</li>
+                <li><strong>Accessibility:</strong> Free satellite data makes precision agriculture available to smallholders, not just large farms</li>
+                <li><strong>CAR specifically:</strong> "Salad Bowl of the Philippines" - 432,000 MT vegetables annually</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: Most soil remote sensing studies use European data (LUCAS). Will that actually work here in the Philippines / Southeast Asia?</div>
+        <div class="qa-a">
+            <h5>This is exactly why we're collecting LOCAL soil samples.</h5>
+            <p><strong>The short answer:</strong> European MODELS won't work directly — but the European METHODOLOGY does. That's the key distinction.</p>
+
+            <h5>What transfers (universal physics):</h5>
+            <ul>
+                <li><strong>Spectral physics is universal</strong> — SWIR absorption by clay minerals works the same way whether you're in Germany or Benguet</li>
+                <li><strong>The relationship patterns</strong> — "more organic matter = darker soil = lower reflectance" is true everywhere</li>
+                <li><strong>The ML workflow</strong> — collect samples → extract spectral features → train model → validate</li>
+                <li><strong>Sentinel-2 bands</strong> — the satellite sees Philippine soil the same way it sees European soil</li>
+            </ul>
+
+            <h5>What does NOT transfer (requires local calibration):</h5>
+            <ul>
+                <li><strong>Model coefficients</strong> — A model trained on German soil will predict WRONG values for CAR soil</li>
+                <li><strong>Nutrient ranges</strong> — European "low nitrogen" might be "medium" in Philippine volcanic soils</li>
+                <li><strong>Soil types</strong> — CAR has Andisols (volcanic); Europe has mostly Alfisols/Mollisols</li>
+                <li><strong>Climate effects</strong> — Tropical weathering creates different mineral compositions</li>
+            </ul>
+
+            <h5>Our solution — LOCAL CALIBRATION:</h5>
+            <ul>
+                <li>We collect <strong>300+ soil samples from CAR itself</strong></li>
+                <li>We train models on <strong>Philippine soil + Philippine satellite data</strong></li>
+                <li>European studies prove the METHOD works; our samples make it work HERE</li>
+            </ul>
+
+            <div class="tip">Think of it like a recipe: European studies proved "satellite + ML = soil prediction" works. But we can't use their exact recipe — we need to adjust the ingredients for local conditions. That's what our 300+ samples do.</div>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: What makes your research different from existing studies?</div>
+        <div class="qa-a">
+            <h5>Answer:</h5>
+            <ul>
+                <li><strong>Local calibration:</strong> Uses 300+ CAR soil samples, not European/global datasets</li>
+                <li><strong>Tropical highlands:</strong> First study applying satellite soil mapping in Philippine mountain agriculture</li>
+                <li><strong>End-to-end system:</strong> Not just prediction - includes fertilizer recommendations + web delivery</li>
+                <li><strong>Multi-sensor:</strong> Combines Sentinel-2 + Landsat-8 for improved accuracy</li>
+                <li><strong>Practical validation:</strong> Field trials comparing actual yields, not just statistical metrics</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: Who are the beneficiaries of your research?</div>
+        <div class="qa-a">
+            <ul>
+                <li><strong>Smallholder farmers:</strong> Access soil information without P500-1500 lab fees</li>
+                <li><strong>Agricultural extension agents:</strong> Data-driven tools for advising farmers</li>
+                <li><strong>DA-CAR / LGUs:</strong> Regional soil fertility maps for planning interventions</li>
+                <li><strong>Researchers:</strong> Replicable methodology for other Philippine highland areas</li>
+                <li><strong>Environment:</strong> Reduced fertilizer runoff from over-application</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Q&A TECHNICAL -->
+<section id="qa-technical">
+    <h2>19. Defense Q&A: Technical Questions</h2>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: Why Sentinel-2 specifically? Why not other satellites?</div>
+        <div class="qa-a">
+            <ul>
+                <li><strong>Free and open:</strong> No licensing costs through Copernicus program</li>
+                <li><strong>High resolution:</strong> 10m bands vs 30m for Landsat</li>
+                <li><strong>Red-edge bands:</strong> Unique 705-783nm bands sensitive to N status - Landsat lacks these</li>
+                <li><strong>Frequent revisit:</strong> 5 days = more cloud-free opportunities in CAR's cloudy climate</li>
+                <li><strong>Level-2A:</strong> Pre-corrected atmospheric effects saves processing time</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: Why use machine learning instead of simple linear regression?</div>
+        <div class="qa-a">
+            <ul>
+                <li><strong>Non-linear relationships:</strong> Soil-spectral correlations are complex, not straight lines</li>
+                <li><strong>High dimensionality:</strong> 50+ features; linear regression struggles with multicollinearity</li>
+                <li><strong>Interactions:</strong> ML captures feature interactions (e.g., vegetation × terrain effects)</li>
+                <li><strong>Noise tolerance:</strong> Ensemble methods robust to outliers common in RS data</li>
+                <li><strong>Literature consensus:</strong> ML consistently outperforms linear methods for soil prediction</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: Explain spatial cross-validation. Why not regular K-fold?</div>
+        <div class="qa-a">
+            <p><strong>Problem:</strong> Nearby soil samples are similar (spatial autocorrelation). Regular K-fold randomly mixes nearby points into training and test sets, making the model appear more accurate than it really is.</p>
+            <p><strong>Solution:</strong> Spatial CV ensures geographic separation. Example: train on La Trinidad + Atok + Kibungan + Bauko, test on Tinoc. The model must generalize to a completely new area.</p>
+            <p><strong>Result:</strong> More realistic accuracy estimates that reflect real-world performance on new farms.</p>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: What is SHAP and why do you use it?</div>
+        <div class="qa-a">
+            <p><strong>SHAP = SHapley Additive exPlanations</strong> - a method to explain ML predictions.</p>
+            <p>For each prediction, SHAP shows how much each feature contributed. If SHAP says SWIR bands are most important for pH prediction, we can verify this matches soil science (SWIR is sensitive to mineralogy). It builds trust with users who want to understand "why" not just "what."</p>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: Why is R² ≥ 0.65 your target? Is that good enough?</div>
+        <div class="qa-a">
+            <ul>
+                <li><strong>Literature benchmark:</strong> Zhang et al. achieved 0.74-0.84 in optimal conditions; 0.65+ is reasonable for complex tropical highlands</li>
+                <li><strong>Practical sufficiency:</strong> R²=0.65 means we explain 65% of nutrient variation - enough to distinguish high vs low fertility zones and guide appropriate fertilizer rates</li>
+                <li><strong>Not a replacement:</strong> We complement, not replace, lab testing for critical decisions</li>
+                <li><strong>Exceeding target:</strong> With local calibration + terrain data, we may achieve 0.70+</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Q&A METHODOLOGY -->
+<section id="qa-methodology">
+    <h2>20. Defense Q&A: Methodology Questions</h2>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: How did you determine your sample size of 300+?</div>
+        <div class="qa-a">
+            <ul>
+                <li><strong>Rule of thumb:</strong> 10 samples per feature → 50 features × 10 = 500 ideal; 300 is practical compromise</li>
+                <li><strong>Stratification:</strong> 5 municipalities × 3 elevations × 3 slopes × 7 crops = many strata to cover</li>
+                <li><strong>Literature precedent:</strong> Similar studies used 200-500 samples successfully</li>
+                <li><strong>Resource constraints:</strong> Lab costs, field accessibility, project timeline</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: Why January-March for data collection?</div>
+        <div class="qa-a">
+            <ul>
+                <li><strong>Dry season:</strong> Fewer clouds = more usable satellite images</li>
+                <li><strong>Pre-planting:</strong> More bare soil visible for direct soil spectral analysis</li>
+                <li><strong>Stable conditions:</strong> Soil moisture more consistent than monsoon season</li>
+                <li><strong>Temporal matching:</strong> ±5 days between sampling and satellite pass minimizes change</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: How do you handle vegetation covering the soil?</div>
+        <div class="qa-a">
+            <ul>
+                <li><strong>Timing:</strong> Sample during pre-planting or early growth stages</li>
+                <li><strong>Indirect sensing:</strong> Vegetation health reflects soil N status (via NDVI, NDRE)</li>
+                <li><strong>Spectral indices:</strong> SAVI and BSI designed to account for vegetation effects</li>
+                <li><strong>SWIR penetration:</strong> Shortwave infrared partially penetrates thin canopies</li>
+                <li><strong>Acknowledged limitation:</strong> Full crop cover reduces accuracy; future work could add radar (SAR)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: What if model performs well for N but poorly for P?</div>
+        <div class="qa-a">
+            <p><strong>This is expected and handled:</strong></p>
+            <ul>
+                <li>Different nutrients have different spectral signatures</li>
+                <li>N affects vegetation (easy to detect); P has weaker direct signal</li>
+                <li>We train <strong>separate models per nutrient</strong> - best algorithm may differ</li>
+                <li>Report confidence levels with predictions</li>
+                <li>Recommend lab testing for nutrients with lower model confidence</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Q&A ML -->
+<section id="qa-ml">
+    <h2>21. Defense Q&A: ML-Specific Questions</h2>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: How does Random Forest work?</div>
+        <div class="qa-a">
+            <ol>
+                <li>Create many decision trees (e.g., 500)</li>
+                <li>Each tree trained on random subset of samples (bootstrap)</li>
+                <li>At each split, consider random subset of features</li>
+                <li>Final prediction = average of all tree predictions</li>
+            </ol>
+            <p><strong>Why it works:</strong> Individual trees may overfit, but averaging many trees cancels out errors. Random feature selection ensures trees are diverse.</p>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: What's the difference between Random Forest and XGBoost?</div>
+        <div class="qa-a">
+            <table>
+                <tr><th>Aspect</th><th>Random Forest</th><th>XGBoost</th></tr>
+                <tr><td>Building trees</td><td>Parallel (independent)</td><td>Sequential (each corrects previous)</td></tr>
+                <tr><td>Combining</td><td>Simple averaging</td><td>Weighted sum</td></tr>
+                <tr><td>Focus</td><td>Reduce variance</td><td>Reduce bias then variance</td></tr>
+                <tr><td>Speed</td><td>Faster training</td><td>Slower but often more accurate</td></tr>
+                <tr><td>Tuning</td><td>Fewer hyperparameters</td><td>More tuning options</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: What is Bayesian optimization for hyperparameter tuning?</div>
+        <div class="qa-a">
+            <p>Instead of trying all combinations (grid search) or random sampling:</p>
+            <ol>
+                <li>Build probabilistic model of objective function</li>
+                <li>Use model to predict which hyperparameters might be best</li>
+                <li>Try those hyperparameters, update model with result</li>
+                <li>Repeat - focuses search on promising regions</li>
+            </ol>
+            <p><strong>Advantage:</strong> Finds good hyperparameters in fewer iterations (100 vs 1000s for grid search).</p>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: How do you prevent overfitting?</div>
+        <div class="qa-a">
+            <ul>
+                <li><strong>Spatial cross-validation:</strong> Tests generalization to new areas</li>
+                <li><strong>Regularization:</strong> XGBoost has L1/L2 penalties; RF limits tree depth</li>
+                <li><strong>Early stopping:</strong> Stop training when validation error increases</li>
+                <li><strong>Feature selection:</strong> Remove redundant features that add noise</li>
+                <li><strong>Holdout test set:</strong> Final evaluation on never-seen data</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Q&A CHALLENGES -->
+<section id="qa-challenges">
+    <h2>22. Defense Q&A: Challenges & Limitations</h2>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: What are the main limitations of your study?</div>
+        <div class="qa-a">
+            <ul>
+                <li><strong>Geographic scope:</strong> Only 5 CAR municipalities; may not transfer to lowlands</li>
+                <li><strong>Crop coverage:</strong> 7 highland vegetables; not applicable to rice/corn without recalibration</li>
+                <li><strong>Cloud dependence:</strong> Optical satellites blocked by clouds; wet season data limited</li>
+                <li><strong>Proof-of-concept:</strong> Web system uses pre-processed data, not real-time satellite feeds</li>
+                <li><strong>Vegetation interference:</strong> Accuracy decreases under full crop canopy</li>
+                <li><strong>Temporal snapshot:</strong> Models trained on one season; seasonal variation needs study</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: What are potential sources of error?</div>
+        <div class="qa-a">
+            <table>
+                <tr><th>Error Source</th><th>Mitigation</th></tr>
+                <tr><td>GPS inaccuracy</td><td>±10m buffer; average multiple pixels</td></tr>
+                <tr><td>Temporal mismatch</td><td>±5 day window; dry season timing</td></tr>
+                <tr><td>Cloud contamination</td><td>Cloud masking; multiple scenes; visual QC</td></tr>
+                <tr><td>Lab analysis error</td><td>Accredited lab; duplicate samples</td></tr>
+                <tr><td>Spatial autocorrelation</td><td>Spatial cross-validation</td></tr>
+                <tr><td>Model overfitting</td><td>Regularization; holdout validation</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: How will farmers without internet access use your system?</div>
+        <div class="qa-a">
+            <ul>
+                <li><strong>Extension agent mediation:</strong> Technicians access system and share with farmers</li>
+                <li><strong>Downloadable PDF reports:</strong> Print and distribute</li>
+                <li><strong>Static maps:</strong> Display at municipal agriculture offices</li>
+                <li><strong>Mobile-friendly:</strong> Works on smartphones with basic data connection</li>
+                <li><strong>Future work:</strong> Offline-capable mobile app</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: Can your model work in other Philippine regions?</div>
+        <div class="qa-a">
+            <p><strong>Not directly, but methodology is transferable:</strong></p>
+            <ul>
+                <li><strong>Same region (other CAR areas):</strong> Should work reasonably well</li>
+                <li><strong>Similar highlands (e.g., Bukidnon):</strong> Needs 100-150 local samples for recalibration</li>
+                <li><strong>Lowlands (rice areas):</strong> Different crops, soils, conditions - requires new training data</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Q&A IMPACT -->
+<section id="qa-impact">
+    <h2>23. Defense Q&A: Impact & Future Work</h2>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: How does your research contribute to SDGs (Sustainable Development Goals)?</div>
+        <div class="qa-a">
+            <p><em>SDGs are the United Nations' 17 global goals for sustainable development by 2030.</em></p>
+            <table>
+                <tr><th>SDG</th><th>Contribution</th></tr>
+                <tr><td>SDG 2: Zero Hunger</td><td>Improves agricultural productivity through optimized fertilization</td></tr>
+                <tr><td>SDG 1: No Poverty</td><td>Reduces costs for smallholder farmers</td></tr>
+                <tr><td>SDG 9: Innovation</td><td>Applies satellite + ML technology to agriculture</td></tr>
+                <tr><td>SDG 10: Reduced Inequalities</td><td>Makes precision agriculture accessible to remote farmers</td></tr>
+                <tr><td>SDG 12: Responsible Consumption</td><td>Minimizes fertilizer waste and environmental pollution</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: What are your recommendations for future research?</div>
+        <div class="qa-a">
+            <ul>
+                <li><strong>Expand coverage:</strong> Other CAR provinces; lowland comparison sites</li>
+                <li><strong>More nutrients:</strong> Micronutrients (Fe, Zn, B); organic matter</li>
+                <li><strong>Temporal monitoring:</strong> Track soil health changes over seasons/years</li>
+                <li><strong>Radar integration:</strong> Sentinel-1 SAR for all-weather, moisture sensing</li>
+                <li><strong>Deep learning:</strong> CNN/transformer models for spectral feature extraction</li>
+                <li><strong>Mobile app:</strong> Offline-capable smartphone application</li>
+                <li><strong>Economic analysis:</strong> Detailed cost-benefit compared to lab testing</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="qa-item">
+        <div class="qa-q">Q: What is the potential cost savings for farmers?</div>
+        <div class="qa-a">
+            <ul>
+                <li><strong>Lab test savings:</strong> P500-1,500 per sample → free satellite prediction</li>
+                <li><strong>Fertilizer reduction:</strong> 15-25% from avoiding over-application</li>
+                <li><strong>Yield improvement:</strong> 10-30% from proper nutrition (Dobermann et al.)</li>
+                <li><strong>Estimated net benefit:</strong> P5,000-15,000/ha/year for highland vegetables</li>
+            </ul>
+            <p><em>Field trials will provide actual figures for CAR conditions.</em></p>
+        </div>
+    </div>
+</section>
+
+<!-- GLOSSARY -->
+<section id="glossary">
+    <h2>24. Glossary of Key Terms</h2>
+
+    <div class="highlight">
+        <h4>Quick Acronym Cheat Sheet</h4>
+        <div class="grid-2">
+            <div>
+                <strong>Satellites & Data:</strong><br>
+                <strong>ESA</strong> = European Space Agency (makes Sentinel-2)<br>
+                <strong>SWIR</strong> = Shortwave Infrared (light we can't see)<br>
+                <strong>NIR</strong> = Near Infrared (light we can't see)<br>
+                <strong>DEM</strong> = Digital Elevation Model (height map)<br>
+                <strong>GIS</strong> = Geographic Information System (digital maps)<br>
+                <strong>RS</strong> = Remote Sensing (studying Earth from space)
+            </div>
+            <div>
+                <strong>Soil & Agriculture:</strong><br>
+                <strong>NPK</strong> = Nitrogen, Phosphorus, Potassium (fertilizer nutrients)<br>
+                <strong>SOC</strong> = Soil Organic Carbon<br>
+                <strong>SSNM</strong> = Site-Specific Nutrient Management<br>
+                <strong>CAR</strong> = Cordillera Administrative Region<br>
+                <strong>DA</strong> = Department of Agriculture<br>
+                <strong>DOST</strong> = Dept. of Science and Technology
+            </div>
+        </div>
+        <div class="grid-2" style="margin-top: 15px;">
+            <div>
+                <strong>Machine Learning:</strong><br>
+                <strong>ML</strong> = Machine Learning (computer learns patterns)<br>
+                <strong>RF</strong> = Random Forest (ML algorithm)<br>
+                <strong>XGBoost</strong> = Extreme Gradient Boosting (ML algorithm)<br>
+                <strong>SVR</strong> = Support Vector Regression (ML algorithm)<br>
+                <strong>SHAP</strong> = SHapley Additive exPlanations (explains ML)
+            </div>
+            <div>
+                <strong>Vegetation Indices:</strong><br>
+                <strong>NDVI</strong> = Normalized Difference Vegetation Index<br>
+                <strong>SAVI</strong> = Soil Adjusted Vegetation Index<br>
+                <strong>EVI</strong> = Enhanced Vegetation Index<br>
+                <strong>BSI</strong> = Bare Soil Index<br>
+                <strong>NDRE</strong> = Normalized Difference Red Edge
+            </div>
+        </div>
+    </div>
+
+    <h3>Full Definitions (Plain English)</h3>
+    <table>
+        <tr><th>Term</th><th>What It Actually Means</th></tr>
+        <tr><td><strong>Multispectral</strong></td><td>A camera that sees more than human eyes — captures invisible light (infrared, etc.) in addition to regular colors. Like having X-ray vision for plants and soil.</td></tr>
+        <tr><td><strong>Spectral reflectance</strong></td><td>How much light bounces back from a surface. Different soils/plants reflect light differently — that's how satellites "see" what's on the ground.</td></tr>
+        <tr><td><strong>Level-2A</strong></td><td>Pre-cleaned satellite data. ESA already removed clouds and atmospheric haze — ready to use out of the box.</td></tr>
+        <tr><td><strong>NDVI</strong></td><td><strong>Normalized Difference Vegetation Index</strong> — A number from -1 to +1 showing plant health. Green healthy plants = high NDVI (~0.6-0.8). Dead/bare soil = low NDVI (~0.1).</td></tr>
+        <tr><td><strong>SAVI</strong></td><td><strong>Soil Adjusted Vegetation Index</strong> — Like NDVI but smarter. Works better when you can see soil between plants (sparse crops, early growth).</td></tr>
+        <tr><td><strong>SWIR</strong></td><td><strong>Shortwave Infrared</strong> — Invisible light (1500-2500nm wavelength). Soil minerals and moisture absorb SWIR differently — this is our SECRET WEAPON for predicting NPK and pH.</td></tr>
+        <tr><td><strong>Red Edge</strong></td><td>A special zone (705-783nm) where plant leaves change from absorbing to reflecting light. Super sensitive to nitrogen levels in plants.</td></tr>
+        <tr><td><strong>DEM</strong></td><td><strong>Digital Elevation Model</strong> — A height map showing terrain. Tells us if a farm is on a ridge, valley, or slope. Elevation affects soil nutrients.</td></tr>
+        <tr><td><strong>TPI</strong></td><td><strong>Topographic Position Index</strong> — Is this spot higher or lower than its surroundings? Ridges drain nutrients; valleys collect them.</td></tr>
+        <tr><td><strong>Random Forest</strong></td><td>An ML algorithm that builds hundreds of decision trees (like flowcharts) and averages their answers. "Wisdom of the crowd" for computers.</td></tr>
+        <tr><td><strong>XGBoost</strong></td><td><strong>Extreme Gradient Boosting</strong> — An ML algorithm that builds trees one-by-one, each fixing mistakes of the previous. Often the most accurate.</td></tr>
+        <tr><td><strong>SVR</strong></td><td><strong>Support Vector Regression</strong> — An ML algorithm that finds the best line/curve through data points. Works well with smaller datasets.</td></tr>
+        <tr><td><strong>Spatial autocorrelation</strong></td><td>Nearby things are similar. Soil in Farm A is probably similar to soil in neighboring Farm B. We must account for this or our accuracy looks artificially high.</td></tr>
+        <tr><td><strong>SHAP</strong></td><td><strong>SHapley Additive exPlanations</strong> — A method to explain WHY the computer made a prediction. "SWIR band contributed 40% to this pH prediction."</td></tr>
+        <tr><td><strong>R²</strong></td><td><strong>R-squared</strong> — How much variation our model explains. R²=0.70 means we explain 70% of the pattern. Higher = better. 0.65+ is our target.</td></tr>
+        <tr><td><strong>RMSE</strong></td><td><strong>Root Mean Square Error</strong> — Average size of our prediction mistakes. RMSE = 5 for nitrogen means we're typically off by about 5 units.</td></tr>
+        <tr><td><strong>SSNM</strong></td><td><strong>Site-Specific Nutrient Management</strong> — Giving each field exactly what IT needs, not a one-size-fits-all fertilizer rate.</td></tr>
+        <tr><td><strong>TAM</strong></td><td><strong>Technology Acceptance Model</strong> — A survey framework asking: "Do users find this useful? Easy to use? Will they actually adopt it?"</td></tr>
+        <tr><td><strong>SARAi</strong></td><td><strong>Smarter Approaches to Reinvigorate Agriculture as an Industry</strong> — DOST's program using satellites + ML for Philippine agriculture. We align with this.</td></tr>
+        <tr><td><strong>Kjeldahl method</strong></td><td>The standard lab test for nitrogen. Acid digestion converts all nitrogen to ammonia, which is measured. Named after the Danish chemist who invented it.</td></tr>
+        <tr><td><strong>Olsen method</strong></td><td>The standard lab test for available phosphorus. Uses sodium bicarbonate to extract P from soil.</td></tr>
+    </table>
+
+    <div class="info">
+        <strong>Pro Tip for Defense:</strong> If a panelist uses an acronym you don't recognize, it's okay to ask: "Could you clarify what you mean by [acronym]?" — It shows you're listening carefully and want to answer accurately.
+    </div>
+</section>
+
+<!-- FORMULAS -->
+<section id="formulas">
+    <h2>25. Key Formulas Reference</h2>
+
+    <div class="formula">
+<strong>NDVI</strong> = (NIR - Red) / (NIR + Red)
+<strong>SAVI</strong> = ((NIR - Red) / (NIR + Red + L)) × (1 + L)    // L = 0.5
+<strong>EVI</strong>  = 2.5 × ((NIR - Red) / (NIR + 6×Red - 7.5×Blue + 1))
+<strong>BSI</strong>  = ((SWIR1 + Red) - (NIR + Blue)) / ((SWIR1 + Red) + (NIR + Blue))
+<strong>NDRE</strong> = (NIR - RedEdge) / (NIR + RedEdge)
+<strong>OSAVI</strong> = (NIR - Red) / (NIR + Red + 0.16)
+
+<strong>R²</strong>   = 1 - (SS_residual / SS_total)
+<strong>RMSE</strong> = √(Σ(predicted - actual)² / n)
+<strong>MAE</strong>  = Σ|predicted - actual| / n
+    </div>
+</section>
+
+<!-- QUICK FACTS -->
+<section id="quick-facts">
+    <h2>26. Quick Facts Cheatsheet</h2>
+
+    <div class="grid-4">
+        <div class="stat-box"><div class="number">432K MT</div><div class="label">CAR vegetables 2024</div></div>
+        <div class="stat-box"><div class="number">85.9%</div><div class="label">From Benguet</div></div>
+        <div class="stat-box"><div class="number">300+</div><div class="label">Soil samples</div></div>
+        <div class="stat-box"><div class="number">5</div><div class="label">Municipalities</div></div>
+        <div class="stat-box"><div class="number">7</div><div class="label">Crop types</div></div>
+        <div class="stat-box"><div class="number">50+</div><div class="label">Features/sample</div></div>
+        <div class="stat-box"><div class="number">13</div><div class="label">Sentinel-2 bands</div></div>
+        <div class="stat-box"><div class="number">10m</div><div class="label">Best resolution</div></div>
+        <div class="stat-box"><div class="number">5 days</div><div class="label">Revisit time</div></div>
+        <div class="stat-box"><div class="number">R² 0.65+</div><div class="label">Target accuracy</div></div>
+        <div class="stat-box"><div class="number">15-25%</div><div class="label">Cost savings</div></div>
+        <div class="stat-box"><div class="number">65</div><div class="label">Farmers (TAM)</div></div>
+    </div>
+
+    <h3>Key Literature Numbers</h3>
+    <table>
+        <tr><td>Zhang et al. (2023) - NPK R²</td><td>0.78 (N), 0.74 (P), 0.84 (K)</td></tr>
+        <tr><td>Zou et al. (2024) - DEM contribution</td><td>19-65% additional variance</td></tr>
+        <tr><td>Chen et al. (2024) - Multi-sensor gain</td><td>8-12% R² improvement</td></tr>
+        <tr><td>Li et al. (2025) - SSRI for N</td><td>R² > 0.68</td></tr>
+        <tr><td>Anupo (2013) - CAR soil pH</td><td>4.49-5.2 (strongly acidic)</td></tr>
+        <tr><td>2024 PH fertilizer subsidy</td><td>P9.56 billion</td></tr>
+    </table>
+
+    <h3>Timeline</h3>
+    <table>
+        <tr><td><strong>Phase I:</strong> Data Acquisition</td><td>Jan-Mar 2026</td></tr>
+        <tr><td><strong>Phase II:</strong> Model + PoC Development</td><td>Apr-Early May 2026</td></tr>
+        <tr><td><strong>Phase III:</strong> Validations</td><td>Mid-May 2026</td></tr>
+        <tr><td><strong>Phase IV:</strong> Reporting</td><td>Post-May 2026</td></tr>
+    </table>
+</section>
+
+<footer style="text-align: center; padding: 30px; color: var(--text-light); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 30px;">
+    <p><strong>Thesis Defense Study Guide v3.0</strong> — Updated December 2025</p>
+    <p>Satellite Remote Sensing for Soil Nutrient Analysis and Fertilizer Recommendations in CAR</p>
+    <p>Team Skibidata | Saint Louis University | BS Computer Science | 2026</p>
+    <p style="margin-top: 10px; font-size: 0.75rem;">Includes: 2025 satellite developments, DOST program alignment, AgroLens validation</p>
+</footer>
+
+</main>
+
+<script>
+document.querySelectorAll('.nav a').forEach(a => {
+    a.addEventListener('click', e => {
+        e.preventDefault();
+        // Close mobile nav when link clicked
+        document.getElementById('nav').classList.remove('expanded');
+        // Smooth scroll to section
+        document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior: 'smooth'});
+    });
+});
+</script>
+
+</body>
+</html>

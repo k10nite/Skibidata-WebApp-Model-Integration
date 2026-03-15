@@ -60,8 +60,11 @@ __pycache__/
 # Thesis documents (keep only README)
 *.md
 !README.md
+!docs/**/*.md
 *.html
 !index.html
+!docs/**/*.html
+!docs/**/*.jsx
 MC Folder/
 
 # Other projects
