@@ -1,0 +1,351 @@
+/* ============================================================================
+   EARTHY FARM TECH DESIGN SYSTEM
+   Filipino Rice Terrace Heritage meets Modern Soil Lab Dashboard
+   ============================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Roboto+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== FILIPINO FARM COLOR PALETTE ===== */
+:root {
+  /* Primary Colors - Philippine Farm Palette */
+  --color-bg: #ECECEC;           /* Light earth background */
+  --color-primary: #84934A;      /* Rice field green */
+  --color-secondary: #656D3F;    /* Deep crop green */
+  --color-earth: #492828;        /* Clay soil dark */
+
+  /* Semantic Colors */
+  --color-low: #CD5C5C;          /* Red terracotta - needs attention */
+  --color-medium: #DAA520;       /* Golden harvest - monitor */
+  --color-high: #84934A;         /* Rice green - optimal */
+
+  /* UI Colors */
+  --color-card-bg: #FAF9F6;      /* Off-white card */
+  --color-overlay: rgba(73, 40, 40, 0.95);  /* Clay overlay */
+
+  /* Typography */
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-mono: 'Roboto Mono', monospace;
+
+  /* Spacing - Clay Pot Radii */
+  --radius-sm: 1.5rem;
+  --radius-md: 2rem;
+  --radius-lg: 2.5rem;
+
+  /* Shadows - Soil Depth */
+  --shadow-soil-sm: 0 4px 12px rgba(73, 40, 40, 0.1);
+  --shadow-soil-md: 0 8px 24px rgba(73, 40, 40, 0.15);
+  --shadow-soil-lg: 0 12px 32px rgba(73, 40, 40, 0.2);
+
+  /* Transitions */
+  --transition-soil: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== GLOBAL SOIL GRAIN TEXTURE ===== */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05' /%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: overlay;
+}
+
+/* ===== BASE RESETS ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-heading);
+  background-color: var(--color-bg);
+  color: var(--color-earth);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ===== TYPOGRAPHY ===== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--color-earth);
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-family: var(--font-display);
+}
+
+h3 {
+  font-size: clamp(1.25rem, 3vw, 1.875rem);
+}
+
+/* Italic emphasis for nutrient/plant concepts */
+.concept-text {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+}
+
+/* Data/categorical display */
+.data-text {
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+
+/* ===== CLAY POT CARDS ===== */
+.clay-card {
+  background: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soil-md);
+  transition: all var(--transition-soil);
+  overflow: hidden;
+  position: relative;
+}
+
+.clay-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(132, 147, 74, 0.1), transparent);
+  transition: left 0.6s;
+}
+
+.clay-card:hover::before {
+  left: 100%;
+}
+
+.clay-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-soil-lg);
+}
+
+/* ===== NUTRIENT LEVEL INDICATORS ===== */
+.nutrient-low {
+  color: var(--color-low);
+  background: linear-gradient(135deg, rgba(205, 92, 92, 0.1), rgba(205, 92, 92, 0.05));
+  border-left: 4px solid var(--color-low);
+}
+
+.nutrient-medium {
+  color: var(--color-medium);
+  background: linear-gradient(135deg, rgba(218, 165, 32, 0.1), rgba(218, 165, 32, 0.05));
+  border-left: 4px solid var(--color-medium);
+}
+
+.nutrient-high {
+  color: var(--color-high);
+  background: linear-gradient(135deg, rgba(132, 147, 74, 0.1), rgba(132, 147, 74, 0.05));
+  border-left: 4px solid var(--color-high);
+}
+
+/* ===== SOIL GRAIN PARTICLES ===== */
+@keyframes soil-fall {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.soil-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--color-earth);
+  border-radius: 50%;
+  animation: soil-fall 8s infinite linear;
+}
+
+/* ===== MAGNETIC BUTTONS ===== */
+.btn-magnetic {
+  position: relative;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-magnetic:hover {
+  transform: scale(1.05);
+}
+
+.btn-magnetic:active {
+  transform: scale(0.98);
+}
+
+/* ===== RICE TERRACE PATTERN ===== */
+.terrace-pattern {
+  background-image:
+    linear-gradient(90deg, rgba(132, 147, 74, 0.05) 1px, transparent 1px),
+    linear-gradient(rgba(132, 147, 74, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ===== SCREEN TRANSITIONS ===== */
+.screen-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.screen-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== PROGRESS BAR (NPK Bars) ===== */
+.progress-bar {
+  width: 100%;
+  height: 24px;
+  background: rgba(73, 40, 40, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 12px;
+  transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ===== CLAY SHAKE EFFECT ===== */
+@keyframes clay-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+.clay-shake {
+  animation: clay-shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* ===== FERTILIZER SACK CARDS ===== */
+.sack-card {
+  background: var(--color-card-bg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soil-sm);
+  border: 2px solid rgba(101, 109, 63, 0.2);
+  transition: all var(--transition-soil);
+}
+
+.sack-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-soil-md);
+}
+
+/* ===== LOADING SPINNER (Soil Drill) ===== */
+@keyframes drill-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.soil-drill {
+  width: 80px;
+  height: 80px;
+  border: 8px solid rgba(132, 147, 74, 0.2);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: drill-spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+  :root {
+    --radius-sm: 1rem;
+    --radius-md: 1.5rem;
+    --radius-lg: 2rem;
+  }
+
+  .clay-card {
+    border-radius: var(--radius-md);
+  }
+}
+
+/* ===== UTILITY CLASSES ===== */
+.bg-earth { background-color: var(--color-earth); }
+.bg-primary { background-color: var(--color-primary); }
+.bg-secondary { background-color: var(--color-secondary); }
+.bg-light { background-color: var(--color-bg); }
+
+.text-earth { color: var(--color-earth); }
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-secondary); }
+
+/* ===== APP CONTAINER ===== */
+.app-container {
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ===== TYPEWRITER EFFECT ===== */
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.typewriter {
+  overflow: hidden;
+  border-right: 2px solid var(--color-primary);
+  white-space: nowrap;
+  animation: typewriter 1.5s steps(40) forwards;
+}
+
+/* ===== STAGGER REVEAL ===== */
+.stagger-item {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.stagger-item.revealed {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SoilScan - Academic Research Poster</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+@page{size:A1 portrait;margin:0}
+body{font-family:'Inter',sans-serif;background:#FAFAF8;color:#212121;padding:36px;width:23.4in;height:33.1in;margin:0 auto}
+.poster{display:flex;flex-direction:column;height:100%}
+header{text-align:center;padding:24px 48px;background:linear-gradient(135deg,#2E7D32 0%,#0288D1 100%);color:white;border-radius:12px;margin-bottom:24px}
+header h1{font-size:48pt;font-weight:700;line-height:1.2;margin-bottom:12px}
+.project-title{display:flex;align-items:center;justify-content:center;gap:12px;font-size:36pt;font-weight:700;margin-top:16px}
+.leaf-icon{width:48px;height:48px;background:#10B981;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:28px}
+.tagline{font-size:24pt;font-weight:400;margin-top:8px;opacity:0.95}
+.intro{background:white;padding:24px;border-radius:8px;margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid #2E7D32}
+.intro h2{font-size:30pt;color:#2E7D32;margin-bottom:16px}
+.intro p{font-size:20pt;line-height:1.6}
+.content{display:grid;grid-template-columns:1fr 1fr;gap:24px;flex:1}
+.column{display:flex;flex-direction:column;gap:24px}
+.section{background:white;padding:20px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid #2E7D32}
+.section h3{font-size:28pt;color:#2E7D32;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.section h4{font-size:22pt;color:#0288D1;margin:12px 0 8px 0}
+.section p,.section li{font-size:18pt;line-height:1.5}
+.section ul{list-style:none;margin-left:16px}
+.section li::before{content:"→ ";color:#2E7D32;font-weight:600}
+.flowchart{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:16px 0;font-size:16pt}
+.flow-step{flex:1;background:linear-gradient(135deg,#e8f5e9 0%,#e1f5fe 100%);padding:12px;border-radius:6px;text-align:center;font-weight:600;color:#2E7D32}
+.flow-arrow{font-size:24pt;color:#0288D1}
+.performance-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:16pt}
+.performance-table th{background:#2E7D32;color:white;padding:12px;text-align:left;font-weight:600}
+.performance-table td{padding:10px 12px;border-bottom:1px solid #e0e0e0}
+.performance-table tr:nth-child(odd){background:#f5f5f5}
+.score-low{background:#EF4444;color:white}
+.score-med{background:#F59E0B;color:white}
+.score-good{background:#EAB308}
+.score-high{background:#84CC16}
+.score-excellent{background:#10B981;color:white}
+.heatmap-cell{padding:8px 12px;border-radius:4px;text-align:center;font-weight:600}
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.result-card{background:linear-gradient(135deg,#e8f5e9 0%,#e1f5fe 100%);padding:16px;border-radius:6px;border-left:3px solid #2E7D32}
+.result-card h5{font-size:16pt;color:#0288D1;margin-bottom:8px}
+.result-card p{font-size:18pt;font-weight:600;color:#2E7D32}
+.sdg-container{display:flex;justify-content:space-around;gap:12px;margin:16px 0}
+.sdg-icon{width:80px;height:80px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14pt;text-align:center;padding:8px}
+.sdg-1{background:#E5243B}
+.sdg-2{background:#DDA63A}
+.sdg-3{background:#4C9F38}
+.sdg-10{background:#DD1367}
+.sdg-12{background:#BF8B2E}
+footer{background:linear-gradient(135deg,#2E7D32 0%,#0288D1 100%);color:white;padding:20px 24px;border-radius:8px;margin-top:24px;text-align:center}
+footer h4{font-size:18pt;margin-bottom:8px}
+footer p{font-size:16pt;line-height:1.4}
+.legend{display:flex;gap:8px;margin:12px 0;font-size:14pt}
+.legend-item{display:flex;align-items:center;gap:6px}
+.legend-color{width:24px;height:24px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="poster">
+<header>
+<h1>Satellite Remote Sensing for Soil Nutrient Analysis<br>and Fertilizer Recommendations in CAR</h1>
+<div class="project-title"><span class="leaf-icon">🌿</span><span>SoilScan</span></div>
+<div class="tagline">Team SkibiData | Satellite-powered soil intelligence for highland farming</div>
+</header>
+<div class="intro">
+<h2>Introduction</h2>
+<p>This study focuses on soil nutrient analysis in Benguet, using satellite imagery and ground-truth soil data. It integrates field measurements, terrain attributes, and spectral indices to evaluate soil properties such as nitrogen, phosphorus, potassium, and pH. The research develops machine learning models to predict soil nutrient levels and provide crop-specific fertilizer recommendations for improved agricultural management.</p>
+</div>
+<div class="content">
+<div class="column">
+<div class="section">
+<h3>🔬 Research Methodology</h3>
+<h4>Data Collection & Processing</h4>
+<div class="flowchart">
+<div class="flow-step">Field Survey</div>
+<div class="flow-arrow">→</div>
+<div class="flow-step">Lab Analysis</div>
+<div class="flow-arrow">→</div>
+<div class="flow-step">Satellite Integration</div>
+<div class="flow-arrow">→</div>
+<div class="flow-step">ML Models</div>
+</div>
+<ul>
+<li>Soil sample collection (0-20cm depth)</li>
+<li>Laboratory analysis for NPK, pH, texture</li>
+<li>Sentinel-2 satellite data integration (10m resolution)</li>
+<li>Terrain attributes: elevation, slope, aspect</li>
+<li>Spectral indices: NDVI, EVI, SAVI, GNDVI</li>
+</ul>
+<h4>Machine Learning Models</h4>
+<ul>
+<li><strong>XGBoost</strong> - Extreme Gradient Boosting</li>
+<li><strong>Random Forest</strong> - Ensemble Learning</li>
+<li><strong>SVM</strong> - Support Vector Machine</li>
+</ul>
+</div>
+<div class="section">
+<h3>📊 Model Performance Comparison</h3>
+<table class="performance-table">
+<thead>
+<tr><th>Nutrient</th><th>Model</th><th>Overall Accuracy</th><th>F1-Score ± Std</th></tr>
+</thead>
+<tbody>
+<tr><td rowspan="3"><strong>Nitrogen</strong></td><td>XGBoost</td><td><span class="heatmap-cell score-high">0.782</span></td><td>0.794 ± 0.660</td></tr>
+<tr><td>Random Forest</td><td><span class="heatmap-cell score-high">0.768</span></td><td>0.771 ± 0.639</td></tr>
+<tr><td>SVM</td><td><span class="heatmap-cell score-good">0.721</span></td><td>0.726 ± 0.504</td></tr>
+<tr><td rowspan="3"><strong>Phosphorus</strong></td><td>XGBoost</td><td><span class="heatmap-cell score-high">0.750</span></td><td>0.742 ± 0.615</td></tr>
+<tr><td>Random Forest</td><td><span class="heatmap-cell score-high">0.748</span></td><td>0.741 ± 0.613</td></tr>
+<tr><td>SVM</td><td><span class="heatmap-cell score-good">0.695</span></td><td>0.689 ± 0.531</td></tr>
+<tr><td rowspan="3"><strong>Potassium</strong></td><td>XGBoost</td><td><span class="heatmap-cell score-good">0.723</span></td><td>0.730 ± 0.573</td></tr>
+<tr><td>Random Forest</td><td><span class="heatmap-cell score-good">0.704</span></td><td>0.708 ± 0.544</td></tr>
+<tr><td>SVM</td><td><span class="heatmap-cell score-good">0.689</span></td><td>0.689 ± 0.524</td></tr>
+<tr><td rowspan="3"><strong>pH</strong></td><td>XGBoost</td><td><span class="heatmap-cell score-low">0.216</span></td><td>0.190 ± 0.310</td></tr>
+<tr><td>Random Forest</td><td><span class="heatmap-cell score-low">0.221</span></td><td>0.196 ± 0.321</td></tr>
+<tr><td>SVM</td><td><span class="heatmap-cell score-low">0.217</span></td><td>0.186 ± 0.312</td></tr>
+</tbody>
+</table>
+<div class="legend">
+<div class="legend-item"><div class="legend-color score-excellent"></div><span>0.85-1.0</span></div>
+<div class="legend-item"><div class="legend-color score-high"></div><span>0.70-0.85</span></div>
+<div class="legend-item"><div class="legend-color score-good"></div><span>0.50-0.70</span></div>
+<div class="legend-item"><div class="legend-color score-med"></div><span>0.30-0.50</span></div>
+<div class="legend-item"><div class="legend-color score-low"></div><span>0.0-0.30</span></div>
+</div>
+</div>
+</div>
+<div class="column">
+<div class="section">
+<h3>🎯 Results & Impact</h3>
+<h4>Key Findings</h4>
+<div class="results-grid">
+<div class="result-card"><h5>Nitrogen</h5><p>78.2% Accuracy</p></div>
+<div class="result-card"><h5>Phosphorus</h5><p>75.0% Accuracy</p></div>
+<div class="result-card"><h5>Potassium</h5><p>72.3% Accuracy</p></div>
+<div class="result-card"><h5>pH Level</h5><p>21.6% Accuracy*</p></div>
+</div>
+<p style="margin:12px 0;font-size:14pt;font-style:italic">* pH prediction requires further model improvement</p>
+<h4>Agricultural Impact</h4>
+<ul>
+<li><strong>Precision Agriculture:</strong> Enables data-driven fertilizer recommendations</li>
+<li><strong>Cost Reduction:</strong> Reduces fertilizer waste and farming costs</li>
+<li><strong>Yield Optimization:</strong> Supports higher crop yields through targeted nutrient management</li>
+<li><strong>Sustainability:</strong> Promotes sustainable farming practices in CAR</li>
+<li><strong>Accessibility:</strong> Provides affordable soil analysis for smallholder farmers</li>
+</ul>
+</div>
+<div class="section">
+<h3>🗺️ Study Area & Data Sources</h3>
+<h4>Location</h4>
+<p><strong>Benguet Province</strong>, Cordillera Administrative Region (CAR), Philippines</p>
+<h4>Data Sources</h4>
+<ul>
+<li><strong>Ground-truth soil samples:</strong> Field measurements from Benguet</li>
+<li><strong>Satellite imagery:</strong> Sentinel-2 multispectral data (10m resolution)</li>
+<li><strong>Terrain data:</strong> Digital Elevation Model (DEM)</li>
+<li><strong>Spectral indices:</strong> NDVI, EVI, SAVI, GNDVI for vegetation and soil analysis</li>
+</ul>
+</div>
+<div class="section">
+<h3>🌍 Sustainable Development Goals</h3>
+<div class="sdg-container">
+<div class="sdg-icon sdg-1">SDG 1<br>No Poverty</div>
+<div class="sdg-icon sdg-2">SDG 2<br>Zero Hunger</div>
+<div class="sdg-icon sdg-3">SDG 3<br>Good Health</div>
+<div class="sdg-icon sdg-10">SDG 10<br>Reduced Inequalities</div>
+<div class="sdg-icon sdg-12">SDG 12<br>Responsible Consumption</div>
+</div>
+</div>
+</div>
+</div>
+<footer>
+<h4>Research Team</h4>
+<p>Aragona (Hans Fredrick), Bravo (Matt Danielle), Cayton (Neil Clarence), Fabe (Milton Junsel),<br>
+Magpili (Dylan Yeoj), Morados (Lou Diamond), Morales (Liam Jiro), Palacio (Malmar)</p>
+<p style="margin-top:12px"><strong>Computer Science Department, Saint Louis University</strong></p>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+# Kimi CLI Configuration
+[model]
+api_key = "sk-pEKKpjk1bG1ffYkc4ukS3GC3A745HZ3xnpA9aVmBIZp17P4X"
+api_base = "https://api.moonshot.cn/v1"
+model = "moonshot-v1-8k"
+
+[agent]
+thinking = true
+max_steps_per_turn = 50
+max_retries_per_step = 3

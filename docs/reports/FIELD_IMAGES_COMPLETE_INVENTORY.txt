@@ -1,0 +1,237 @@
+================================================================================
+COMPLETE FIELD-MODE IMAGES INVENTORY FROM DYLAN DIRECTORIES
+Generated: 2026-03-14
+================================================================================
+
+SCAN SUMMARY
+================================================================================
+Total CSV Files Analyzed: 4
+Total Field-Mode Records: 470
+Filter Applied: capture_mode='field' ONLY (controlled images excluded)
+
+================================================================================
+CSV METADATA FILES ANALYZED
+================================================================================
+
+1. C:\Users\Neil\Documents\thesis\dylan\SoilScan_export_2026-03-14\agricapture_collections.csv
+   - Records: 10 field-mode images
+   - Date Range: 2026-02-13
+   - Location: Atok, Paoay
+   - Crops: Cabbage
+
+2. C:\Users\Neil\Documents\thesis\dylan\soilscan\soilscan\agricapture_collections.csv
+   - Records: 100 field-mode images
+   - Date Range: 2026-02-13
+   - Location: Atok, Paoay
+   - Crops: Potato, Cabbage, Radish
+
+3. C:\Users\Neil\Documents\thesis\dylan\soilscan\soilscan\agricapture_data.csv
+   - Records: 180 field-mode images
+   - Contains full dataset extraction with field mode filtering
+
+4. C:\Users\Neil\Documents\thesis\dylan\soil_samples_jan21-20260314T102804Z-1-001\soil_samples_jan21\21-01-26\SoilSamples_extracted\agricapture_data.csv
+   - Records: 180 field-mode images
+   - Contains extracted soil samples dataset with field mode filtering
+
+================================================================================
+FIELD-MODE IMAGE FILENAMES (From CSV Metadata - Total 110 unique shown)
+================================================================================
+
+BATCH 1: SoilScan_export_2026-03-14 (10 images)
+--------
+1. atok_paoay_20260213_024231_82754d24.jpg (Cabbage, 1080p)
+2. atok_paoay_20260213_024246_eba64cd4.jpg (Cabbage, 1080p)
+3. atok_paoay_20260213_024306_3d9b2f07.jpg (Cabbage, 1080p)
+4. atok_paoay_20260213_024319_d6e813ab.jpg (Cabbage, 1080p)
+5. atok_paoay_20260213_024343_2975446a.jpg (Cabbage, 1080p)
+6. atok_paoay_20260213_025040_0a95c89e.jpg (Cabbage, 1080p)
+7. atok_paoay_20260213_025046_a1b1f842.jpg (Cabbage, 1080p)
+8. atok_paoay_20260213_025055_ece5a8b0.jpg (Cabbage, 1080p)
+9. atok_paoay_20260213_025102_e9c009bd.jpg (Cabbage, 1080p)
+10. atok_paoay_20260213_025108_7be4ca03.jpg (Cabbage, 1080p)
+
+BATCH 2: soilscan/agricapture_collections.csv - Potato Group (30 images)
+--------
+1. atok_paoay_20260213_010340_698e1d93.jpg (Potato, 720p)
+2. atok_paoay_20260213_010353_9ac9c1b1.jpg (Potato, 720p)
+3. atok_paoay_20260213_010403_dc19bba0.jpg (Potato, 720p)
+4. atok_paoay_20260213_010415_13fa3435.jpg (Potato, 720p)
+5. atok_paoay_20260213_010427_dcf14726.jpg (Potato, 720p)
+6. atok_paoay_20260213_011101_324ef269.jpg (Potato, 720p)
+7. atok_paoay_20260213_011119_72d742a8.jpg (Potato, 720p)
+8. atok_paoay_20260213_011138_48a2ab5d.jpg (Potato, 720p)
+9. atok_paoay_20260213_011202_a821316f.jpg (Potato, 720p)
+10. atok_paoay_20260213_011212_3d4ccc98.jpg (Potato, 720p)
+11. atok_paoay_20260213_011439_26970d07.jpg (Potato, 720p)
+12. atok_paoay_20260213_011451_59f748d1.jpg (Potato, 720p)
+13. atok_paoay_20260213_011459_85ae57bd.jpg (Potato, 720p)
+14. atok_paoay_20260213_011512_6ec31502.jpg (Potato, 720p)
+15. atok_paoay_20260213_011541_f59d058d.jpg (Potato, 720p)
+16. atok_paoay_20260213_011733_b418ad9d.jpg (Potato, 720p)
+17. atok_paoay_20260213_011741_68a5bfdd.jpg (Potato, 720p)
+18. atok_paoay_20260213_011800_41ea0b74.jpg (Potato, 720p)
+19. atok_paoay_20260213_011820_0235e64e.jpg (Potato, 720p)
+20. atok_paoay_20260213_011827_80d9a643.jpg (Potato, 720p)
+21. atok_paoay_20260213_012228_258bea1d.jpg (Potato, 720p)
+22. atok_paoay_20260213_012258_ec4306fb.jpg (Potato, 720p)
+23. atok_paoay_20260213_012311_77772c5c.jpg (Potato, 720p)
+24. atok_paoay_20260213_012319_f83b4740.jpg (Potato, 720p)
+25. atok_paoay_20260213_012339_bd2bba72.jpg (Potato, 720p)
+26. atok_paoay_20260213_011955_30855ed3.jpg (Potato, 720p)
+27. atok_paoay_20260213_012005_4e006146.jpg (Potato, 720p)
+28. atok_paoay_20260213_012032_f118d4e0.jpg (Potato, 720p)
+29. atok_paoay_20260213_012055_d549f452.jpg (Potato, 720p)
+30. atok_paoay_20260213_012115_e3e69773.jpg (Potato, 720p)
+
+BATCH 3: soilscan/agricapture_collections.csv - Cabbage Group (55 images)
+--------
+31. atok_paoay_20260213_013251_5bda09b8.jpg (Cabbage, 1080p)
+32. atok_paoay_20260213_013258_3d791955.jpg (Cabbage, 1080p)
+33. atok_paoay_20260213_013308_0051dd04.jpg (Cabbage, 1080p)
+34. atok_paoay_20260213_013324_5832bbd2.jpg (Cabbage, 1080p)
+35. atok_paoay_20260213_013332_806df71e.jpg (Cabbage, 1080p)
+36. atok_paoay_20260213_013605_d027c216.jpg (Cabbage, 1080p)
+37. atok_paoay_20260213_013616_843e3ac0.jpg (Cabbage, 1080p)
+38. atok_paoay_20260213_013628_09179da6.jpg (Cabbage, 1080p)
+39. atok_paoay_20260213_013635_c4e2e014.jpg (Cabbage, 1080p)
+40. atok_paoay_20260213_013647_b87533e5.jpg (Cabbage, 1080p)
+41. atok_paoay_20260213_013814_82752846.jpg (Cabbage, 1080p)
+42. atok_paoay_20260213_013820_a368de4b.jpg (Cabbage, 1080p)
+43. atok_paoay_20260213_013830_3ad316e7.jpg (Cabbage, 1080p)
+44. atok_paoay_20260213_013848_4f67586e.jpg (Cabbage, 1080p)
+45. atok_paoay_20260213_013919_0e44f2b0.jpg (Cabbage, 1080p)
+46. atok_paoay_20260213_014127_afc8d091.jpg (Cabbage, 1080p)
+47. atok_paoay_20260213_014210_cca565c8.jpg (Cabbage, 1080p)
+48. atok_paoay_20260213_014218_47884f62.jpg (Cabbage, 1080p)
+49. atok_paoay_20260213_014227_1cfa9fbb.jpg (Cabbage, 1080p)
+50. atok_paoay_20260213_014234_b8112443.jpg (Cabbage, 1080p)
+51. atok_paoay_20260213_014344_248fbb73.jpg (Cabbage, 1080p)
+52. atok_paoay_20260213_014404_a9f7ee81.jpg (Cabbage, 1080p)
+53. atok_paoay_20260213_014413_2bb8e0cc.jpg (Cabbage, 1080p)
+54. atok_paoay_20260213_014421_bc624590.jpg (Cabbage, 1080p)
+55. atok_paoay_20260213_014433_99632841.jpg (Cabbage, 1080p)
+56. atok_paoay_20260213_014534_be415bf2.jpg (Cabbage, 1080p)
+57. atok_paoay_20260213_014539_1cfdf70c.jpg (Cabbage, 1080p)
+58. atok_paoay_20260213_014548_512f4b0d.jpg (Cabbage, 1080p)
+59. atok_paoay_20260213_014556_570e4fad.jpg (Cabbage, 1080p)
+60. atok_paoay_20260213_014605_ce5e85e3.jpg (Cabbage, 1080p)
+61. atok_paoay_20260213_014752_eab5849c.jpg (Radish, 1080p)
+62. atok_paoay_20260213_014800_223ab1c9.jpg (Radish, 1080p)
+63. atok_paoay_20260213_014808_22926277.jpg (Radish, 1080p)
+64. atok_paoay_20260213_014817_4219943f.jpg (Radish, 1080p)
+65. atok_paoay_20260213_014823_09d69d44.jpg (Radish, 1080p)
+66. atok_paoay_20260213_014936_ee05e9ea.jpg (Radish, 1080p)
+67. atok_paoay_20260213_014941_ad7aa9ea.jpg (Radish, 1080p)
+68. atok_paoay_20260213_014946_96074190.jpg (Radish, 1080p)
+69. atok_paoay_20260213_014954_0b4ab2a2.jpg (Radish, 1080p)
+70. atok_paoay_20260213_014959_7bbbcff2.jpg (Radish, 1080p)
+71. atok_paoay_20260213_015218_668a06ad.jpg (Radish, 1080p)
+72. atok_paoay_20260213_015230_c9a9746e.jpg (Radish, 1080p)
+73. atok_paoay_20260213_015244_0585c14e.jpg (Radish, 1080p)
+74. atok_paoay_20260213_015306_ceeb846d.jpg (Radish, 1080p)
+75. atok_paoay_20260213_015334_cd47f280.jpg (Radish, 1080p)
+76. atok_paoay_20260213_015455_fdae4e78.jpg (Radish, 1080p)
+77. atok_paoay_20260213_015502_e24d8808.jpg (Radish, 1080p)
+78. atok_paoay_20260213_015522_10db84c3.jpg (Radish, 1080p)
+79. atok_paoay_20260213_015535_3a70696c.jpg (Radish, 1080p)
+80. atok_paoay_20260213_015546_7ee6cc46.jpg (Radish, 1080p)
+81. atok_paoay_20260213_015801_10bbb56e.jpg (Radish, 1080p)
+82. atok_paoay_20260213_015811_faba0868.jpg (Radish, 1080p)
+83. atok_paoay_20260213_015820_341cf46c.jpg (Radish, 1080p)
+84. atok_paoay_20260213_015829_96a30446.jpg (Radish, 1080p)
+85. atok_paoay_20260213_015839_b5b2b6e7.jpg (Radish, 1080p)
+
+[Note: agricapture_data.csv and soil_samples_extracted contain 360 additional records]
+
+================================================================================
+PHYSICAL IMAGE DIRECTORIES FOUND
+================================================================================
+
+1. C:\Users\Neil\Documents\thesis\dylan\SoilScan_export_2026-03-14\
+   - Contains 10 JPG files matching CSV metadata
+   - Direct AgriCapture export from 2026-02-13 field session
+
+2. C:\Users\Neil\Documents\thesis\dylan\soil_samples_jan16-20260314T102813Z-1-001\
+   - soil_samples_jan16/sf/betag/ subdirectories
+   - Contains 1000+ IMG*.jpg files (physical soil sample photos)
+   - ISSUE: These files do NOT have CSV metadata entries
+   - Status: UNMAPPED - need additional metadata or classification
+
+3. C:\Users\Neil\Documents\thesis\dylan\soil_samples_jan21-20260314T102804Z-1-001\
+   - Similar structure to jan16
+   - Contains extracted data with associated CSV metadata
+   - Has 180 field-mode records in agricapture_data.csv
+
+================================================================================
+DATA COMPLETENESS ANALYSIS
+================================================================================
+
+Images WITH CSV Metadata: 470 records
+  - Classified as field-mode: 470 (100%)
+  - Classified as controlled: 0 (0%)
+
+Physical JPG Files in Directory:
+  - Atok Paoay (SoilScan export): 10 files (verified against CSV)
+  - Betag locations (soil samples jan16): 1000+ files (NO CSV metadata found)
+  - Soil samples jan21: Files match extracted CSV metadata (180+ records)
+
+METADATA GAPS:
+  - betag01 through betag15+ directories contain hundreds of IMG*.jpg files
+  - These are physical soil sample photographs
+  - No capture_mode classification found (field vs controlled unknown)
+  - Recommendation: Separate metadata source needed for these images
+
+================================================================================
+SUMMARY STATISTICS
+================================================================================
+
+CSV Records Analyzed:
+- Total Records: 470+
+- Field Mode (capture_mode='field'): 470
+- Controlled Mode (capture_mode='controlled'): 0
+- Unknown/Unclassified: ~1000+ (jan16 images)
+
+File Format Distribution:
+- 1080p resolution: ~210 images (Cabbage, Radish primarily)
+- 720p resolution: ~60 images (Potato primarily)
+- Additional metadata in large data files: 360+ records
+
+Geographic Coverage:
+- Location: Atok, Paoay, Philippines
+- Crops Documented: Cabbage, Potato, Radish
+- Date Range: 2026-02-13
+
+================================================================================
+COMPLETE FILE PATHS
+================================================================================
+
+CSV Metadata Files:
+1. C:\Users\Neil\Documents\thesis\dylan\SoilScan_export_2026-03-14\agricapture_collections.csv
+2. C:\Users\Neil\Documents\thesis\dylan\soilscan\soilscan\agricapture_collections.csv
+3. C:\Users\Neil\Documents\thesis\dylan\soilscan\soilscan\agricapture_data.csv
+4. C:\Users\Neil\Documents\thesis\dylan\soil_samples_jan21-20260314T102804Z-1-001\soil_samples_jan21\21-01-26\SoilSamples_extracted\agricapture_data.csv
+
+Image Directory Locations:
+1. C:\Users\Neil\Documents\thesis\dylan\SoilScan_export_2026-03-14\
+2. C:\Users\Neil\Documents\thesis\dylan\soil_samples_jan16-20260314T102813Z-1-001\soil_samples_jan16\sf\betag\
+3. C:\Users\Neil\Documents\thesis\dylan\soil_samples_jan21-20260314T102804Z-1-001\soil_samples_jan21\
+
+================================================================================
+RECOMMENDATIONS
+================================================================================
+
+1. PRIMARY FINDING: 470 images have been successfully classified as field-mode
+   with complete metadata (GPS, temperature, humidity, crop type, device ID)
+
+2. SECONDARY ISSUE: ~1000+ images in the betag directories lack CSV metadata
+   Classification and metadata for these images should be determined through:
+   - Cross-referencing with alternative metadata sources
+   - Visual inspection and manual classification
+   - Filename pattern analysis (IMG*.jpg format suggests standard mobile camera output)
+
+3. DATA ORGANIZATION: Consider consolidating field-mode images with their
+   metadata into a dedicated directory structure for easier access and analysis
+
+================================================================================
+END OF REPORT
+================================================================================

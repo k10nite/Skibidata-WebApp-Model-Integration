@@ -1,0 +1,141 @@
+Create a PREMIUM AIRBNB/APPLE-STYLE fertilizer recommendation app prototype for Filipino farmers.
+
+DESIGN REQUIREMENTS:
+- Premium SaaS aesthetic (Airbnb/Apple/Linear quality)
+- Tailwind CSS + GSAP animations
+- React components (NOT React Native - web prototype only)
+- Bilingual: Filipino + English labels
+- Large tap targets (50px+ height)
+- Green agricultural palette: #2E7D32 (forest green), #84934A (rice green), #492828 (clay dark)
+- Bold typography (Nunito/Inter)
+- Smooth transitions, stagger animations
+- Mobile-first responsive design
+
+SCREENS TO CREATE (7 total):
+
+1. LOCATION SELECTION SCREEN
+   - Title: "Pumili ng Lokasyon / Select Location"
+   - "Use Current Location" button with GPS icon
+   - Interactive map with pin drop (Leaflet/Mapbox style)
+   - Shows: Lat: 16.4023, Lng: 120.5960
+   - Premium card showing selected location details
+   - Floating "Continue" button with GSAP animation
+
+2. PLANT SELECTION SCREEN
+   - Title: "Pumili ng Pananim / Choose Your Crop"
+   - 20+ Filipino crops in beautiful cards with emojis
+   - Categories: Highland Vegetables, Root Crops, Cereals, Fruits
+   - Search bar with animations
+   - Category filter pills
+   - Selected plant shows checkmark
+   - "Analyze Soil" button (disabled until selection)
+
+3. PROCESSING SCREEN
+   - Title: "Sinusuri ang Lupa / Analyzing Soil"
+   - Beautiful loading animation (particles, progress bar)
+   - Step progression with GSAP stagger:
+     * "Retrieving soil data..." ✓
+     * "Analyzing nutrient levels..." ✓
+     * "Matching plant requirements..." ✓
+     * "Preparing recommendations..." ✓
+   - Animated icons for each step
+   - 3-5 second duration with smooth transitions
+
+4. SOIL STATUS SCREEN (Categorical NPK + pH)
+   - Title: "Estado ng Lupa / Soil Condition"
+   - Location summary card (small, top)
+   - 4 Premium gauge cards:
+     * Nitrogen (N) - Status: Low/Medium/High
+     * Phosphorus (P) - Status: Low/Medium/High
+     * Potassium (K) - Status: Low/Medium/High
+     * Soil pH - Status: Low/Medium/High
+   - Color coding:
+     * Low = Red (#E74C3C) with warning icon
+     * Medium = Yellow (#F39C12) with caution icon
+     * High/Optimal = Green (#27AE60) with check icon
+   - Animated circular progress bars
+   - Visual bars showing levels
+   - "View Recommendations" button
+
+5. PLANT REQUIREMENTS SCREEN
+   - Title: "Kailangan ng [Plant Name] / Plant Requirements"
+   - Beautiful reference table/cards
+   - Shows optimal levels for selected plant:
+     * Nitrogen: High
+     * Phosphorus: Medium-High
+     * Potassium: High
+     * Soil pH: Medium
+   - Visual comparison with current soil status
+   - No numbers, just categorical levels
+   - Icons and color-coded badges
+
+6. FERTILIZER RECOMMENDATIONS SCREEN
+   - Title: "Rekomendasyon / Recommendations"
+   - Premium recommendation cards (one per nutrient):
+
+     NITROGEN CARD:
+     - Current: Low 🔴
+     - Target: High 🟢
+     - Recommended: Urea Fertilizer
+     - Purpose: "Increase nitrogen level"
+     - Dosage indicator (visual, not exact numbers)
+
+     PHOSPHORUS CARD:
+     - Current: Medium 🟡
+     - Target: High 🟢
+     - Recommended: DAP Fertilizer
+     - Purpose: "Improve phosphorus availability"
+
+     POTASSIUM CARD:
+     - Current: Low 🔴
+     - Target: High 🟢
+     - Recommended: Muriate of Potash
+     - Purpose: "Increase potassium for growth"
+
+     pH CARD:
+     - Current: Low (Acidic) 🟡
+     - Target: Medium 🟢
+     - Recommended: Agricultural Lime
+     - Purpose: "Raise soil pH to optimal level"
+
+   - Status banner: "⚠ Soil requires adjustment" or "✔ Soil suitable"
+   - Smooth scroll animations
+
+7. END ACTIONS SCREEN
+   - Title: "Tapos na / Complete"
+   - Success animation (confetti, checkmark)
+   - Three premium action buttons:
+     * "🔁 Analyze Another Location"
+     * "🌱 Change Plant"
+     * "📄 Export Results"
+   - Beautiful summary card
+   - Smooth exit animations
+
+TECHNICAL REQUIREMENTS:
+- Each screen in separate component file
+- Shared components: Header, Button, Card, Badge
+- GSAP useGSAP hook for all animations
+- Tailwind CSS with custom green theme
+- Lucide React icons
+- React Router for navigation
+- Mobile frame wrapper (iPhone-style bezel)
+- Smooth page transitions
+
+FARMER-FRIENDLY FEATURES:
+- Bilingual throughout (Filipino first, English second)
+- Large buttons, big fonts
+- Simple categorical language (Low/Medium/High)
+- Visual indicators (colors, icons, progress bars)
+- No complex numbers shown to users
+- Clear call-to-action buttons
+
+OUTPUT FORMAT:
+Generate complete React components for all 7 screens with:
+- Full imports
+- GSAP animations
+- Tailwind styling
+- Filipino + English labels
+- Premium Airbnb/Apple aesthetic
+- Mobile-responsive design
+
+Start with Screen 1 (Location Selection).
