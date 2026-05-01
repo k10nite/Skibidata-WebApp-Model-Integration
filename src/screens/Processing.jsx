@@ -6,9 +6,9 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import useAppStore from '../store/appStore';
-import { getScenarioByLocation } from '../data/soilScenarios';
 import { getRecommendationsForScenario, getRecommendationSummary } from '../data/fertilizerRecommendations';
 import { getSatelliteAnalysis } from '../services/satelliteService';
+import { predictForLocation } from '../services/mlPredictionService';
 
 // Processing steps with clean, minimal descriptions
 const PROCESSING_STEPS = [
@@ -32,7 +32,7 @@ const PROCESSING_STEPS = [
 
 export default function Processing() {
   const navigate = useNavigate();
-  const { location, municipality, selectedPlant, plantRequirements, setSoilData, setRecommendations, setSatelliteData } = useAppStore();
+  const { location, municipality, selectedPlant, plantRequirements, setMLPrediction, setRecommendations, setSatelliteData } = useAppStore();
 
   // Refs for GSAP animations
   const timelineRef = useRef(null);
@@ -79,23 +79,23 @@ export default function Processing() {
     const tl = gsap.timeline({
       onComplete: () => {
         // Wait for satellite data if not yet received
-        const processAndNavigate = () => {
+        const processAndNavigate = async () => {
           // Store satellite data in app state
           if (satelliteDataRef.current) {
             setSatelliteData(satelliteDataRef.current);
           }
 
-          // Process soil scenario and recommendations
-          const scenario = getScenarioByLocation(location.lat, location.lng);
+          // Get soil prediction from ML service (Liam's SoilScan-Sentinel2 model output)
+          const prediction = await predictForLocation(municipality || 'La Trinidad');
           const recommendations = getRecommendationsForScenario(
-            scenario.status,
+            prediction,
             plantRequirements,
             selectedPlant.name
           );
           const summary = getRecommendationSummary(recommendations);
 
-          // Store in app state
-          setSoilData(scenario.status, scenario);
+          // Store in app state — ML prediction wins over satellite-derived soil estimates
+          setMLPrediction(prediction);
           setRecommendations(recommendations, summary);
 
           // Navigate to soil status after completion
@@ -197,7 +197,7 @@ export default function Processing() {
         timelineRef.current.kill();
       }
     };
-  }, [location, selectedPlant, plantRequirements, navigate, setSoilData, setRecommendations, setSatelliteData, satelliteDataFetched]);
+  }, [location, municipality, selectedPlant, plantRequirements, navigate, setMLPrediction, setRecommendations, setSatelliteData, satelliteDataFetched]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white relative overflow-hidden">

@@ -39,6 +39,12 @@ const useAppStore = create((set) => ({
   setSoilData: (soilData, scenario) =>
     set({ soilData, soilScenario: scenario }),
 
+  setMLPrediction: (prediction) =>
+    set({
+      soilData: prediction,
+      soilScenario: { status: prediction, source: prediction?.source ?? 'ml' }
+    }),
+
   setSatelliteData: (satelliteData) =>
     set({
       satelliteData,

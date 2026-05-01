@@ -23,8 +23,8 @@ import {
   ArrowRight
 } from 'lucide-react';
 import useAppStore from '../store/appStore';
-import { getScenarioByLocation } from '../data/soilScenarios';
 import { getRecommendationsForScenario, getRecommendationSummary } from '../data/fertilizerRecommendations';
+import { predictForLocation } from '../services/mlPredictionService';
 
 // Processing steps with bilingual labels
 const PROCESSING_STEPS = [
@@ -186,7 +186,7 @@ function ProgressStep({ step, index, currentStep, isCompleted, isActive }) {
  */
 export default function ProcessingScreen({ onComplete }) {
   const navigate = useNavigate();
-  const { location, selectedPlant, plantRequirements, setSoilData, setRecommendations } = useAppStore();
+  const { location, municipality, selectedPlant, plantRequirements, setMLPrediction, setRecommendations } = useAppStore();
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
@@ -260,18 +260,18 @@ export default function ProcessingScreen({ onComplete }) {
       setIsComplete(true);
 
       // Process soil data and navigate after a short delay
-      const completeTimer = setTimeout(() => {
-        // Process soil scenario and recommendations
-        const scenario = getScenarioByLocation(location.lat, location.lng);
+      const completeTimer = setTimeout(async () => {
+        // Get soil prediction from ML service (Liam's SoilScan-Sentinel2 model output)
+        const prediction = await predictForLocation(municipality || 'La Trinidad');
         const recommendations = getRecommendationsForScenario(
-          scenario.status,
+          prediction,
           plantRequirements,
           selectedPlant.name
         );
         const summary = getRecommendationSummary(recommendations);
 
         // Store in app state
-        setSoilData(scenario.status, scenario);
+        setMLPrediction(prediction);
         setRecommendations(recommendations, summary);
 
         // Navigate to soil status
@@ -284,7 +284,7 @@ export default function ProcessingScreen({ onComplete }) {
 
       return () => clearTimeout(completeTimer);
     }
-  }, [currentStep, isComplete, onComplete, location, selectedPlant, plantRequirements, setSoilData, setRecommendations, navigate]);
+  }, [currentStep, isComplete, onComplete, location, municipality, selectedPlant, plantRequirements, setMLPrediction, setRecommendations, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FAF9F6] via-white to-[#E8F5E9] flex items-center justify-center p-4 overflow-hidden">
