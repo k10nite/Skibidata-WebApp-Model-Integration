@@ -6,11 +6,7 @@ import { useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import useAppStore from '../store/appStore';
-import {
-  calculateFertilizerRecommendation,
-  PH_FERTILIZERS,
-  CROP_REQUIREMENTS
-} from '../services/fertilizerEngine';
+import { getRecommendationForCrop } from '../services/recommendationService';
 
 // Map plant names to crop keys in CROP_REQUIREMENTS
 const PLANT_TO_CROP_KEY = {
@@ -60,7 +56,7 @@ export default function FertilizerRecommendations() {
   // Calculate fertilizer recommendations
   const fertilizerData = useMemo(() => {
     const soil = soilData || DEFAULT_SOIL_DATA;
-    return calculateFertilizerRecommendation(soil, cropKey, 1);
+    return getRecommendationForCrop(soil, cropKey, 1);
   }, [soilData, cropKey]);
 
   // Store recommendations in app store
