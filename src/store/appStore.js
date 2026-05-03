@@ -29,6 +29,10 @@ const useAppStore = create((set) => ({
   recommendations: null,
   recommendationSummary: null,
 
+  // Farm inputs
+  areaHectares: 1,
+  availableFertilizers: '',
+
   // Actions
   setLocation: (location, municipality, barangay) =>
     set({ location, municipality, barangay }),
@@ -56,6 +60,12 @@ const useAppStore = create((set) => ({
   setRecommendations: (recommendations, summary) =>
     set({ recommendations, recommendationSummary: summary }),
 
+  setAreaHectares: (areaHectares) =>
+    set({ areaHectares }),
+
+  setAvailableFertilizers: (availableFertilizers) =>
+    set({ availableFertilizers }),
+
   nextScreen: () =>
     set((state) => ({
       currentScreen: Math.min(state.currentScreen + 1, 7)
@@ -78,7 +88,9 @@ const useAppStore = create((set) => ({
       weatherData: null,
       vegetationIndex: null,
       recommendations: null,
-      recommendationSummary: null
+      recommendationSummary: null,
+      areaHectares: 1,
+      availableFertilizers: ''
     })
 }));
 

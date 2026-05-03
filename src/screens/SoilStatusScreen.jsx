@@ -375,7 +375,7 @@ export default function SoilStatusScreen() {
   };
 
   const handleContinue = () => {
-    navigate('/fertilizer-recommendations-premium');
+    navigate('/fertilizer-recommendations');
   };
   
   // Prepare nutrients data

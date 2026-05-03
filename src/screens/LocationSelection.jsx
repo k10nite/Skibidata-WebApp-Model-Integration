@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import { Crosshair, MapPin, Navigation, ChevronRight } from 'lucide-react';
+import { Crosshair, ChevronRight } from 'lucide-react';
 import { gsap } from 'gsap';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { motion } from 'framer-motion';
 
 // Fix Leaflet default icon issue
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -47,7 +48,7 @@ const customPinIcon = L.divIcon({
 
 // Draggable marker component
 function DraggableMarker({ position, setPosition }) {
-  const [draggable, setDraggable] = useState(true);
+  const [draggable] = useState(true);
   const markerRef = useRef(null);
 
   const eventHandlers = {
@@ -88,58 +89,33 @@ export default function LocationSelection() {
   const [showContinue, setShowContinue] = useState(false);
 
   const containerRef = useRef(null);
-  const titleRef = useRef(null);
   const mapContainerRef = useRef(null);
-  const locationCardRef = useRef(null);
   const continueBtnRef = useRef(null);
   const gpsBtnRef = useRef(null);
   const pulseRef = useRef(null);
 
-  // GSAP entrance animations
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Title animation
-      gsap.fromTo(
-        titleRef.current,
-        { opacity: 0, y: -30 },
-        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }
-      );
-
-      // Map container animation
-      gsap.fromTo(
-        mapContainerRef.current,
-        { opacity: 0, scale: 0.95 },
-        { opacity: 1, scale: 1, duration: 0.8, delay: 0.2, ease: 'power3.out' }
-      );
-
-      // Location card animation
-      gsap.fromTo(
-        locationCardRef.current,
-        { opacity: 0, x: -30 },
-        { opacity: 1, x: 0, duration: 0.6, delay: 0.4, ease: 'power3.out' }
-      );
-
-      // GPS button animation
-      gsap.fromTo(
-        gpsBtnRef.current,
-        { opacity: 0, scale: 0.8 },
-        { opacity: 1, scale: 1, duration: 0.5, delay: 0.6, ease: 'back.out(1.7)' }
-      );
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, []);
-
-  // Continue button slide-up animation
-  useEffect(() => {
-    if (showContinue && continueBtnRef.current) {
-      gsap.fromTo(
-        continueBtnRef.current,
-        { opacity: 0, y: 100 },
-        { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
-      );
+  // Animation variants for motion
+  const containerVariants = {
+    initial: {},
+    animate: {
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.1
+      }
     }
-  }, [showContinue]);
+  };
+
+  const itemVariants = {
+    initial: { y: 16, opacity: 0 },
+    animate: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.7,
+        ease: [0.16, 1, 0.3, 1]
+      }
+    }
+  };
 
   // GPS pulse animation
   useEffect(() => {
@@ -194,169 +170,186 @@ export default function LocationSelection() {
   }, [position]);
 
   const handleContinue = () => {
-    // Button click animation
-    gsap.to(continueBtnRef.current, {
-      scale: 0.98,
-      duration: 0.1,
-      yoyo: true,
-      repeat: 1,
-      ease: 'power2.inOut',
-      onComplete: () => {
-        // Navigate to plant selection screen
-        console.log('Continue with location:', position);
-        navigate('/plant-selection-kimi');
-      },
-    });
+    // Navigate to plant selection screen
+    console.log('Continue with location:', position);
+    navigate('/plant-selection');
   };
 
   return (
-    <div 
+    <motion.div
       ref={containerRef}
-      className="min-h-screen bg-gradient-to-br from-[#FAFAF8] via-[#F5F7F2] to-[#E8EDE3] relative overflow-hidden"
+      variants={containerVariants}
+      initial="initial"
+      animate="animate"
+      className="min-h-screen bg-[var(--color-paper)] relative overflow-hidden"
     >
-      {/* Decorative background elements */}
-      <div className="absolute top-0 left-0 w-full h-80 bg-gradient-to-b from-[#2E7D32]/5 to-transparent pointer-events-none" />
-      <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-[#84934A]/10 blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 -left-20 w-60 h-60 rounded-full bg-[#2E7D32]/5 blur-3xl pointer-events-none" />
+      {/* Topographic background contours */}
+      <svg className="terrace-topo opacity-8" viewBox="0 0 1200 800" preserveAspectRatio="none">
+        <path
+          d="M0,200 Q300,150 600,200 T1200,200"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1"
+          opacity="0.6"
+        />
+        <path
+          d="M0,350 Q400,300 800,350 T1200,350"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1"
+          opacity="0.4"
+        />
+        <path
+          d="M0,500 Q200,450 500,500 T1200,500"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1"
+          opacity="0.3"
+        />
+      </svg>
 
-
-      {/* Title Section */}
-      <div ref={titleRef} className="relative z-10 px-4 sm:px-6 lg:px-8 pt-8 mb-4">
-        <div className="max-w-lg mx-auto text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold text-[#492828] leading-tight mb-2">
-            Select Farm Location
-          </h1>
-          <p className="mt-3 text-sm text-[#492828]/60 max-w-md mx-auto">
-            Drag the pin on the map or use GPS to set your farm location
-          </p>
-        </div>
-      </div>
-
-      {/* Map Section */}
-      <div
-        ref={mapContainerRef}
-        className="relative z-10 px-4 sm:px-6 lg:px-8 mb-6"
-      >
-        <div className="max-w-lg mx-auto">
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-[#2E7D32]/15 border-4 border-white">
-            <div className="h-80 sm:h-96 w-full">
-              <MapContainer
-                center={[position.lat, position.lng]}
-                zoom={13}
-                scrollWheelZoom={true}
-                style={{ height: '100%', width: '100%' }}
-                className="z-0"
+      <div className="relative z-10 min-h-screen flex">
+        {/* Map Section - 62% Hero */}
+        <motion.div
+          variants={itemVariants}
+          className="w-full lg:w-[62%] relative"
+        >
+          <div className="h-screen p-6 lg:p-12 flex flex-col">
+            {/* Eyebrow and title */}
+            <motion.div variants={itemVariants} className="mb-8 lg:mb-12">
+              <div className="terrace-eyebrow mb-6">01 — LOCATION</div>
+              <h1
+                className="terrace-display text-4xl lg:text-6xl mb-4"
+                style={{
+                  fontFamily: '"Fraunces", serif',
+                  fontVariationSettings: '"opsz" 144, "wght" 600'
+                }}
               >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <DraggableMarker position={position} setPosition={setPosition} />
-                <MapClickHandler setPosition={setPosition} />
-              </MapContainer>
-            </div>
+                Where is your field?
+              </h1>
+            </motion.div>
 
-            {/* Map overlay gradient */}
-            <div className="absolute inset-0 pointer-events-none rounded-3xl shadow-inner"
-                 style={{ boxShadow: 'inset 0 0 40px rgba(0,0,0,0.1)' }} />
-          </div>
-        </div>
-      </div>
-
-      {/* GPS Button */}
-      <div className="relative z-10 px-4 sm:px-6 lg:px-8 mb-6">
-        <div className="max-w-lg mx-auto">
-          <button
-            ref={gpsBtnRef}
-            onClick={handleSelectGPS}
-            disabled={isLocating}
-            className="group w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-[#2E7D32] to-[#84934A] rounded-2xl shadow-xl shadow-[#2E7D32]/20 hover:shadow-2xl hover:shadow-[#2E7D32]/30 transition-all duration-300 disabled:opacity-70"
-          >
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
-              isLocating ? 'bg-white/30' : 'bg-white/20 group-hover:bg-white/30'
-            }`}>
-              <Crosshair className={`w-5 h-5 text-white ${isLocating ? 'animate-pulse' : ''}`} />
-            </div>
-
-            <div className="text-left flex-1">
-              <span className="block text-base font-semibold text-white">
-                {isLocating ? 'Getting Your Location...' : 'Use My Current Location'}
-              </span>
-              <span className="block text-xs text-white/70">
-                {isLocating ? 'Please wait...' : 'Automatically set pin to GPS location'}
-              </span>
-            </div>
-          </button>
-
-          <p className="text-center text-xs text-[#492828]/40 mt-2">
-            You can also click or drag the pin on the map
-          </p>
-        </div>
-      </div>
-
-      {/* Location Info Card */}
-      <div
-        ref={locationCardRef}
-        className="relative z-10 px-4 sm:px-6 lg:px-8 mb-6"
-      >
-        <div className="max-w-lg mx-auto">
-          <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-5 shadow-xl shadow-[#2E7D32]/10 border border-[#2E7D32]/10">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#2E7D32]/10 to-[#84934A]/10 flex items-center justify-center flex-shrink-0">
-                <Navigation className="w-6 h-6 text-[#2E7D32]" />
+            {/* Map Container - takes remaining space */}
+            <motion.div
+              variants={itemVariants}
+              ref={mapContainerRef}
+              className="flex-1 relative"
+            >
+              <div className="h-full w-full terrace-card-hairline overflow-hidden">
+                <MapContainer
+                  center={[position.lat, position.lng]}
+                  zoom={13}
+                  scrollWheelZoom={true}
+                  style={{ height: '100%', width: '100%' }}
+                  className="z-0"
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <DraggableMarker position={position} setPosition={setPosition} />
+                  <MapClickHandler setPosition={setPosition} />
+                </MapContainer>
               </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-semibold text-[#492828] mb-1">
-                  Current Location
-                </h3>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="text-[#492828]/50 w-8">Lat:</span>
-                    <span className="font-mono text-[#2E7D32] font-medium">
-                      {position.lat.toFixed(6)}° N
-                    </span>
+            </motion.div>
+          </div>
+        </motion.div>
+
+        {/* Editorial Rail - 38% */}
+        <motion.div
+          variants={itemVariants}
+          className="hidden lg:block w-[38%] bg-[var(--color-paper-card)] relative"
+        >
+          <div className="h-screen p-12 flex flex-col justify-between">
+            {/* Editorial content */}
+            <div className="space-y-8">
+              <motion.div variants={itemVariants} className="space-y-4">
+                <p className="text-[var(--color-earth-deep)] leading-relaxed">
+                  Your selected location determines which Sentinel-2 satellite imagery we&apos;ll use to analyze soil composition and nutrient patterns across your field.
+                </p>
+                <p className="text-[var(--color-earth-deep)]/80 text-sm">
+                  The Cordillera region&apos;s unique terraced landscapes require precise positioning for accurate soil heritage mapping.
+                </p>
+              </motion.div>
+
+              {/* Current coordinates - data as ornament */}
+              <motion.div variants={itemVariants} className="space-y-6">
+                <div className="terrace-eyebrow">COORDINATES</div>
+                <div className="space-y-3">
+                  <div
+                    className="terrace-data text-4xl lg:text-5xl text-[var(--color-moss)]"
+                    style={{
+                      fontFamily: '"JetBrains Mono", monospace',
+                      fontVariantNumeric: 'tabular-nums'
+                    }}
+                  >
+                    {position.lat.toFixed(4)}° N
                   </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="text-[#492828]/50 w-8">Lng:</span>
-                    <span className="font-mono text-[#2E7D32] font-medium">
-                      {position.lng.toFixed(6)}° E
-                    </span>
+                  <div
+                    className="terrace-data text-4xl lg:text-5xl text-[var(--color-moss)]"
+                    style={{
+                      fontFamily: '"JetBrains Mono", monospace',
+                      fontVariantNumeric: 'tabular-nums'
+                    }}
+                  >
+                    {position.lng.toFixed(4)}° E
                   </div>
                 </div>
-              </div>
+              </motion.div>
+
+              {/* GPS Button */}
+              <motion.div variants={itemVariants}>
+                <button
+                  ref={gpsBtnRef}
+                  onClick={handleSelectGPS}
+                  disabled={isLocating}
+                  className="group w-full terrace-btn flex items-center justify-center gap-3 py-4 disabled:opacity-70"
+                >
+                  <Crosshair className={`w-5 h-5 ${isLocating ? 'animate-pulse' : ''}`} />
+                  {isLocating ? 'Locating...' : 'Use GPS Location'}
+                </button>
+                <p className="text-xs text-[var(--color-earth-deep)]/50 mt-3 text-center">
+                  Or click anywhere on the map
+                </p>
+              </motion.div>
             </div>
+
+            {/* Continue Button */}
+            {showContinue && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="pt-8 border-t border-[var(--color-contour)]"
+              >
+                <button
+                  ref={continueBtnRef}
+                  onClick={handleContinue}
+                  className="terrace-btn w-full group hover:scale-[1.01] transition-all duration-300"
+                  style={{ padding: '1.2rem 2rem' }}
+                >
+                  Continue to Plant Selection
+                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+                </button>
+              </motion.div>
+            )}
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      {/* Continue Button - Floating */}
+      {/* Mobile-only continue button */}
       {showContinue && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-6 pt-4 bg-gradient-to-t from-[#FAFAF8] via-[#FAFAF8] to-transparent">
-          <div className="max-w-lg mx-auto">
-            <button
-              ref={continueBtnRef}
-              onClick={handleContinue}
-              className="group w-full flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#2E7D32] to-[#84934A] rounded-2xl shadow-2xl shadow-[#2E7D32]/30 hover:shadow-[#2E7D32]/40 transition-all duration-300 hover:-translate-y-0.5"
-            >
-              <div className="text-left">
-                <span className="block text-base font-semibold text-white">
-                  Continue to Plant Selection
-                </span>
-                <span className="block text-xs text-white/70">
-                  Next Step
-                </span>
-              </div>
-
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-all duration-300 group-hover:scale-110">
-                <ChevronRight className="w-6 h-6 text-white" />
-              </div>
-            </button>
-          </div>
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 p-6 bg-gradient-to-t from-[var(--color-paper)] via-[var(--color-paper)] to-transparent">
+          <button
+            ref={continueBtnRef}
+            onClick={handleContinue}
+            className="terrace-btn w-full group flex items-center justify-between px-6 py-4"
+          >
+            <span>Continue to Plant Selection</span>
+            <ChevronRight className="w-5 h-5" />
+          </button>
         </div>
       )}
-
-      {/* Spacer for floating button */}
-      {showContinue && <div className="h-24" />}
 
       {/* Custom CSS for Leaflet */}
       <style>{`
@@ -372,6 +365,6 @@ export default function LocationSelection() {
           border: none;
         }
       `}</style>
-    </div>
+    </motion.div>
   );
 }

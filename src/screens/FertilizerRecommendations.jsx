@@ -1,10 +1,10 @@
-// Screen 6: Fertilizer Recommendations - Clean Product Cards
-// PEAK MOMENT 3: Main results reveal with staggered animations
-// Airbnb-style professional product listing with clean design
+// Screen 6: Fertilizer Recommendations - CLIMAX
+// Field prescription in lab notebook aesthetic
+// Editorial-cartographic, Cordillera terraces meet scientific journal
 
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import gsap from 'gsap';
+import { motion } from 'framer-motion';
 import useAppStore from '../store/appStore';
 import { getRecommendationForCrop } from '../services/recommendationService';
 
@@ -38,14 +38,40 @@ const DEFAULT_SOIL_DATA = {
 
 export default function FertilizerRecommendations() {
   const navigate = useNavigate();
-  const { selectedPlant, soilData, municipality, setRecommendations } = useAppStore();
+  const {
+    selectedPlant,
+    soilData,
+    municipality,
+    setRecommendations,
+    areaHectares,
+    availableFertilizers,
+    setAreaHectares,
+    setAvailableFertilizers
+  } = useAppStore();
 
-  // Refs for GSAP animations
-  const headerRef = useRef(null);
-  const cardsRef = useRef([]);
-  const phSectionRef = useRef(null);
-  const organicSectionRef = useRef(null);
-  const summaryRef = useRef(null);
+  // Container animation timing
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        ease: [0.16, 1, 0.3, 1]
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: [0.16, 1, 0.3, 1]
+      }
+    }
+  };
 
   // Determine crop key from selected plant
   const cropKey = useMemo(() => {
@@ -53,11 +79,11 @@ export default function FertilizerRecommendations() {
     return PLANT_TO_CROP_KEY[selectedPlant.name] || 'cabbage';
   }, [selectedPlant]);
 
-  // Calculate fertilizer recommendations
+  // Calculate fertilizer recommendations - PRESERVE ENGINE SEAM
   const fertilizerData = useMemo(() => {
     const soil = soilData || DEFAULT_SOIL_DATA;
-    return getRecommendationForCrop(soil, cropKey, 1);
-  }, [soilData, cropKey]);
+    return getRecommendationForCrop(soil, cropKey, areaHectares, availableFertilizers);
+  }, [soilData, cropKey, areaHectares, availableFertilizers]);
 
   // Store recommendations in app store
   useEffect(() => {
@@ -71,53 +97,6 @@ export default function FertilizerRecommendations() {
       navigate('/plant-selection');
       return;
     }
-
-    // GSAP Timeline for smooth entrance animations
-    const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
-
-    // 1. Header fade in
-    tl.fromTo(
-      headerRef.current,
-      { opacity: 0, y: -20 },
-      { opacity: 1, y: 0, duration: 0.5 }
-    );
-
-    // 2. Product cards stagger
-    tl.fromTo(
-      cardsRef.current.filter(Boolean),
-      { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 0.6, stagger: 0.15 },
-      '-=0.3'
-    );
-
-    // 3. pH section
-    if (phSectionRef.current) {
-      tl.fromTo(
-        phSectionRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.5 },
-        '-=0.2'
-      );
-    }
-
-    // 4. Organic section
-    if (organicSectionRef.current) {
-      tl.fromTo(
-        organicSectionRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.5 },
-        '-=0.2'
-      );
-    }
-
-    // 5. Summary card
-    tl.fromTo(
-      summaryRef.current,
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.5 },
-      '-=0.2'
-    );
-
   }, [selectedPlant, navigate]);
 
   const handleContinue = () => {
@@ -128,366 +107,254 @@ export default function FertilizerRecommendations() {
     navigate('/plant-requirements');
   };
 
-  const handleDownloadReport = () => {
-    console.log('Downloading report...');
-  };
-
-  const handleAddToPlan = (productName) => {
-    console.log(`Added ${productName} to plan`);
-  };
-
-  // Get stage styling
-  const getStageStyles = (stage) => {
-    if (stage.includes('Basal')) {
-      return {
-        bg: 'bg-emerald-50',
-        text: 'text-emerald-700',
-        border: 'border-emerald-200',
-        dot: 'bg-emerald-500',
-        label: 'Basal'
-      };
-    }
-    if (stage.includes('First')) {
-      return {
-        bg: 'bg-blue-50',
-        text: 'text-blue-700',
-        border: 'border-blue-200',
-        dot: 'bg-blue-500',
-        label: 'Side Dress 1'
-      };
-    }
-    return {
-      bg: 'bg-amber-50',
-      text: 'text-amber-700',
-      border: 'border-amber-200',
-      dot: 'bg-amber-500',
-      label: 'Side Dress 2'
-    };
-  };
-
   const locationDisplay = municipality || 'La Trinidad, Benguet';
+  const todayDisplay = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8 pb-24">
-      <div className="max-w-5xl mx-auto">
+    <motion.div
+      className="min-h-screen bg-[var(--color-paper)] relative"
+      style={{ paddingBottom: '6rem' }}
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
+      {/* Background topographic contours */}
+      <svg className="terrace-topo opacity-[0.06]" viewBox="0 0 800 600" fill="none">
+        <path
+          d="M50 150C150 120, 250 180, 350 150C450 120, 550 180, 650 150"
+          stroke="currentColor"
+          strokeWidth="1"
+          fill="none"
+        />
+        <path
+          d="M30 280C130 250, 230 310, 330 280C430 250, 530 310, 630 280"
+          stroke="currentColor"
+          strokeWidth="1"
+          fill="none"
+        />
+        <path
+          d="M70 420C170 390, 270 450, 370 420C470 390, 570 450, 670 420"
+          stroke="currentColor"
+          strokeWidth="1"
+          fill="none"
+        />
+      </svg>
 
-        {/* Header Section */}
-        <div ref={headerRef} className="mb-8">
-          {/* Back Button */}
-          <button
-            onClick={handleBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            <span className="font-medium">Back</span>
-          </button>
+      <div className="max-w-4xl mx-auto px-6 md:px-8 py-12">
 
-          {/* Title */}
-          <h1
-            className="text-3xl md:text-4xl font-semibold text-gray-900 mb-2"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            Fertilizer Recommendations
+        {/* Header Section - paper bg */}
+        <motion.div variants={itemVariants} className="mb-16">
+          <div className="terrace-eyebrow mb-6">05 — RECOMMENDATION</div>
+          <h1 className="terrace-display text-5xl md:text-6xl mb-4">
+            Field Prescription
           </h1>
-          <p
-            className="text-lg text-gray-600"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            Recommended for {fertilizerData.crop.name}
-          </p>
-          <p
-            className="text-sm text-gray-500 mt-1"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            {locationDisplay} · {fertilizerData.summary.areaHectares} hectare
-          </p>
-        </div>
+          <div className="text-lg text-[var(--color-moss)] leading-relaxed">
+            {fertilizerData.crop.name} cultivation guidance · {locationDisplay} · {todayDisplay}
+          </div>
+        </motion.div>
 
-        {/* Application Schedule Cards */}
-        <div className="space-y-4 mb-6">
-          {fertilizerData.recommendations.map((rec, index) => {
-            const stageStyles = getStageStyles(rec.stage);
+        {/* Farm Inputs Panel - paper-card bg distinct stratum */}
+        <motion.div
+          variants={itemVariants}
+          className="terrace-card p-8 mb-12"
+          style={{ background: 'var(--color-paper-card)' }}
+        >
+          <div className="terrace-eyebrow mb-6">INPUTS</div>
 
-            return (
-              <div
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Area Input */}
+            <div>
+              <label className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider block mb-3">
+                FIELD AREA
+              </label>
+              <div className="flex items-end gap-2">
+                <input
+                  type="number"
+                  value={areaHectares}
+                  onChange={(e) => setAreaHectares(Number(e.target.value) || 0)}
+                  min="0.1"
+                  step="0.1"
+                  className="terrace-input text-2xl flex-1"
+                  style={{ fontSize: '1.5rem', lineHeight: '1.2' }}
+                />
+                <span className="terrace-data text-[var(--color-moss)] pb-2">ha</span>
+              </div>
+            </div>
+
+            {/* Available Fertilizers */}
+            <div>
+              <label className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider block mb-3">
+                ON HAND
+              </label>
+              <textarea
+                value={availableFertilizers}
+                onChange={(e) => setAvailableFertilizers(e.target.value)}
+                className="terrace-textarea"
+                placeholder="Urea 46-0-0, DAP 18-46-0, MOP 0-0-60..."
+                rows={3}
+              />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Recommendation Cards - paper bg hero stratum */}
+        <motion.div variants={itemVariants} className="mb-16">
+          <div className="terrace-eyebrow mb-8">APPLICATION SCHEDULE</div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {fertilizerData.recommendations.map((rec, index) => (
+              <motion.div
                 key={`${rec.stage}-${rec.fertilizer.name}-${index}`}
-                ref={(el) => (cardsRef.current[index] = el)}
-                className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300 group"
+                variants={itemVariants}
+                className="terrace-card p-6 hover:scale-[1.01] transition-transform duration-300"
+                whileHover={{ scale: 1.01 }}
+                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
               >
-                <div className="flex flex-col gap-4">
-
-                  {/* Header Row */}
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3
-                        className="text-xl font-semibold text-gray-900 mb-1"
-                        style={{ fontFamily: 'Inter, sans-serif' }}
-                      >
-                        {rec.fertilizer.name}
-                      </h3>
-                      <p
-                        className="text-sm text-gray-600"
-                        style={{ fontFamily: 'Inter, sans-serif' }}
-                      >
-                        {rec.fertilizer.brand}
-                      </p>
-                    </div>
-
-                    {/* Stage Badge */}
-                    <div
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${stageStyles.bg} ${stageStyles.border} border`}
-                    >
-                      <div className={`w-2 h-2 rounded-full ${stageStyles.dot}`}></div>
-                      <span
-                        className={`text-xs font-medium ${stageStyles.text}`}
-                        style={{ fontFamily: 'Inter, sans-serif' }}
-                      >
-                        {stageStyles.label}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Divider */}
-                  <div className="border-t border-gray-100"></div>
-
-                  {/* Application Instructions */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <p
-                        className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1"
-                        style={{ fontFamily: 'Inter, sans-serif' }}
-                      >
-                        Amount
-                      </p>
-                      <p
-                        className="text-sm text-gray-900 font-medium"
-                        style={{ fontFamily: 'Inter, sans-serif' }}
-                      >
-                        {rec.amountKg} kg
-                      </p>
-                    </div>
-                    <div>
-                      <p
-                        className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1"
-                        style={{ fontFamily: 'Inter, sans-serif' }}
-                      >
-                        Timing
-                      </p>
-                      <p
-                        className="text-sm text-gray-900 font-medium"
-                        style={{ fontFamily: 'Inter, sans-serif' }}
-                      >
-                        {rec.timing}
-                      </p>
-                    </div>
-                    <div>
-                      <p
-                        className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1"
-                        style={{ fontFamily: 'Inter, sans-serif' }}
-                      >
-                        Method
-                      </p>
-                      <p
-                        className="text-sm text-gray-900 font-medium"
-                        style={{ fontFamily: 'Inter, sans-serif' }}
-                      >
-                        {rec.method}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Price and Action Row */}
-                  <div className="flex items-center justify-between pt-2">
-                    <div>
-                      <p
-                        className="text-2xl font-semibold text-gray-900"
-                        style={{ fontFamily: 'Inter, sans-serif' }}
-                      >
-                        PHP {rec.cost.toLocaleString()}
-                      </p>
-                      <p
-                        className="text-xs text-gray-500"
-                        style={{ fontFamily: 'Inter, sans-serif' }}
-                      >
-                        PHP {rec.fertilizer.pricePerKg}/kg
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => handleAddToPlan(rec.fertilizer.name)}
-                      className="px-6 py-2.5 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
-                      style={{ fontFamily: 'Inter, sans-serif' }}
-                    >
-                      Add to Plan
-                    </button>
-                  </div>
-
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* pH Adjustment Section */}
-        {fertilizerData.phAdjustment.needed && (
-          <div
-            ref={phSectionRef}
-            className="bg-orange-50 rounded-xl border border-orange-200 p-6 mb-6"
-          >
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <h3
-                  className="text-lg font-semibold text-orange-900 mb-2"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
-                >
-                  pH Adjustment Required
+                {/* Fertilizer name */}
+                <h3 className="terrace-display text-2xl mb-4" style={{ fontVariationSettings: '"opsz" 144, "wght" 500' }}>
+                  {rec.fertilizer.name}
                 </h3>
-                <p
-                  className="text-sm text-orange-800 mb-3"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
-                >
-                  {fertilizerData.phAdjustment.reason}
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white/50 rounded-lg p-4">
-                  <div>
-                    <p className="text-xs font-medium text-orange-600 uppercase tracking-wide mb-1">Action</p>
-                    <p className="text-sm text-orange-900 font-medium">{fertilizerData.phAdjustment.action}</p>
+
+                {/* Dosage as DisplayNumber */}
+                <div className="text-center mb-6">
+                  <div className="terrace-display text-4xl" style={{ fontVariationSettings: '"opsz" 144, "wght" 700' }}>
+                    {rec.amountKg}
                   </div>
-                  <div>
-                    <p className="text-xs font-medium text-orange-600 uppercase tracking-wide mb-1">Amount</p>
-                    <p className="text-sm text-orange-900 font-medium">{fertilizerData.phAdjustment.amount}</p>
+                  <div className="terrace-data text-sm text-[var(--color-moss)] mt-1">kg/ha</div>
+                </div>
+
+                {/* Application details */}
+                <div className="space-y-3 text-sm leading-relaxed">
+                  <div><strong>Timing:</strong> {rec.timing}</div>
+                  <div><strong>Method:</strong> {rec.method}</div>
+                  {rec.fertilizer.brand && (
+                    <div><strong>Brand:</strong> {rec.fertilizer.brand}</div>
+                  )}
+                </div>
+
+                {/* Cost at bottom */}
+                <div className="mt-6 pt-4 border-t border-[var(--color-contour)]">
+                  <div className="terrace-data text-lg font-semibold">
+                    ₱{rec.cost.toLocaleString()}
                   </div>
-                  <div>
-                    <p className="text-xs font-medium text-orange-600 uppercase tracking-wide mb-1">Timing</p>
-                    <p className="text-sm text-orange-900 font-medium">{fertilizerData.phAdjustment.timing}</p>
+                  <div className="text-xs text-[var(--color-moss)] mt-1">
+                    ₱{rec.fertilizer.pricePerKg}/kg
                   </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Empty state if no recommendations */}
+          {(!fertilizerData.recommendations || fertilizerData.recommendations.length === 0) && (
+            <div className="text-center py-12">
+              <div className="terrace-display-italic text-xl text-[var(--color-moss)]">
+                No specific recommendations available for current conditions.
+              </div>
+            </div>
+          )}
+        </motion.div>
+
+        {/* pH Adjustment if needed */}
+        {fertilizerData.phAdjustment?.needed && (
+          <motion.div
+            variants={itemVariants}
+            className="terrace-card-hairline p-6 mb-12"
+            style={{ background: 'var(--color-paper-card)', borderColor: 'var(--color-rust)' }}
+          >
+            <div className="flex gap-4">
+              <div className="w-8 h-8 rounded-full bg-[var(--color-rust)] bg-opacity-20 flex items-center justify-center flex-shrink-0 mt-1">
+                <div className="w-3 h-3 rounded-full bg-[var(--color-rust)]"></div>
+              </div>
+              <div>
+                <h4 className="terrace-display text-lg mb-2">pH Adjustment Required</h4>
+                <p className="text-sm mb-3">{fertilizerData.phAdjustment.reason}</p>
+                <div className="terrace-data text-sm">
+                  <strong>{fertilizerData.phAdjustment.action}:</strong> {fertilizerData.phAdjustment.amount} · {fertilizerData.phAdjustment.timing}
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
-        {/* Organic Alternative Section */}
-        <div
-          ref={organicSectionRef}
-          className="bg-green-50 rounded-xl border border-green-200 p-6 mb-6"
+        {/* Total Summary - paper-deep bg closing stratum */}
+        <motion.div
+          variants={itemVariants}
+          className="p-8 rounded-2xl"
+          style={{ background: 'var(--color-paper-deep)' }}
         >
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <h3
-                className="text-lg font-semibold text-green-900 mb-2"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                Organic Alternative
-              </h3>
-              <p
-                className="text-sm text-green-800 mb-4"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                {fertilizerData.organicOption.note}
-              </p>
-              <div className="space-y-3">
-                {fertilizerData.organicOption.materials.map((material, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between bg-white/50 rounded-lg p-4"
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-green-900">{material.fertilizer.name}</p>
-                      <p className="text-xs text-green-700">{material.amountKg} kg needed</p>
-                    </div>
-                    <p className="text-lg font-semibold text-green-900">
-                      PHP {material.cost.toLocaleString()}
-                    </p>
-                  </div>
-                ))}
+          <div className="terrace-eyebrow mb-6">TOTAL</div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div>
+              <div className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider mb-1">
+                NITROGEN
               </div>
-              <div className="mt-4 pt-4 border-t border-green-200 flex items-center justify-between">
-                <p className="text-sm font-medium text-green-800">Total Organic Option Cost</p>
-                <p className="text-xl font-semibold text-green-900">
-                  PHP {fertilizerData.organicOption.totalCost.toLocaleString()}
-                </p>
+              <div className="terrace-data text-2xl font-semibold">
+                {fertilizerData.summary.totalNutrients.n} kg
+              </div>
+            </div>
+            <div>
+              <div className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider mb-1">
+                PHOSPHORUS
+              </div>
+              <div className="terrace-data text-2xl font-semibold">
+                {fertilizerData.summary.totalNutrients.p} kg
+              </div>
+            </div>
+            <div>
+              <div className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider mb-1">
+                POTASSIUM
+              </div>
+              <div className="terrace-data text-2xl font-semibold">
+                {fertilizerData.summary.totalNutrients.k} kg
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Cost Summary Card */}
-        <div
-          ref={summaryRef}
-          className="bg-gray-900 rounded-xl p-8 text-white"
-        >
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-
-            {/* Left: Cost Info */}
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 pt-6 border-t border-[var(--color-contour)]">
             <div>
-              <p
-                className="text-sm text-gray-400 mb-2"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                Conventional Fertilizer Cost
-              </p>
-              <p
-                className="text-4xl font-semibold mb-1"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                PHP {fertilizerData.summary.totalCostPHP.toLocaleString()}
-              </p>
-              <p
-                className="text-sm text-gray-400"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                Estimated total for {fertilizerData.summary.areaHectares} hectare · Expected yield: {fertilizerData.summary.expectedYield}
-              </p>
-              <div className="mt-3 flex gap-4 text-xs text-gray-400">
-                <span>N: {fertilizerData.summary.totalNutrients.n} kg</span>
-                <span>P: {fertilizerData.summary.totalNutrients.p} kg</span>
-                <span>K: {fertilizerData.summary.totalNutrients.k} kg</span>
+              <div className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider mb-1">
+                TOTAL COST
+              </div>
+              <div className="terrace-display text-3xl" style={{ fontVariationSettings: '"opsz" 144, "wght" 700' }}>
+                ₱{fertilizerData.summary.totalCostPHP.toLocaleString()}
+              </div>
+              <div className="text-sm text-[var(--color-moss)] mt-2">
+                Coverage: {fertilizerData.summary.areaHectares} ha · Expected yield: {fertilizerData.summary.expectedYield}
               </div>
             </div>
 
-            {/* Right: Actions */}
             <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={handleDownloadReport}
-                className="px-6 py-3 bg-white text-gray-900 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
-                style={{ fontFamily: 'Inter, sans-serif' }}
+                onClick={handleBack}
+                className="terrace-btn-ghost"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Download Report
+                Edit Inputs
               </button>
-
               <button
                 onClick={handleContinue}
-                className="px-6 py-3 bg-[#84934A] text-white rounded-lg font-medium hover:bg-[#6d7a3d] transition-colors flex items-center justify-center gap-2"
-                style={{ fontFamily: 'Inter, sans-serif' }}
+                className="terrace-btn"
               >
-                Continue
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                Continue to Summary
               </button>
             </div>
-
           </div>
-        </div>
+
+          {/* Editorial closing */}
+          <div className="mt-8 pt-6 border-t border-[var(--color-contour)]">
+            <p className="text-sm text-[var(--color-moss)] italic">
+              Recommendations based on current soil conditions and selected crop requirements.
+              Adjust application timing based on local weather patterns.
+            </p>
+          </div>
+        </motion.div>
 
       </div>
-    </div>
+    </motion.div>
   );
 }
