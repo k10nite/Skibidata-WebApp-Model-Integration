@@ -2,11 +2,11 @@
 // Field prescription in lab notebook aesthetic
 // Editorial-cartographic, Cordillera terraces meet scientific journal
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import useAppStore from '../store/appStore';
-import { getRecommendationForCrop } from '../services/recommendationService';
+import { getRecommendationForCrop, getRecommendationForCropAsync } from '../services/recommendationService';
 
 // Map plant names to crop keys in CROP_REQUIREMENTS
 const PLANT_TO_CROP_KEY = {
@@ -79,10 +79,20 @@ export default function FertilizerRecommendations() {
     return PLANT_TO_CROP_KEY[selectedPlant.name] || 'cabbage';
   }, [selectedPlant]);
 
-  // Calculate fertilizer recommendations - PRESERVE ENGINE SEAM
-  const fertilizerData = useMemo(() => {
+  // Calculate fertilizer recommendations - sync stub renders instantly, async engine upgrades when reachable
+  const [fertilizerData, setFertilizerData] = useState(() => {
     const soil = soilData || DEFAULT_SOIL_DATA;
     return getRecommendationForCrop(soil, cropKey, areaHectares, availableFertilizers);
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    const soil = soilData || DEFAULT_SOIL_DATA;
+    setFertilizerData(getRecommendationForCrop(soil, cropKey, areaHectares, availableFertilizers));
+    getRecommendationForCropAsync(soil, cropKey, areaHectares, availableFertilizers)
+      .then((data) => { if (!cancelled) setFertilizerData(data); })
+      .catch(() => {});
+    return () => { cancelled = true; };
   }, [soilData, cropKey, areaHectares, availableFertilizers]);
 
   // Store recommendations in app store
