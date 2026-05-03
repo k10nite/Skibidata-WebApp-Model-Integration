@@ -3,7 +3,7 @@
    Filipino Rice Terrace Heritage meets Modern Soil Lab Dashboard
    ============================================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Roboto+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Roboto+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..700&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -44,6 +44,178 @@
 
   /* Transitions */
   --transition-soil: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ===== TERRACE DESIGN SYSTEM (additive) ===== */
+  /* Editorial-cartographic evolution of Earthy Farm Tech.
+     Inspired by Cordillera rice terraces + scientific journal aesthetic.
+     Consume via var() or Tailwind arbitrary values: bg-[var(--color-paper)] */
+  --color-paper: #F1EDE5;
+  --color-paper-card: #FAF7F0;
+  --color-paper-deep: #E8E2D4;
+  --color-loam: #1F1A14;
+  --color-moss: #4F5B2F;
+  --color-moss-soft: #84934A;
+  --color-ochre: #C8893A;
+  --color-rust: #A24B2A;
+  --color-earth-deep: #3E2A1F;
+  --color-contour: rgba(79, 91, 47, 0.12);
+  --color-contour-strong: rgba(79, 91, 47, 0.24);
+
+  --font-display-serif: 'Fraunces', 'Playfair Display', serif;
+  --font-data: 'JetBrains Mono', 'Roboto Mono', monospace;
+
+  --ease-terrace: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-terrace-in: cubic-bezier(0.7, 0, 0.84, 0);
+
+  --shadow-terrace-sm: 0 2px 8px rgba(62, 42, 31, 0.06);
+  --shadow-terrace-md: 0 8px 24px rgba(62, 42, 31, 0.08);
+  --shadow-terrace-lg: 0 24px 48px rgba(62, 42, 31, 0.12);
+}
+
+/* ===== TERRACE PRIMITIVES (composable, additive) ===== */
+.terrace-eyebrow {
+  font-family: var(--font-data);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--color-moss);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.terrace-eyebrow::before {
+  content: '';
+  width: 32px;
+  height: 1px;
+  background: currentColor;
+  display: inline-block;
+}
+
+.terrace-display {
+  font-family: var(--font-display-serif);
+  font-variation-settings: "opsz" 144, "wght" 600;
+  letter-spacing: -0.025em;
+  line-height: 0.95;
+  color: var(--color-earth-deep);
+}
+
+.terrace-display-italic {
+  font-family: var(--font-display-serif);
+  font-style: italic;
+  font-variation-settings: "opsz" 144, "wght" 500;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  color: var(--color-earth-deep);
+}
+
+.terrace-data {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.terrace-card {
+  background: var(--color-paper-card);
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow-terrace-md);
+  border-bottom: 1px solid var(--color-contour);
+  position: relative;
+  overflow: hidden;
+}
+
+.terrace-card-hairline {
+  background: var(--color-paper-card);
+  border: 1px solid var(--color-contour);
+  border-radius: 1rem;
+  position: relative;
+}
+
+/* Subtle horizontal contour stria — apply as bg layer */
+.terrace-strata {
+  background-image:
+    linear-gradient(to bottom, transparent 0, transparent calc(100% - 1px), var(--color-contour) calc(100% - 1px), var(--color-contour) 100%);
+  background-size: 100% 28px;
+}
+
+/* Topographic contour SVG inline use:
+   <svg class="terrace-topo" ...>  — pair with opacity utility */
+.terrace-topo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  color: var(--color-contour);
+}
+
+.terrace-input {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-contour-strong);
+  padding: 0.5rem 0;
+  color: var(--color-earth-deep);
+  outline: none;
+  transition: border-color 200ms var(--ease-terrace);
+}
+
+.terrace-input:focus {
+  border-bottom-color: var(--color-moss);
+}
+
+.terrace-textarea {
+  font-family: var(--font-heading);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-contour-strong);
+  padding: 0.5rem 0;
+  color: var(--color-earth-deep);
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+  width: 100%;
+  transition: border-color 200ms var(--ease-terrace);
+}
+
+.terrace-textarea:focus {
+  border-bottom-color: var(--color-moss);
+}
+
+.terrace-btn {
+  font-family: var(--font-data);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.78rem;
+  padding: 0.95rem 1.75rem;
+  border-radius: 999px;
+  background: var(--color-earth-deep);
+  color: var(--color-paper);
+  border: 1px solid var(--color-earth-deep);
+  cursor: pointer;
+  transition: all 220ms var(--ease-terrace);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.terrace-btn:hover {
+  background: var(--color-moss);
+  border-color: var(--color-moss);
+  transform: translateY(-1px);
+}
+
+.terrace-btn-ghost {
+  background: transparent;
+  color: var(--color-earth-deep);
+}
+
+.terrace-btn-ghost:hover {
+  background: var(--color-earth-deep);
+  color: var(--color-paper);
+  transform: translateY(-1px);
 }
 
 /* ===== GLOBAL SOIL GRAIN TEXTURE ===== */
