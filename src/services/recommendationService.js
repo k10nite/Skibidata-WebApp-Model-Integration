@@ -38,6 +38,28 @@ function readRating(field) {
   return 'Medium';
 }
 
+// pH lands in the store via different paths: mlPredictions.json emits
+// strings like "Slightly Acidic", liamMLService normalizes Liam's response
+// to a number. Tolerate both. Also tolerate the legacy lowercase `ph` key.
+function readPh(soilData) {
+  const candidates = [soilData?.pH, soilData?.ph];
+  for (const v of candidates) {
+    if (typeof v === 'number' && v >= 3 && v <= 9) return v;
+    if (typeof v === 'string') {
+      const n = parseFloat(v);
+      if (!Number.isNaN(n) && n >= 3 && n <= 9) return n;
+      const s = v.toLowerCase();
+      if (s.includes('strongly acid')) return 4.5;
+      if (s.includes('slightly acid')) return 6.0;
+      if (s.includes('acidic')) return 5.2;
+      if (s.includes('neutral')) return 6.8;
+      if (s.includes('slightly alkal')) return 7.4;
+      if (s.includes('alkaline')) return 7.8;
+    }
+  }
+  return 6.0;
+}
+
 function mapSoilToEngine(soilData, cropKey, areaHectares, availableFertilizers) {
   const nRating = readRating(soilData?.nitrogen);
   const pRating = readRating(soilData?.phosphorus);
@@ -47,7 +69,7 @@ function mapSoilToEngine(soilData, cropKey, areaHectares, availableFertilizers) 
     n_status: N_STATUS_MAP[nRating] ?? 'Medium',
     p_status: P_STATUS_MAP[pRating] ?? 'Medium',
     k_status: K_STATUS_MAP[kRating] ?? 'Medium',
-    soil_ph: typeof soilData?.ph === 'number' ? soilData.ph : 6.0,
+    soil_ph: readPh(soilData),
     raw_area: areaHectares || 1,
     area_unit: 'ha',
     selected_inventory_names: parseAvailableFertilizers(availableFertilizers)
@@ -110,6 +132,43 @@ function normalizeEngineResponse(engineRes, soilData, cropKey, areaHectares) {
   if (!Array.isArray(mixCandidates) || !mixCandidates.length) {
     return calculateFertilizerRecommendation(soilData, cropKey, areaHectares);
   }
+
+  // Process ALL candidates, not just the best one
+  const candidates = mixCandidates.map((combo, index) => {
+    const prescriptions = (combo.Prescription || [])
+      .map(parsePrescriptionString)
+      .filter(Boolean);
+    const recommendations = prescriptions
+      .map((p) => {
+        const cls = classifyByInventory(p.name, engineRes.inventory);
+        const pricePerKg = ENGINE_NAME_TO_PRICE_PHP[p.name] ?? 0;
+        return {
+          stage: cls.stage,
+          sortOrder: cls.sortOrder,
+          fertilizer: { name: p.name, brand: '', pricePerKg },
+          amountKg: p.qty,
+          timing: '',
+          method: 'Broadcast',
+          cost: p.qty * pricePerKg
+        };
+      })
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map(({ sortOrder: _, ...cleanRec }) => cleanRec);
+
+    return {
+      sourceName: combo.Source || `Combo ${index + 1}`,
+      totalWeight: combo['Total Weight'] || 0,
+      applied: {
+        n: combo['Applied N'] || 0,
+        p: combo['Applied P'] || 0,
+        k: combo['Applied K'] || 0
+      },
+      prescriptions: recommendations,
+      cost: recommendations.reduce((s, r) => s + (r.cost || 0), 0)
+    };
+  });
+
+  // Use the first (best) combo for backwards compatibility
   const bestCombo = mixCandidates[0];
   const prescriptions = (bestCombo.Prescription || [])
     .map(parsePrescriptionString)
@@ -129,13 +188,15 @@ function normalizeEngineResponse(engineRes, soilData, cropKey, areaHectares) {
       };
     })
     .sort((a, b) => a.sortOrder - b.sortOrder)
-    .map(({ sortOrder, ...rec }) => rec);
+    .map(({ sortOrder: _, ...cleanRec }) => cleanRec);
   const totalBase = engineRes.total_base ?? { N: 0, P: 0, K: 0 };
   const ph = engineRes.ph_result ?? {};
   const phNeeded = typeof ph.ph_action === 'string' && ph.ph_action !== 'none';
   return {
     crop: { name: engineRes.selected_crop_label ?? engineRes.selected_crop ?? cropKey },
     recommendations,
+    selectedCandidateIndex: 0,
+    candidates,
     summary: {
       totalCostPHP: recommendations.reduce((s, r) => s + (r.cost || 0), 0),
       totalNutrients: {
@@ -177,19 +238,19 @@ async function fetchFromEngine(soilData, cropKey, areaHectares, availableFertili
   }
 }
 
-export function getRecommendationForCrop(soilData, cropKey, areaHectares = 1, availableFertilizers = '') {
+export function getRecommendationForCrop(soilData, cropKey, areaHectares = 1) {
   if (!RULE_API_URL) {
     return calculateFertilizerRecommendation(soilData, cropKey, areaHectares);
   }
   return calculateFertilizerRecommendation(soilData, cropKey, areaHectares);
 }
 
-export async function getRecommendationForCropAsync(soilData, cropKey, areaHectares = 1, availableFertilizers = '') {
+export async function getRecommendationForCropAsync(soilData, cropKey, areaHectares = 1) {
   if (!RULE_API_URL) {
     return calculateFertilizerRecommendation(soilData, cropKey, areaHectares);
   }
   try {
-    return await fetchFromEngine(soilData, cropKey, areaHectares, availableFertilizers);
+    return await fetchFromEngine(soilData, cropKey, areaHectares, '');
   } catch (err) {
     console.warn('[recommendationService] engine fetch failed, falling back:', err?.message ?? err);
     return calculateFertilizerRecommendation(soilData, cropKey, areaHectares);

@@ -1,10 +1,27 @@
-// Screen 7: Complete / End Actions - Field Return Dashboard
-// END MOMENT of Peak-End Rule - Satisfying conclusion with clear actions
-// Clean Apple-style success state with clear actions
+// Screen 7: Complete - Field Report Dashboard
+// Instrument-panel completion screen showing fertilizer prescription summary
+// Matches SoilStatus aesthetic with hairline grids, mono labels, terrace styling
 
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import useAppStore from '../store/appStore';
+
+// ─────────────────────────────────────────────────────────────────────────
+// Motion
+// ─────────────────────────────────────────────────────────────────────────
+
+const containerVariants = {
+  initial: {},
+  animate: { transition: { delayChildren: 0.05, staggerChildren: 0.06 } }
+};
+const itemVariants = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } }
+};
+
+// ─────────────────────────────────────────────────────────────────────────
+// Component
+// ─────────────────────────────────────────────────────────────────────────
 
 export default function Complete() {
   const navigate = useNavigate();
@@ -14,8 +31,24 @@ export default function Complete() {
     recommendations,
     recommendationSummary,
     soilData,
+    fieldAreaHa,
     resetApp,
   } = useAppStore();
+
+  const sessionId = Math.random().toString(36).substring(2, 7);
+  const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+  // Normalize soil data ratings for display
+  const readRating = (field) => {
+    if (typeof field === 'string') return field;
+    if (field && typeof field === 'object' && typeof field.rating === 'string') return field.rating;
+    return 'Medium';
+  };
+
+  const nStatus = readRating(soilData?.nitrogen) || 'Medium';
+  const pStatus = readRating(soilData?.phosphorus) || 'Medium';
+  const kStatus = readRating(soilData?.potassium) || 'Medium';
+  const phValue = typeof soilData?.pH === 'number' ? soilData.pH.toFixed(1) : '6.5';
 
   const handleDownloadReport = () => {
     const summary = generateTextSummary();
@@ -30,14 +63,13 @@ export default function Complete() {
     URL.revokeObjectURL(url);
   };
 
-  const handleAnalyzeAnother = () => {
-    // Keep location, reset everything else
-    navigate('/plant-selection');
-  };
-
-  const handleNewLocation = () => {
+  const handleNewAnalysis = () => {
     resetApp();
     navigate('/location-selection');
+  };
+
+  const handleBackToPrescription = () => {
+    navigate('/fertilizer-recommendations');
   };
 
   const generateTextSummary = () => {
@@ -52,28 +84,27 @@ Tanim: ${selectedPlant?.name} (${selectedPlant?.scientificName || ''})
 
 KALAGAYAN NG LUPA (Soil Status)
 --------------------------------------------------------------------------------
-Nitrogen (N):        ${soilData?.nitrogen}
-Phosphorus (P):      ${soilData?.phosphorus}
-Potassium (K):       ${soilData?.potassium}
-pH ng Lupa:          ${soilData?.pH}
+Nitrogen (N):        ${nStatus}
+Phosphorus (P):      ${pStatus}
+Potassium (K):       ${kStatus}
+pH ng Lupa:          ${phValue}
 
 BUOD NG REKOMENDASYON (Recommendations Summary)
 --------------------------------------------------------------------------------
-Kabuuang Produkto:   ${recommendationSummary?.totalProducts}
-Mataas na Priyoridad: ${recommendationSummary?.highPriority}
-Katamtamang Priyoridad: ${recommendationSummary?.mediumPriority}
-Tinatayang Gastos:   ₱${recommendationSummary?.estimatedCost?.toLocaleString()} (1 ektarya)
+Kabuuang Produkto:   ${recommendationSummary?.totalProducts || 0}
+Mataas na Priyoridad: ${recommendationSummary?.highPriority || 0}
+Katamtamang Priyoridad: ${recommendationSummary?.mediumPriority || 0}
+Tinatayang Gastos:   ₱${recommendationSummary?.estimatedCost?.toLocaleString() || '0'} (1 ektarya)
 
 MGA PRODUKTONG PATABA (Fertilizer Products)
 --------------------------------------------------------------------------------
 ${recommendations?.map((rec, i) => `
-${i + 1}. ${rec.fertilizer.name} (${rec.fertilizer.formula})
+${i + 1}. ${rec.fertilizer?.name || rec.name} (${rec.fertilizer?.formula || rec.formula})
    Priyoridad: ${rec.priority}
    Nutrient: ${rec.nutrient}
    Dahilan: ${rec.reason}
-   Paggamit: ${rec.fertilizer.applicationRate}
-   Takdang Panahon: ${rec.fertilizer.applicationTiming}
-   Presyo: ₱${rec.fertilizer.pricePerBag} bawat ${rec.fertilizer.bagSize}
+   Paggamit: ${rec.fertilizer?.applicationRate || rec.applicationRate}
+   Presyo: ₱${rec.fertilizer?.pricePerBag || rec.pricePerBag} bawat ${rec.fertilizer?.bagSize || rec.bagSize}
 `).join('\n') || 'Walang kailangang pataba - perpekto na ang lupa!'}
 
 ================================================================================
@@ -84,135 +115,224 @@ Para sa mga Magsasaka ng CAR Highland Farms
   };
 
   return (
-    <div className="min-h-screen p-6 flex items-center justify-center" style={{ background: 'var(--color-paper)' }}>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-md w-full"
+    <motion.div
+      initial="initial"
+      animate="animate"
+      variants={containerVariants}
+      className="h-screen flex flex-col relative overflow-hidden"
+      style={{ background: 'var(--color-paper)', fontFamily: '"Fraunces", serif' }}
+    >
+      {/* Subtle topo backdrop */}
+      <svg className="terrace-topo opacity-[0.04] absolute inset-0 pointer-events-none" viewBox="0 0 1200 800" preserveAspectRatio="none">
+        <path d="M0,200 Q300,150 600,200 T1200,200" fill="none" stroke="currentColor" strokeWidth="1" />
+        <path d="M0,360 Q400,310 800,360 T1200,360" fill="none" stroke="currentColor" strokeWidth="1" />
+        <path d="M0,520 Q200,470 500,520 T1200,520" fill="none" stroke="currentColor" strokeWidth="1" />
+      </svg>
+
+      {/* ─── Top session strip ─── */}
+      <motion.header
+        variants={itemVariants}
+        className="flex items-center justify-between px-8 lg:px-12 py-3"
+        style={{
+          borderBottom: '1px solid var(--color-contour)',
+          background: 'var(--color-paper-card)',
+          flexShrink: 0
+        }}
       >
-        {/* Success Icon */}
-        <div className="text-center mb-8">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
-            className="inline-flex items-center justify-center w-20 h-20 bg-green-500 rounded-full mb-6"
-          >
-            <svg
-              className="w-12 h-12 text-white"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="3"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+        <div
+          style={{
+            fontFamily: '"JetBrains Mono", monospace',
+            fontSize: '11px',
+            letterSpacing: '0.18em',
+            color: 'var(--color-earth-deep)',
+            opacity: 0.7
+          }}
+        >
+          ANALYSIS COMPLETE · session #{sessionId} · saved {dateStr}
+        </div>
+      </motion.header>
+
+      {/* ─── Main content ─── */}
+      <div className="flex-1 flex flex-col items-center justify-center px-8 lg:px-12 py-8">
+        <motion.div
+          variants={itemVariants}
+          className="w-full max-w-4xl"
+        >
+          {/* Title */}
+          <div className="mb-8">
+            <h1
+              style={{
+                fontFamily: '"Fraunces", serif',
+                fontVariationSettings: '"opsz" 144, "wght" 600',
+                fontSize: '32px',
+                color: 'var(--color-earth-deep)',
+                letterSpacing: '-0.01em',
+                marginBottom: '4px'
+              }}
             >
-              <path d="M5 13l4 4L19 7" />
-            </svg>
+              FIELD REPORT — {municipality || 'La Trinidad, Benguet'}
+            </h1>
+          </div>
+
+          {/* 2x2 grid report */}
+          <motion.div
+            variants={itemVariants}
+            className="grid grid-cols-2 gap-px mb-8"
+            style={{
+              background: 'var(--color-contour)',
+              border: '1px solid var(--color-contour)',
+              borderRadius: '4px',
+              overflow: 'hidden'
+            }}
+          >
+            {/* FIELD cell */}
+            <ReportCell title="FIELD">
+              <TelemetryRow label="LOCATION" value={municipality || 'La Trinidad, Benguet'} />
+              <TelemetryRow label="AREA" value={`${fieldAreaHa?.toFixed(2) || '1.0'} ha`} />
+              <TelemetryRow label="pH" value={phValue} />
+            </ReportCell>
+
+            {/* SOIL cell */}
+            <ReportCell title="SOIL">
+              <TelemetryRow label="N STATUS" value={nStatus} />
+              <TelemetryRow label="P STATUS" value={pStatus} />
+              <TelemetryRow label="K STATUS" value={kStatus} />
+            </ReportCell>
+
+            {/* CROP cell */}
+            <ReportCell title="CROP">
+              <TelemetryRow label="" value={selectedPlant?.name || 'Cabbage'} />
+              <TelemetryRow label="" value="vegetables · highland" />
+            </ReportCell>
+
+            {/* PRESCRIPTION cell */}
+            <ReportCell title="PRESCRIPTION">
+              {recommendations?.slice(0, 3).map((rec, i) => (
+                <div key={i} className="flex justify-between" style={{ marginBottom: '3px' }}>
+                  <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)' }}>
+                    {rec.fertilizer?.name || rec.name}:
+                  </span>
+                  <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', fontVariantNumeric: 'tabular-nums' }}>
+                    {rec.amount || '25'} kg
+                  </span>
+                </div>
+              )) || (
+                <>
+                  <TelemetryRow label="Urea:" value="25 kg" />
+                  <TelemetryRow label="14-14-14:" value="30 kg" />
+                  <TelemetryRow label="Muriate:" value="15 kg" />
+                </>
+              )}
+              <div
+                className="flex justify-between pt-2 mt-2"
+                style={{ borderTop: '1px solid var(--color-contour)' }}
+              >
+                <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', fontWeight: 600 }}>
+                  TOTAL:
+                </span>
+                <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+                  ₱{recommendationSummary?.estimatedCost?.toLocaleString() || '8,350'}
+                </span>
+              </div>
+            </ReportCell>
           </motion.div>
 
-          <h1 className="font-semibold text-3xl mb-2" style={{ fontFamily: '"Fraunces", serif', fontVariationSettings: '"opsz" 144, "wght" 600', color: 'var(--color-earth-deep)' }}>
-            Analysis Complete
-          </h1>
-
-          <p className="text-base" style={{ color: 'var(--color-earth-deep)', opacity: 0.7 }}>
-            Your fertilizer plan is ready
-          </p>
-        </div>
-
-        {/* Summary Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="border border-gray-200 rounded-2xl p-6 mb-6 shadow-sm" style={{ background: 'var(--color-paper)' }}
-        >
-          <h2 className="text-sm font-semibold uppercase tracking-wide mb-4" style={{ color: 'var(--color-earth-deep)', opacity: 0.6 }}>
-            Summary
-          </h2>
-
-          <div className="space-y-4">
-            {/* Crop */}
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">{selectedPlant?.icon || '🍅'}</span>
-              <span className="font-medium" style={{ color: 'var(--color-earth-deep)' }}>
-                {selectedPlant?.name || 'Kamatis'}
-              </span>
+          {/* Actions */}
+          <motion.div variants={itemVariants}>
+            <Eyebrow>ACTIONS</Eyebrow>
+            <div className="flex gap-4 mt-3">
+              <button
+                onClick={handleDownloadReport}
+                className="terrace-btn"
+                style={{ letterSpacing: '0.18em', flex: '1' }}
+              >
+                ↓ DOWNLOAD REPORT
+              </button>
+              <button
+                onClick={handleNewAnalysis}
+                className="terrace-btn"
+                style={{ letterSpacing: '0.18em', flex: '1' }}
+              >
+                ↻ NEW ANALYSIS
+              </button>
+              <button
+                onClick={handleBackToPrescription}
+                className="terrace-btn"
+                style={{ letterSpacing: '0.18em', flex: '1' }}
+              >
+                ← PRESCRIPTION
+              </button>
             </div>
-
-            {/* Location */}
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">📍</span>
-              <span className="font-medium" style={{ color: 'var(--color-earth-deep)' }}>
-                {municipality || 'La Trinidad, Benguet'}
-              </span>
-            </div>
-
-            {/* Products */}
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">💊</span>
-              <span className="font-medium" style={{ color: 'var(--color-earth-deep)' }}>
-                {recommendationSummary?.totalProducts || 4} Products Recommended
-              </span>
-            </div>
-
-            {/* Cost */}
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">💰</span>
-              <span className="font-medium" style={{ color: 'var(--color-earth-deep)' }}>
-                Estimated Cost: ₱<span style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>{recommendationSummary?.estimatedCost?.toLocaleString() || '8,395'}</span>
-              </span>
-            </div>
-          </div>
+          </motion.div>
         </motion.div>
+      </div>
+    </motion.div>
+  );
+}
 
-        {/* Action Buttons */}
-        <div className="space-y-3">
-          {/* Download Report Button */}
-          <motion.button
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            onClick={handleDownloadReport}
-            className="w-full border border-gray-200 rounded-2xl p-5 flex items-center gap-4 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm" style={{ background: 'var(--color-paper)' }}
-          >
-            <span className="text-2xl">📥</span>
-            <span className="font-medium text-left flex-1" style={{ color: 'var(--color-earth-deep)' }}>
-              Download Full Report
-            </span>
-          </motion.button>
+// ─────────────────────────────────────────────────────────────────────────
+// Subcomponents
+// ─────────────────────────────────────────────────────────────────────────
 
-          {/* Analyze Another Crop Button */}
-          <motion.button
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            onClick={handleAnalyzeAnother}
-            className="w-full border border-gray-200 rounded-2xl p-5 flex items-center gap-4 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm" style={{ background: 'var(--color-paper)' }}
-          >
-            <span className="text-2xl">🔄</span>
-            <span className="font-medium text-left flex-1" style={{ color: 'var(--color-earth-deep)' }}>
-              Analyze Another Crop
-            </span>
-          </motion.button>
+function Eyebrow({ children }) {
+  return (
+    <div
+      style={{
+        fontFamily: '"JetBrains Mono", monospace',
+        fontSize: '10px',
+        letterSpacing: '0.22em',
+        color: 'var(--color-moss)',
+        fontWeight: 600
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
-          {/* New Location Button */}
-          <motion.button
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            onClick={handleNewLocation}
-            className="w-full border border-gray-200 rounded-2xl p-5 flex items-center gap-4 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm" style={{ background: 'var(--color-paper)' }}
-          >
-            <span className="text-2xl">🗺️</span>
-            <span className="font-medium text-left flex-1" style={{ color: 'var(--color-earth-deep)' }}>
-              New Location
-            </span>
-          </motion.button>
-        </div>
+function ReportCell({ title, children }) {
+  return (
+    <div
+      style={{
+        background: 'var(--color-paper-card)',
+        padding: '16px 18px'
+      }}
+    >
+      <Eyebrow>{title}</Eyebrow>
+      <div className="mt-3 space-y-1">
+        {children}
+      </div>
+    </div>
+  );
+}
 
-      </motion.div>
+function TelemetryRow({ label, value }) {
+  return (
+    <div className="flex justify-between items-baseline">
+      {label && (
+        <span
+          style={{
+            fontFamily: '"JetBrains Mono", monospace',
+            fontSize: '10px',
+            color: 'var(--color-earth-deep)',
+            opacity: 0.6,
+            letterSpacing: '0.1em'
+          }}
+        >
+          {label}
+        </span>
+      )}
+      <span
+        style={{
+          fontFamily: label ? '"JetBrains Mono", monospace' : '"Fraunces", serif',
+          fontSize: label ? '11px' : '13px',
+          color: 'var(--color-earth-deep)',
+          fontWeight: label ? 600 : 500,
+          fontVariantNumeric: 'tabular-nums'
+        }}
+      >
+        {value}
+      </span>
     </div>
   );
 }
