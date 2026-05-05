@@ -2,7 +2,7 @@
 // Direct dropdown + filters interface following Hans's rule-based engine UI philosophy
 // Editorial-cartographic, topographic-map vibes with 62/38 hero+rail layout
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, ChevronRight } from 'lucide-react';
@@ -72,6 +72,24 @@ const CATEGORIES = [
   { id: 'highland', name: 'Highland' }
 ];
 
+// Hans's complete fertilizer inventory (matching RulebasedTest/main.py)
+const HANS_INVENTORY = [
+  'Urea',
+  'Ammonium Sulfate',
+  'Calcium Nitrate',
+  'Complete (14-14-14)',
+  'Complete (16-16-16)',
+  'Ammophos',
+  '15-9-20 Compound',
+  '13-33-21 Compound',
+  '13-31-21 Compound',
+  '19-4-19 Compound',
+  'Single Superphosphate (18)',
+  'Single Superphosphate (20)',
+  'Single Superphosphate (22)',
+  'Muriate of Potash'
+];
+
 const containerVariants = {
   initial: {},
   animate: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } }
@@ -91,11 +109,48 @@ function readRating(field) {
 
 export default function PlantSelection() {
   const navigate = useNavigate();
-  const { setSelectedPlant, soilData, municipality } = useAppStore();
+  const {
+    setSelectedPlant,
+    soilData,
+    municipality,
+    fieldAreaHa,
+    areaHectares,
+    setAreaHectares,
+    availableFertilizers,
+    setAvailableFertilizers
+  } = useAppStore();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedCrop, setSelectedCrop] = useState(null);
+
+  // Initialize area from polygon if available
+  useEffect(() => {
+    if (fieldAreaHa > 0 && areaHectares === 1) {
+      setAreaHectares(fieldAreaHa);
+    }
+  }, [fieldAreaHa, areaHectares, setAreaHectares]);
+
+  // Initialize fertilizer selection from store
+  const [selectedFertilizers, setSelectedFertilizers] = useState(() => {
+    if (!availableFertilizers) return new Set();
+    const items = availableFertilizers.split(',').map(s => s.trim()).filter(Boolean);
+    return new Set(items.filter(item => HANS_INVENTORY.includes(item)));
+  });
+
+  // Update store when selection changes
+  const handleFertilizerToggle = (fertilizerName) => {
+    setSelectedFertilizers(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(fertilizerName)) {
+        newSet.delete(fertilizerName);
+      } else {
+        newSet.add(fertilizerName);
+      }
+      setAvailableFertilizers(Array.from(newSet).join(', '));
+      return newSet;
+    });
+  };
 
   // Filter crops
   const filteredCrops = useMemo(() => {
@@ -236,6 +291,127 @@ export default function PlantSelection() {
                 </div>
               </div>
             )}
+
+            {/* ML Confidence Enrichment - only when Liam data available */}
+            {soilData?.liam && (
+              <div className="mt-6 pt-4 border-t" style={{ borderColor: 'var(--color-contour)' }}>
+                {/* Confidence bars per nutrient */}
+                {['nitrogen', 'phosphorus', 'potassium'].map((nutrient) => {
+                  const data = soilData.liam[nutrient];
+                  if (!data?.class_distribution) return null;
+
+                  const distribution = data.class_distribution;
+                  const total = Object.values(distribution).reduce((sum, val) => sum + val, 0);
+                  const dominantClass = Object.entries(distribution)
+                    .sort((a, b) => b[1] - a[1])[0];
+                  const [className, confidence] = dominantClass;
+                  const percentage = ((confidence / total) * 100).toFixed(1);
+
+                  return (
+                    <div key={nutrient} className="mb-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="terrace-data text-xs uppercase">
+                          {nutrient.charAt(0).toUpperCase()} Confidence
+                        </div>
+                        <div className="font-mono text-xs text-[var(--color-earth-deep)]">
+                          {className} {percentage}%
+                        </div>
+                      </div>
+                      <div className="h-4 bg-[var(--color-paper-deep)] rounded overflow-hidden flex">
+                        {Object.entries(distribution)
+                          .sort((a, b) => b[1] - a[1])
+                          .map(([cls, val]) => {
+                            const colors = { Low: '#A0522D', Medium: '#556B2F', High: '#2F4F4F' };
+                            return (
+                              <div
+                                key={cls}
+                                style={{
+                                  width: `${(val / total) * 100}%`,
+                                  backgroundColor: colors[cls] || '#8B7D6B'
+                                }}
+                              />
+                            );
+                          })}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Telemetry strip */}
+                <div className="flex flex-wrap gap-2 mt-4">
+                  <div className="terrace-data text-xs px-2 py-1 bg-[var(--color-paper-deep)] rounded">
+                    Sample Count: {soilData.liam.sample_count}
+                  </div>
+                  <div className="terrace-data text-xs px-2 py-1 bg-[var(--color-paper-deep)] rounded">
+                    Polygon Area: {soilData.liam.polygon_area_ha?.toFixed(2)} ha
+                  </div>
+                  <div
+                    className={`terrace-data text-xs px-2 py-1 rounded ${
+                      soilData.liam.warnings?.length > 0
+                        ? 'bg-[var(--color-rust)] text-white'
+                        : 'bg-[var(--color-paper-deep)]'
+                    }`}
+                    title={soilData.liam.warnings?.join('; ')}
+                  >
+                    Warnings: {soilData.liam.warnings?.length || 0}
+                  </div>
+                </div>
+              </div>
+            )}
+          </motion.div>
+
+          {/* Engine Inputs Panel */}
+          <motion.div
+            className="terrace-card-hairline p-6"
+            style={{ background: 'var(--color-paper-card)' }}
+            variants={itemVariants}
+          >
+            <div className="terrace-eyebrow mb-4">ENGINE INPUTS</div>
+
+            {/* Field Area */}
+            <div className="mb-6">
+              <label className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider block mb-2">
+                FIELD AREA
+              </label>
+              <div className="flex items-end gap-2">
+                <input
+                  type="number"
+                  value={areaHectares}
+                  onChange={(e) => setAreaHectares(Number(e.target.value) || 0)}
+                  min="0.1"
+                  step="0.1"
+                  className="terrace-input text-lg flex-1"
+                />
+                <div className="text-sm text-[var(--color-earth-deep)] pb-2">ha</div>
+              </div>
+            </div>
+
+            {/* On-hand Fertilizers */}
+            <div>
+              <label className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider block mb-3">
+                ON-HAND FERTILIZERS
+              </label>
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                {HANS_INVENTORY.map((fertilizer) => (
+                  <button
+                    key={fertilizer}
+                    onClick={() => handleFertilizerToggle(fertilizer)}
+                    className={`
+                      text-xs px-3 py-2 rounded transition-colors text-left
+                      ${selectedFertilizers.has(fertilizer)
+                        ? 'bg-[var(--color-moss)] text-white'
+                        : 'bg-[var(--color-paper-deep)] text-[var(--color-earth-deep)] border border-[var(--color-contour)] hover:bg-[var(--color-moss)] hover:text-white'
+                      }
+                    `}
+                  >
+                    {fertilizer}
+                  </button>
+                ))}
+              </div>
+              <div className="terrace-data text-xs text-[var(--color-contour)]">
+                Tip: Selecting nothing = engine recommends from all 14 products.
+              </div>
+            </div>
           </motion.div>
         </div>
       </motion.div>

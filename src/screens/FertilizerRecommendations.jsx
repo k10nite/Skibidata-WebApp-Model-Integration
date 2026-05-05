@@ -44,9 +44,7 @@ export default function FertilizerRecommendations() {
     municipality,
     setRecommendations,
     areaHectares,
-    availableFertilizers,
-    setAreaHectares,
-    setAvailableFertilizers
+    availableFertilizers
   } = useAppStore();
 
   // Container animation timing
@@ -167,49 +165,6 @@ export default function FertilizerRecommendations() {
           </div>
         </motion.div>
 
-        {/* Farm Inputs Panel - paper-card bg distinct stratum */}
-        <motion.div
-          variants={itemVariants}
-          className="terrace-card p-8 mb-12"
-          style={{ background: 'var(--color-paper-card)' }}
-        >
-          <div className="terrace-eyebrow mb-6">INPUTS</div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Area Input */}
-            <div>
-              <label className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider block mb-3">
-                FIELD AREA
-              </label>
-              <div className="flex items-end gap-2">
-                <input
-                  type="number"
-                  value={areaHectares}
-                  onChange={(e) => setAreaHectares(Number(e.target.value) || 0)}
-                  min="0.1"
-                  step="0.1"
-                  className="terrace-input text-2xl flex-1"
-                  style={{ fontSize: '1.5rem', lineHeight: '1.2' }}
-                />
-                <span className="terrace-data text-[var(--color-moss)] pb-2">ha</span>
-              </div>
-            </div>
-
-            {/* Available Fertilizers */}
-            <div>
-              <label className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider block mb-3">
-                ON HAND
-              </label>
-              <textarea
-                value={availableFertilizers}
-                onChange={(e) => setAvailableFertilizers(e.target.value)}
-                className="terrace-textarea"
-                placeholder="Urea 46-0-0, DAP 18-46-0, MOP 0-0-60..."
-                rows={3}
-              />
-            </div>
-          </div>
-        </motion.div>
 
         {/* Recommendation Cards - paper bg hero stratum */}
         <motion.div variants={itemVariants} className="mb-16">
