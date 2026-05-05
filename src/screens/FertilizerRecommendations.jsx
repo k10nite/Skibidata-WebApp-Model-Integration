@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import useAppStore from '../store/appStore';
 import { getRecommendationForCrop, getRecommendationForCropAsync } from '../services/recommendationService';
+import { log } from '../services/logger';
 
 // Map plant names to crop keys in CROP_REQUIREMENTS
 const PLANT_TO_CROP_KEY = {
@@ -114,15 +115,28 @@ export default function FertilizerRecommendations() {
   useEffect(() => {
     let cancelled = false;
     const soil = soilData || DEFAULT_SOIL_DATA;
+    log.flow('FertilizerRecommendations effect → engine call', {
+      cropKey,
+      areaHectares,
+      availableFertilizers: availableFertilizers || '(empty)',
+      hasSoilData: Boolean(soilData),
+      soilSource: soilData?.source ?? 'fallback'
+    });
     setFertilizerData(getRecommendationForCrop(soil, cropKey, areaHectares));
-    getRecommendationForCropAsync(soil, cropKey, areaHectares)
+    getRecommendationForCropAsync(soil, cropKey, areaHectares, availableFertilizers)
       .then((data) => {
-        if (!cancelled) {
-          setFertilizerData(data);
-          setSelectedCandidateIndex(data.selectedCandidateIndex || 0);
-        }
+        if (cancelled) return;
+        log.flow('FertilizerRecommendations got engine result', {
+          source: data?._engineRaw ? 'engine' : 'stub',
+          candidates: data?.candidates?.length ?? 0,
+          firstSource: data?.candidates?.[0]?.sourceName,
+          phAction: data?._engineRaw?.ph_result?.ph_action,
+          userInventory: (data?._engineRaw?.user_inventory || []).map((f) => f.name)
+        });
+        setFertilizerData(data);
+        setSelectedCandidateIndex(data.selectedCandidateIndex || 0);
       })
-      .catch(() => {});
+      .catch((err) => log.warn('engine call rejected', err?.message ?? err));
     return () => { cancelled = true; };
   }, [soilData, cropKey, areaHectares, availableFertilizers]);
 

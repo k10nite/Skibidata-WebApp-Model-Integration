@@ -2,6 +2,8 @@
 // POSTs GeoJSON polygon to deployed Railway API and normalizes response
 // for downstream consumption by recommendationService.mapSoilToEngine
 
+import { log } from './logger';
+
 const API_URL = import.meta.env.VITE_LIAM_API_URL;
 const FETCH_TIMEOUT_MS = 30000;
 
@@ -44,31 +46,38 @@ export async function predictForField(polygon, opts = {}) {
       sample_spacing_m: sampleSpacingM
     };
 
+    log.ml('POST /predict → Liam', { url: API_URL, polygonVertices: polygon?.coordinates?.[0]?.length, cropType });
+    const t0 = performance.now();
     const response = await fetch(`${API_URL}/predict`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
       signal: requestSignal
     });
+    const ms = Math.round(performance.now() - t0);
 
     if (!response.ok) {
+      log.warn(`Liam HTTP ${response.status} in ${ms}ms — falling back`, { status: response.status });
       throw new Error(`Liam predict HTTP ${response.status}`);
     }
 
     const data = await response.json();
+    log.ml(`Liam response ${response.status} in ${ms}ms`, {
+      sampleCount: data.sample_count,
+      polygonAreaHa: data.polygon_area_ha,
+      n: data.nitrogen?.dominant_class,
+      p: data.phosphorus?.dominant_class,
+      k: data.potassium?.dominant_class,
+      ph: data.ph?.dominant_class,
+      warnings: (data.warnings || []).length
+    });
 
-    // Normalize response to match mlPredictionService.predictForLocation shape
-    // Map Liam's dominant_class values to flat strings for recommendationService.readRating
     const normalized = {
       nitrogen: data.nitrogen?.dominant_class || 'Medium',
       phosphorus: data.phosphorus?.dominant_class || 'Medium',
       potassium: data.potassium?.dominant_class || 'Medium',
-      // Convert pH string to number for recommendationService.mapSoilToEngine
       pH: data.ph?.dominant_class ? parseFloat(data.ph.dominant_class) : 6.0,
       source: 'liam-ml',
-      // Preserve rich metadata under 'liam' key for potential SoilStatus use
       liam: {
         nitrogen: data.nitrogen,
         phosphorus: data.phosphorus,

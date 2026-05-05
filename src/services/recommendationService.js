@@ -1,7 +1,30 @@
 import { calculateFertilizerRecommendation } from './fertilizerEngine';
+import { log } from './logger';
 
 const RULE_API_URL = import.meta.env.VITE_RULE_API_URL;
 const FETCH_TIMEOUT_MS = 8000;
+
+// Canonical NPK % for every fertilizer Hans's engine knows. Mirrors
+// _hans_rulebased/fertilizers.json. Used as a fallback when the engine's
+// response doesn't include the inventory needed for per-row breakdown
+// (the response only includes user_inventory, which is empty when the
+// user hasn't picked any chips).
+const MASTER_INVENTORY = {
+  'Urea':                       { n: 46,   p: 0,  k: 0 },
+  'Ammonium Sulfate':           { n: 21,   p: 0,  k: 0 },
+  'Calcium Nitrate':            { n: 15.4, p: 0,  k: 0 },
+  'Complete (14-14-14)':        { n: 14,   p: 14, k: 14 },
+  'Complete (16-16-16)':        { n: 16,   p: 16, k: 16 },
+  'Ammophos':                   { n: 16,   p: 20, k: 0 },
+  '15-9-20 Compound':           { n: 15,   p: 9,  k: 20 },
+  '13-33-21 Compound':          { n: 13,   p: 33, k: 21 },
+  '13-31-21 Compound':          { n: 13,   p: 31, k: 21 },
+  '19-4-19 Compound':           { n: 19,   p: 4,  k: 19 },
+  'Single Superphosphate (18)': { n: 0,    p: 18, k: 0 },
+  'Single Superphosphate (20)': { n: 0,    p: 20, k: 0 },
+  'Single Superphosphate (22)': { n: 0,    p: 22, k: 0 },
+  'Muriate of Potash':          { n: 0,    p: 0,  k: 60 }
+};
 
 // Hans's engine advertises L/M/H/VH status codes via OpenAPI, but crop_npk_rules.json
 // keys use long-form Low/Medium/High and the lookup falls through to 0 if codes don't match.
@@ -21,12 +44,17 @@ const CROP_LABEL_MAP = {
   chayote: 'Chayote'
 };
 
+// Hans's engine does string equality on fertilizer names — including the
+// parenthesized portions like "(14-14-14)" and "(18)". The previous
+// implementation stripped parens, which broke 5 of 14 chips silently.
+// Now we just split on commas/semicolons/newlines and trim whitespace.
 function parseAvailableFertilizers(text) {
   if (!text || typeof text !== 'string') return null;
   const names = text
     .split(/[,\n;]/)
-    .map((s) => s.trim().replace(/\s*\([^)]*\)\s*/g, '').trim())
+    .map((s) => s.trim())
     .filter(Boolean);
+  log.rule('parseAvailableFertilizers', { input: text, parsed: names });
   return names.length ? names : null;
 }
 
@@ -133,20 +161,32 @@ function normalizeEngineResponse(engineRes, soilData, cropKey, areaHectares) {
     return calculateFertilizerRecommendation(soilData, cropKey, areaHectares);
   }
 
-  // Helper to look up a fertilizer's NPK percentages from the engine inventory.
-  // Returns {n, p, k} as percentages (0-46 range, e.g. Urea is {n:46,p:0,k:0}).
-  const inventoryByName = {};
+  // Look up fertilizer NPK %. The engine does NOT include a master inventory
+  // in its response — only `user_inventory` (the user's filtered selection).
+  // We try user_inventory first, then fall back to MASTER_INVENTORY (hardcoded
+  // mirror of _hans_rulebased/fertilizers.json) so per-row breakdown works
+  // even when the user hasn't picked any chips.
+  const responseInv = {};
+  if (Array.isArray(engineRes.user_inventory)) {
+    for (const item of engineRes.user_inventory) {
+      if (item?.name) responseInv[item.name] = item;
+    }
+  }
   if (Array.isArray(engineRes.inventory)) {
     for (const item of engineRes.inventory) {
-      if (item?.name) inventoryByName[item.name] = item;
+      if (item?.name) responseInv[item.name] = item;
     }
   }
   const getNpkPercent = (name) => {
-    const f = inventoryByName[name];
+    const f = responseInv[name] ?? MASTER_INVENTORY[name];
+    if (!f) {
+      log.warn('getNpkPercent: unknown fertilizer', name);
+      return { n: 0, p: 0, k: 0 };
+    }
     return {
-      n: typeof f?.n === 'number' ? f.n : 0,
-      p: typeof f?.p === 'number' ? f.p : 0,
-      k: typeof f?.k === 'number' ? f.k : 0
+      n: typeof f.n === 'number' ? f.n : 0,
+      p: typeof f.p === 'number' ? f.p : 0,
+      k: typeof f.k === 'number' ? f.k : 0
     };
   };
 
@@ -248,14 +288,29 @@ async function fetchFromEngine(soilData, cropKey, areaHectares, availableFertili
   const t = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
     const body = mapSoilToEngine(soilData, cropKey, areaHectares, availableFertilizers);
+    log.rule('POST /recommendation → engine', { url: RULE_API_URL, body });
+    const t0 = performance.now();
     const res = await fetch(`${RULE_API_URL.replace(/\/$/, '')}/recommendation`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
       signal: controller.signal
     });
-    if (!res.ok) throw new Error(`Engine HTTP ${res.status}`);
+    const ms = Math.round(performance.now() - t0);
+    if (!res.ok) {
+      log.warn(`engine HTTP ${res.status} in ${ms}ms`, { status: res.status });
+      throw new Error(`Engine HTTP ${res.status}`);
+    }
     const data = await res.json();
+    log.rule(`engine response ${res.status} in ${ms}ms`, {
+      crop: data.selected_crop_label,
+      total_base: data.total_base,
+      ph_action: data.ph_result?.ph_action,
+      candidates: (data.standard_mix || []).length,
+      user_inventory_size: (data.user_inventory || []).length,
+      inventory_check_valid: data.inventory_check?.valid,
+      inventory_check_reason: data.inventory_check?.reason
+    });
     return normalizeEngineResponse(data, soilData, cropKey, areaHectares);
   } finally {
     clearTimeout(t);
@@ -263,20 +318,26 @@ async function fetchFromEngine(soilData, cropKey, areaHectares, availableFertili
 }
 
 export function getRecommendationForCrop(soilData, cropKey, areaHectares = 1) {
-  if (!RULE_API_URL) {
-    return calculateFertilizerRecommendation(soilData, cropKey, areaHectares);
-  }
+  // Sync version always returns the local stub — the async path is canonical.
   return calculateFertilizerRecommendation(soilData, cropKey, areaHectares);
 }
 
-export async function getRecommendationForCropAsync(soilData, cropKey, areaHectares = 1) {
+export async function getRecommendationForCropAsync(soilData, cropKey, areaHectares = 1, availableFertilizers = '') {
+  log.rule('getRecommendationForCropAsync called', {
+    cropKey,
+    areaHectares,
+    availableFertilizers,
+    soilStatus: { n: soilData?.nitrogen, p: soilData?.phosphorus, k: soilData?.potassium, ph: soilData?.pH },
+    engineConfigured: Boolean(RULE_API_URL)
+  });
   if (!RULE_API_URL) {
+    log.warn('VITE_RULE_API_URL not set — using local stub');
     return calculateFertilizerRecommendation(soilData, cropKey, areaHectares);
   }
   try {
-    return await fetchFromEngine(soilData, cropKey, areaHectares, '');
+    return await fetchFromEngine(soilData, cropKey, areaHectares, availableFertilizers);
   } catch (err) {
-    console.warn('[recommendationService] engine fetch failed, falling back:', err?.message ?? err);
+    log.warn('engine fetch failed, falling back to local stub', { error: err?.message ?? String(err) });
     return calculateFertilizerRecommendation(soilData, cropKey, areaHectares);
   }
 }

@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import useAppStore from '../store/appStore';
 import { getWeatherData } from '../services/satelliteService';
 import { buildPolygonPreviewUrl } from '../services/mapboxStaticService';
+import { log } from '../services/logger';
 
 // ─────────────────────────────────────────────────────────────────────────
 // Data
@@ -289,14 +290,29 @@ export default function PlantSelection() {
   const handleFertilizerToggle = (name) => {
     setSelectedFertilizers((prev) => {
       const next = new Set(prev);
-      if (next.has(name)) next.delete(name); else next.add(name);
-      setAvailableFertilizers(Array.from(next).join(', '));
+      if (next.has(name)) {
+        next.delete(name);
+        log.store('fertilizer chip removed', { name, count: next.size });
+      } else {
+        next.add(name);
+        log.store('fertilizer chip added', { name, count: next.size });
+      }
+      const csv = Array.from(next).join(', ');
+      setAvailableFertilizers(csv);
+      log.store('availableFertilizers → store', csv || '(empty)');
       return next;
     });
   };
 
   const handleContinue = () => {
     if (!selectedCrop) return;
+    log.flow('PlantSelection → /soil-status', {
+      crop: selectedCrop.engineLabel,
+      cropId: selectedCrop.id,
+      areaHectares,
+      availableFertilizers: Array.from(selectedFertilizers).join(', ') || '(empty)',
+      fertilizerCount: selectedFertilizers.size
+    });
     setSelectedPlant({
       name: selectedCrop.engineLabel,
       id: selectedCrop.id,
