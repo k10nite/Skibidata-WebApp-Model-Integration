@@ -1,13 +1,19 @@
-// PlantSelection: Editorial magazine spread with marginalia
-// Dense botanical-journal aesthetic - NO hollow space allowed
-// Penguin Classics frontispiece + soil-survey datasheet + 19th-century field guide
+// PlantSelection — content-first redesign.
+// The previous attempts ornamented a thin screen; this one carries weight via
+// real data: polygon thumbnail, weather + elevation, ML soil profile, and
+// crop recommendations scored against the field's actual conditions.
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import useAppStore from '../store/appStore';
+import { getWeatherData } from '../services/satelliteService';
+import { buildPolygonPreviewUrl } from '../services/mapboxStaticService';
 
-// Complete crop data - 42 entries matching Hans's engine contract
+// ─────────────────────────────────────────────────────────────────────────
+// Data
+// ─────────────────────────────────────────────────────────────────────────
+
 const CROPS_DATA = [
   // Vegetables (21 crops)
   { id: 'cabbage', name: 'Cabbage', nameFil: 'Repolyo', category: 'vegetables', engineLabel: 'Cabbage' },
@@ -32,7 +38,7 @@ const CROPS_DATA = [
   { id: 'ampalaya', name: 'Ampalaya', nameFil: 'Ampalaya', category: 'vegetables', engineLabel: 'Ampalaya' },
   { id: 'chayote', name: 'Chayote', nameFil: 'Sayote', category: 'vegetables', engineLabel: 'Chayote' },
 
-  // Root crops (8 crops)
+  // Root crops (8)
   { id: 'potato', name: 'Potato', nameFil: 'Patatas', category: 'roots', engineLabel: 'Potato' },
   { id: 'carrot', name: 'Carrot', nameFil: 'Karot', category: 'roots', engineLabel: 'Carrot' },
   { id: 'radish', name: 'Radish/Turnips', nameFil: 'Labanos', category: 'roots', engineLabel: 'Radish/Turnips' },
@@ -42,7 +48,7 @@ const CROPS_DATA = [
   { id: 'ginger_local', name: 'Ginger (Local)', nameFil: 'Luya', category: 'roots', engineLabel: 'Ginger (Local)' },
   { id: 'ginger_improved', name: 'Ginger (Improved)', nameFil: 'Luyang Bago', category: 'roots', engineLabel: 'Ginger (Improved)' },
 
-  // Beans/Pulses (10 crops - verified from engine data)
+  // Beans/Pulses (10)
   { id: 'string_beans', name: 'String Beans', nameFil: 'Sitaw', category: 'beans', engineLabel: 'String Beans' },
   { id: 'snap_bean', name: 'Snap Bean', nameFil: 'Snap Bean', category: 'beans', engineLabel: 'Snap Bean' },
   { id: 'baguio_beans', name: 'Baguio Beans', nameFil: 'Baguio Beans', category: 'beans', engineLabel: 'Baguio Beans' },
@@ -53,112 +59,169 @@ const CROPS_DATA = [
   { id: 'batao', name: 'Batao', nameFil: 'Batao', category: 'beans', engineLabel: 'Batao' },
   { id: 'peas', name: 'Peas', nameFil: 'Gisantes', category: 'beans', engineLabel: 'Peas' },
 
-  // Herbs (2 crops)
+  // Herbs (2)
   { id: 'basil', name: 'Basil', nameFil: 'Balanoy', category: 'herbs', engineLabel: 'Basil' },
   { id: 'mint', name: 'Mint herb', nameFil: 'Mint', category: 'herbs', engineLabel: 'Mint herb' },
 
-  // Highland (1 crop)
+  // Highland (1)
   { id: 'asparagus', name: 'Asparagus', nameFil: 'Asparagus', category: 'highland', engineLabel: 'Asparagus' }
 ];
 
-// Fertilizer inventory - organized by type for group headers
 const NITROGEN_PURE = [
-  { name: 'Urea', npk: '46-0-0', group: 'nitrogen' },
-  { name: 'Ammonium Sulfate', npk: '21-0-0', group: 'nitrogen' },
-  { name: 'Calcium Nitrate', npk: '15.4-0-0', group: 'nitrogen' }
+  { name: 'Urea', npk: '46-0-0' },
+  { name: 'Ammonium Sulfate', npk: '21-0-0' },
+  { name: 'Calcium Nitrate', npk: '15.4-0-0' }
 ];
-
 const COMPOUND_COMPLETE = [
-  { name: 'Complete (14-14-14)', npk: '14-14-14', group: 'compound' },
-  { name: 'Complete (16-16-16)', npk: '16-16-16', group: 'compound' },
-  { name: 'Ammophos', npk: '16-20-0', group: 'compound' },
-  { name: '15-9-20 Compound', npk: '15-9-20', group: 'compound' },
-  { name: '13-33-21 Compound', npk: '13-33-21', group: 'compound' },
-  { name: '13-31-21 Compound', npk: '13-31-21', group: 'compound' },
-  { name: '19-4-19 Compound', npk: '19-4-19', group: 'compound' }
+  { name: 'Complete (14-14-14)', npk: '14-14-14' },
+  { name: 'Complete (16-16-16)', npk: '16-16-16' },
+  { name: 'Ammophos', npk: '16-20-0' },
+  { name: '15-9-20 Compound', npk: '15-9-20' },
+  { name: '13-33-21 Compound', npk: '13-33-21' },
+  { name: '13-31-21 Compound', npk: '13-31-21' },
+  { name: '19-4-19 Compound', npk: '19-4-19' }
 ];
-
 const PHOSPHORUS_POTASSIUM = [
-  { name: 'Single Superphosphate (18)', npk: '0-18-0', group: 'pk' },
-  { name: 'Single Superphosphate (20)', npk: '0-20-0', group: 'pk' },
-  { name: 'Single Superphosphate (22)', npk: '0-22-0', group: 'pk' },
-  { name: 'Muriate of Potash', npk: '0-0-60', group: 'pk' }
+  { name: 'Single Superphosphate (18)', npk: '0-18-0' },
+  { name: 'Single Superphosphate (20)', npk: '0-20-0' },
+  { name: 'Single Superphosphate (22)', npk: '0-22-0' },
+  { name: 'Muriate of Potash', npk: '0-0-60' }
 ];
-
 const ALL_FERTILIZERS = [...NITROGEN_PURE, ...COMPOUND_COMPLETE, ...PHOSPHORUS_POTASSIUM];
 
-// Motion variants - orchestrated arrival sequence under 1.6s
-const containerVariants = {
-  initial: {},
-  animate: {
-    transition: { delayChildren: 0.1, staggerChildren: 0.08 }
-  }
+// Ideal pH range + nitrogen tolerance for the most common crops.
+// Used to score "Recommended for your soil." Sourced from PhilRice / BSU
+// extension docs. Crops not listed default to a generic vegetable profile.
+const CROP_FIT = {
+  potato:        { ph: [5.0, 6.5], nMin: 'Low' },
+  cabbage:       { ph: [5.5, 6.5], nMin: 'Medium' },
+  cabbage_head:  { ph: [5.5, 6.5], nMin: 'Medium' },
+  pechay:        { ph: [5.5, 6.8], nMin: 'Medium' },
+  mustard:       { ph: [5.5, 6.8], nMin: 'Medium' },
+  lettuce:       { ph: [5.5, 6.5], nMin: 'Medium' },
+  carrot:        { ph: [5.5, 6.5], nMin: 'Medium' },
+  broccoli:      { ph: [6.0, 6.8], nMin: 'Medium' },
+  cauliflower:   { ph: [6.0, 6.8], nMin: 'Medium' },
+  tomato:        { ph: [6.0, 6.8], nMin: 'Medium' },
+  eggplant:      { ph: [6.0, 6.8], nMin: 'Medium' },
+  bell_pepper:   { ph: [6.0, 6.8], nMin: 'Medium' },
+  pepper:        { ph: [6.0, 6.8], nMin: 'Medium' },
+  squash:        { ph: [5.8, 6.8], nMin: 'Medium' },
+  cucumber:      { ph: [5.8, 7.0], nMin: 'Medium' },
+  ampalaya:      { ph: [5.5, 6.7], nMin: 'Medium' },
+  chayote:       { ph: [5.5, 7.0], nMin: 'Medium' },
+  string_beans:  { ph: [6.0, 7.0], nMin: 'Low' },
+  snap_bean:     { ph: [6.0, 7.0], nMin: 'Low' },
+  baguio_beans:  { ph: [6.0, 7.0], nMin: 'Low' },
+  peas:          { ph: [6.0, 7.0], nMin: 'Low' },
+  garlic:        { ph: [6.0, 7.0], nMin: 'Medium' },
+  onion:         { ph: [6.0, 7.0], nMin: 'Medium' },
+  ginger_local:  { ph: [5.5, 6.5], nMin: 'Medium' },
+  asparagus:     { ph: [6.5, 7.5], nMin: 'Medium' }
 };
 
-const heroVariants = {
-  initial: { opacity: 0, y: -12 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } }
-};
+// ─────────────────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────────────────
 
-const ornamentVariants = {
-  initial: { opacity: 0, scale: 0.8, x: -20 },
-  animate: {
-    opacity: 0.08,
-    scale: 1,
-    x: 0,
-    transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }
-  }
-};
-
-const panelVariants = {
-  initial: { opacity: 0, y: 24 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.8,
-      ease: [0.16, 1, 0.3, 1],
-      staggerChildren: 0.04,
-      delayChildren: 0.1
-    }
-  }
-};
-
-const childVariants = {
-  initial: { opacity: 0, y: 8 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } }
-};
-
-const chipVariants = {
-  initial: { scale: 1, rotate: 0 },
-  hover: { scale: 1.02, rotate: 0.5, transition: { duration: 0.2 } },
-  tap: { scale: 0.98, transition: { duration: 0.1 } }
-};
-
-// Group crops by category for sticky headers
-const groupedCrops = (() => {
-  const groups = {};
-  CROPS_DATA.forEach(crop => {
-    if (!groups[crop.category]) groups[crop.category] = [];
-    groups[crop.category].push(crop);
-  });
-  return groups;
-})();
-
-const categoryLabels = {
-  vegetables: 'VEGETABLES',
-  roots: 'ROOT CROPS',
-  beans: 'BEANS/PULSES',
-  herbs: 'HERBS',
-  highland: 'HIGHLAND'
-};
-
-// Helper to read rating from both flat string and nested object formats
 function readRating(field) {
   if (typeof field === 'string') return field;
   if (field && typeof field === 'object' && typeof field.rating === 'string') return field.rating;
   return 'Unknown';
 }
+
+function phToNumeric(soilData) {
+  // Liam's response normalizes pH dominant_class to a numeric value.
+  if (typeof soilData?.pH === 'number') return soilData.pH;
+  if (typeof soilData?.pH === 'string') {
+    // Try direct parse first ("6.4" from Liam normalizer).
+    const n = parseFloat(soilData.pH);
+    if (!Number.isNaN(n) && n >= 3 && n <= 9) return n;
+    // Categorical mlPredictions.json strings.
+    const s = soilData.pH.toLowerCase();
+    if (s.includes('strongly acid')) return 4.5;
+    if (s.includes('slightly acid')) return 6.0;
+    if (s.includes('acidic')) return 5.2;
+    if (s.includes('neutral')) return 6.8;
+    if (s.includes('slightly alkal')) return 7.4;
+    if (s.includes('alkaline')) return 7.8;
+  }
+  return 6.5;
+}
+
+const N_RANK = { Low: 1, Medium: 2, High: 3 };
+
+function scoreCrop(crop, soilData) {
+  const fit = CROP_FIT[crop.id] ?? { ph: [5.5, 7.0], nMin: 'Medium' };
+  const ph = phToNumeric(soilData);
+  const n = readRating(soilData?.nitrogen);
+
+  let score = 0;
+  // pH match
+  if (ph >= fit.ph[0] && ph <= fit.ph[1]) score += 4;
+  else if (ph >= fit.ph[0] - 0.4 && ph <= fit.ph[1] + 0.4) score += 2;
+
+  // Nitrogen tolerance
+  const nLevel = N_RANK[n] ?? 2;
+  const required = N_RANK[fit.nMin] ?? 2;
+  if (nLevel >= required) score += 3;
+  else if (nLevel === required - 1) score += 1;
+
+  return score;
+}
+
+function recommendCrops(soilData, n = 3) {
+  if (!soilData) return [];
+  const scored = CROPS_DATA
+    .map((c) => ({ crop: c, score: scoreCrop(c, soilData) }))
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score);
+  // Take top n, with at least one beans entry if any qualifies (diversity).
+  const top = scored.slice(0, n);
+  return top;
+}
+
+function fitLabel(score) {
+  if (score >= 7) return 'BEST FIT';
+  if (score >= 5) return 'GOOD FIT';
+  if (score >= 3) return 'WORKABLE';
+  return 'STRETCH';
+}
+
+const groupedCrops = (() => {
+  const groups = {};
+  CROPS_DATA.forEach((c) => {
+    if (!groups[c.category]) groups[c.category] = [];
+    groups[c.category].push(c);
+  });
+  return groups;
+})();
+
+const CATEGORY_ORDER = ['vegetables', 'roots', 'beans', 'herbs', 'highland'];
+const categoryLabels = {
+  vegetables: 'VEGETABLES',
+  roots: 'ROOT CROPS',
+  beans: 'BEANS / PULSES',
+  herbs: 'HERBS',
+  highland: 'HIGHLAND'
+};
+
+// ─────────────────────────────────────────────────────────────────────────
+// Motion
+// ─────────────────────────────────────────────────────────────────────────
+
+const containerVariants = {
+  initial: {},
+  animate: { transition: { delayChildren: 0.05, staggerChildren: 0.06 } }
+};
+const itemVariants = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } }
+};
+
+// ─────────────────────────────────────────────────────────────────────────
+// Component
+// ─────────────────────────────────────────────────────────────────────────
 
 export default function PlantSelection() {
   const navigate = useNavigate();
@@ -166,7 +229,9 @@ export default function PlantSelection() {
     setSelectedPlant,
     soilData,
     municipality,
+    field,
     fieldAreaHa,
+    fieldCenter,
     areaHectares,
     setAreaHectares,
     availableFertilizers,
@@ -174,825 +239,888 @@ export default function PlantSelection() {
   } = useAppStore();
 
   const [selectedCrop, setSelectedCrop] = useState(null);
+  const [search, setSearch] = useState('');
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [weather, setWeather] = useState(null);
   const [selectedFertilizers, setSelectedFertilizers] = useState(() => {
     if (!availableFertilizers) return new Set();
-    const items = availableFertilizers.split(',').map(s => s.trim()).filter(Boolean);
-    const fertilizerNames = ALL_FERTILIZERS.map(f => f.name);
-    return new Set(items.filter(item => fertilizerNames.includes(item)));
+    const items = availableFertilizers.split(',').map((s) => s.trim()).filter(Boolean);
+    const known = ALL_FERTILIZERS.map((f) => f.name);
+    return new Set(items.filter((it) => known.includes(it)));
   });
 
-  // Initialize area from polygon
+  // One-time area seed from polygon
   useEffect(() => {
-    if (fieldAreaHa > 0 && areaHectares === 1) {
-      setAreaHectares(fieldAreaHa);
-    }
+    if (fieldAreaHa > 0 && areaHectares === 1) setAreaHectares(fieldAreaHa);
   }, [fieldAreaHa, areaHectares, setAreaHectares]);
 
-  const handleFertilizerToggle = (fertilizerName) => {
-    setSelectedFertilizers(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(fertilizerName)) {
-        newSet.delete(fertilizerName);
-      } else {
-        newSet.add(fertilizerName);
-      }
-      setAvailableFertilizers(Array.from(newSet).join(', '));
-      return newSet;
+  // Weather fetch on mount when we know the location
+  useEffect(() => {
+    let cancelled = false;
+    const loc = municipality || 'La Trinidad';
+    getWeatherData(loc)
+      .then((data) => { if (!cancelled) setWeather(data); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [municipality]);
+
+  const polygonUrl = useMemo(() => buildPolygonPreviewUrl(field, { width: 720, height: 360 }), [field]);
+  const recommendations = useMemo(() => recommendCrops(soilData, 3), [soilData]);
+
+  const filteredGrouped = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const out = {};
+    CATEGORY_ORDER.forEach((cat) => {
+      if (activeCategory !== 'all' && activeCategory !== cat) return;
+      const items = (groupedCrops[cat] || []).filter((c) => {
+        if (!q) return true;
+        return c.name.toLowerCase().includes(q) || c.nameFil.toLowerCase().includes(q);
+      });
+      if (items.length) out[cat] = items;
+    });
+    return out;
+  }, [search, activeCategory]);
+
+  const totalFiltered = useMemo(
+    () => Object.values(filteredGrouped).reduce((sum, arr) => sum + arr.length, 0),
+    [filteredGrouped]
+  );
+
+  const handleFertilizerToggle = (name) => {
+    setSelectedFertilizers((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name); else next.add(name);
+      setAvailableFertilizers(Array.from(next).join(', '));
+      return next;
     });
   };
 
-  const handleCropSelect = (crop) => {
-    setSelectedCrop(crop);
-  };
-
   const handleContinue = () => {
-    if (selectedCrop) {
-      setSelectedPlant({
-        name: selectedCrop.engineLabel,
-        id: selectedCrop.id,
-        nameFil: selectedCrop.nameFil,
-        category: selectedCrop.category
-      }, null);
-      navigate('/soil-status');
-    }
+    if (!selectedCrop) return;
+    setSelectedPlant({
+      name: selectedCrop.engineLabel,
+      id: selectedCrop.id,
+      nameFil: selectedCrop.nameFil,
+      category: selectedCrop.category
+    }, null);
+    navigate('/soil-status');
   };
 
-  const locationDisplay = municipality || 'La Trinidad, Benguet';
-  const getCropCount = (category) => groupedCrops[category]?.length || 0;
+  const liamRich = soilData?.liam;
+  const nStatus = readRating(soilData?.nitrogen);
+  const pStatus = readRating(soilData?.phosphorus);
+  const kStatus = readRating(soilData?.potassium);
+  const phStr = soilData?.pH != null ? String(soilData.pH) : '—';
+  const ph = phToNumeric(soilData);
+
+  // ───────────────────────────────────────────────────────────────────────
+  // Render
+  // ───────────────────────────────────────────────────────────────────────
 
   return (
     <motion.div
-      className="min-h-screen relative overflow-hidden"
-      style={{
-        background: `
-          radial-gradient(circle at 20% 80%, var(--color-paper-deep) 0%, transparent 50%),
-          radial-gradient(circle at 80% 20%, var(--color-contour) 0%, transparent 30%),
-          var(--color-paper)
-        `
-      }}
       initial="initial"
       animate="animate"
       variants={containerVariants}
+      className="min-h-screen relative"
+      style={{
+        background: 'var(--color-paper)',
+        fontFamily: '"Fraunces", serif'
+      }}
     >
-      {/* Background atmospheric texture layer */}
-      <div
-        className="absolute inset-0 opacity-[0.04] pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          backgroundSize: '60px 60px'
-        }}
-      />
-
-      {/* Topographic contour lines */}
-      <svg
-        className="absolute inset-0 w-full h-full opacity-[0.02] pointer-events-none"
-        viewBox="0 0 1200 800"
-        preserveAspectRatio="xMidYMid slice"
-      >
-        <path d="M0 300Q300 200 600 250T1200 300" stroke="var(--color-earth-deep)" strokeWidth="1"/>
-        <path d="M0 450Q300 350 600 400T1200 450" stroke="var(--color-earth-deep)" strokeWidth="1"/>
-        <path d="M0 600Q300 500 600 550T1200 600" stroke="var(--color-earth-deep)" strokeWidth="1"/>
+      {/* Subtle topo background */}
+      <svg className="terrace-topo opacity-[0.04] fixed inset-0 pointer-events-none" viewBox="0 0 1200 800" preserveAspectRatio="none">
+        <path d="M0,200 Q300,150 600,200 T1200,200" fill="none" stroke="currentColor" strokeWidth="1" />
+        <path d="M0,360 Q400,310 800,360 T1200,360" fill="none" stroke="currentColor" strokeWidth="1" />
+        <path d="M0,520 Q200,470 500,520 T1200,520" fill="none" stroke="currentColor" strokeWidth="1" />
       </svg>
 
-      {/* Giant "02" ornament - compositional anchor bleeding left */}
-      <motion.div
-        className="absolute pointer-events-none select-none z-0"
-        style={{
-          top: '8%',
-          left: '-40px',
-          fontSize: 'clamp(280px, 25vw, 360px)',
-          fontFamily: 'Fraunces',
-          fontVariationSettings: '"opsz" 144, "wght" 200',
-          color: 'var(--color-earth-deep)',
-          lineHeight: 0.8
-        }}
-        variants={ornamentVariants}
-      >
-        02
-      </motion.div>
+      <div className="relative z-10 flex min-h-screen">
 
-      {/* Marginalia caption for ornament */}
-      <motion.div
-        className="absolute z-10 opacity-60"
-        style={{
-          top: '8%',
-          left: '8px',
-          fontSize: '9px',
-          fontFamily: 'JetBrains Mono',
-          color: 'var(--color-earth-deep)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          writingMode: 'vertical-lr',
-          textOrientation: 'mixed'
-        }}
-        variants={childVariants}
-      >
-        ROUTINE VOL. II / FOLIO 02
-      </motion.div>
-
-      <div className="flex min-h-screen">
-        {/* Left Rail - Dense content, no gaps */}
-        <div className="w-[64%] px-8 py-8 relative z-10">
-          {/* Hero section - compact */}
-          <motion.div className="mb-6" variants={heroVariants}>
+        {/* ─────────── LEFT (62%) — content-first composition ─────────── */}
+        <motion.div
+          variants={itemVariants}
+          className="w-full lg:w-[62%] px-8 lg:px-14 py-10"
+        >
+          {/* Hero — slim, no giant ornament */}
+          <div className="mb-6">
             <div
-              className="text-xs font-['JetBrains_Mono'] uppercase tracking-[0.3em] mb-3 opacity-70"
-              style={{ color: 'var(--color-earth-deep)' }}
-            >
-              CROP SELECTION
-            </div>
-
-            <h1
-              className="text-4xl lg:text-5xl mb-3 leading-tight z-20 relative"
               style={{
-                fontFamily: 'Fraunces',
+                fontFamily: '"JetBrains Mono", monospace',
+                fontSize: '11px',
+                letterSpacing: '0.22em',
+                color: 'var(--color-moss)',
+                fontWeight: 600,
+                marginBottom: '12px'
+              }}
+            >
+              02 — CROP
+            </div>
+            <h1
+              style={{
+                fontFamily: '"Fraunces", serif',
+                fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
+                lineHeight: 1.0,
                 fontVariationSettings: '"opsz" 144, "wght" 600',
-                color: 'var(--color-earth-deep)'
+                color: 'var(--color-earth-deep)',
+                margin: 0
               }}
             >
               What&apos;s growing here?
             </h1>
+          </div>
 
+          {/* Polygon thumbnail — visual anchor */}
+          <motion.div variants={itemVariants} className="mb-6">
             <div
-              className="text-sm leading-relaxed max-w-md mb-4"
+              className="relative overflow-hidden"
               style={{
-                fontFamily: 'Fraunces',
-                fontStyle: 'italic',
-                fontVariationSettings: '"opsz" 14, "wght" 400',
-                color: 'var(--color-moss)'
+                width: '100%',
+                aspectRatio: '2 / 1',
+                background: 'var(--color-paper-card)',
+                border: '1px solid var(--color-contour)',
+                borderRadius: '4px',
+                boxShadow: '0 1px 0 rgba(73,40,40,0.04), 0 24px 48px -32px rgba(73,40,40,0.10)'
               }}
             >
-              The soil has spoken. Now name what you&apos;ll grow.
-            </div>
-
-            {/* Hairline rule with ornament */}
-            <div className="flex items-center gap-3 max-w-sm">
-              <div className="h-px flex-1 bg-[var(--color-contour)]" />
-              <div className="text-xs opacity-50" style={{ color: 'var(--color-contour)' }}>§</div>
-            </div>
-          </motion.div>
-
-          {/* FIELD PROFILE - enhanced empty state */}
-          <motion.div
-            className="p-5 mb-4 rounded-sm border border-[var(--color-contour)]"
-            style={{
-              background: 'var(--color-paper-card)',
-              boxShadow: '0 1px 0 rgba(0,0,0,0.04), 0 24px 48px -32px rgba(73,40,40,0.08)'
-            }}
-            variants={panelVariants}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div
-                className="text-xs font-['JetBrains_Mono'] uppercase tracking-[0.2em]"
-                style={{ color: 'var(--color-earth-deep)' }}
-              >
-                FIELD PROFILE
-              </div>
-              {soilData?.liam && (
-                <div
-                  className="text-xs font-['JetBrains_Mono'] opacity-60"
-                  style={{ color: 'var(--color-earth-deep)' }}
-                >
-                  {`// SAMPLE ${soilData.liam.sample_count || 1}`}
-                </div>
-              )}
-            </div>
-
-            {soilData ? (
-              <motion.div variants={childVariants}>
-                {/* Compact data grid */}
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div>
-                    <div
-                      className="text-[9px] font-['JetBrains_Mono'] uppercase tracking-wide mb-1 opacity-60"
-                      style={{ color: 'var(--color-moss)' }}
-                    >
-                      LOCATION
-                    </div>
-                    <div
-                      className="text-sm font-['Fraunces'] tabular-nums"
-                      style={{
-                        fontVariationSettings: '"opsz" 14, "wght" 500',
-                        color: 'var(--color-earth-deep)'
-                      }}
-                    >
-                      {locationDisplay}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div
-                      className="text-[9px] font-['JetBrains_Mono'] uppercase tracking-wide mb-1 opacity-60"
-                      style={{ color: 'var(--color-moss)' }}
-                    >
-                      pH
-                    </div>
-                    <div
-                      className="text-sm font-['Fraunces'] tabular-nums"
-                      style={{
-                        fontVariationSettings: '"opsz" 14, "wght" 500',
-                        color: 'var(--color-earth-deep)'
-                      }}
-                    >
-                      {typeof soilData.pH === 'string' ? soilData.pH :
-                       typeof soilData.ph === 'string' ? soilData.ph :
-                       'Neutral'}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div
-                      className="text-[9px] font-['JetBrains_Mono'] uppercase tracking-wide mb-1 opacity-60"
-                      style={{ color: 'var(--color-moss)' }}
-                    >
-                      N-P-K
-                    </div>
-                    <div
-                      className="text-sm font-['Fraunces'] tabular-nums"
-                      style={{
-                        fontVariationSettings: '"opsz" 14, "wght" 500',
-                        color: 'var(--color-earth-deep)'
-                      }}
-                    >
-                      {readRating(soilData.nitrogen)}-{readRating(soilData.phosphorus)}-{readRating(soilData.potassium)}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Confidence bars - compact */}
-                {soilData?.liam && (
-                  <div className="border-t border-[var(--color-contour)] pt-3">
-                    {['nitrogen', 'phosphorus', 'potassium'].map((nutrient) => {
-                      const data = soilData.liam[nutrient];
-                      if (!data?.class_distribution) return null;
-
-                      const distribution = data.class_distribution;
-                      const total = Object.values(distribution).reduce((sum, val) => sum + val, 0);
-                      const confidence = Math.max(
-                        distribution.Low || 0,
-                        distribution.Medium || 0,
-                        distribution.High || 0
-                      );
-                      const percentage = ((confidence / total) * 100).toFixed(0);
-
-                      return (
-                        <div key={nutrient} className="flex items-center gap-3 mb-2 last:mb-0">
-                          <div
-                            className="w-4 text-[9px] font-['JetBrains_Mono'] uppercase opacity-60"
-                            style={{ color: 'var(--color-moss)' }}
-                          >
-                            {nutrient.charAt(0)}
-                          </div>
-                          <div className="flex-1 h-1 bg-[var(--color-paper-deep)] rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-[var(--color-moss)] rounded-full"
-                              style={{ width: `${percentage}%` }}
-                            />
-                          </div>
-                          <div
-                            className="text-xs font-['Fraunces'] tabular-nums w-8 text-right"
-                            style={{
-                              fontVariationSettings: '"opsz" 14, "wght" 600',
-                              color: 'var(--color-earth-deep)'
-                            }}
-                          >
-                            {percentage}%
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </motion.div>
-            ) : (
-              <motion.div className="py-6 text-center" variants={childVariants}>
-                {/* Enhanced illustration */}
-                <svg
-                  className="mx-auto mb-3 opacity-40"
-                  width="140"
-                  height="140"
-                  viewBox="0 0 140 140"
-                  fill="none"
-                  style={{ color: 'var(--color-contour)' }}
-                >
-                  {/* Soil horizon cross-section */}
-                  <path d="M20 120h100v8H20z" fill="currentColor" opacity="0.3"/>
-                  <path d="M20 110h100v10H20z" fill="currentColor" opacity="0.2"/>
-                  <path d="M20 95h100v15H20z" fill="currentColor" opacity="0.15"/>
-
-                  {/* Microscope lens */}
-                  <circle cx="70" cy="50" r="25" stroke="currentColor" strokeWidth="1.5" fill="none"/>
-                  <circle cx="70" cy="50" r="18" stroke="currentColor" strokeWidth="1" fill="none"/>
-                  <path d="M45 50h8m34 0h8" stroke="currentColor" strokeWidth="1"/>
-                  <path d="M70 25v8m0 34v8" stroke="currentColor" strokeWidth="1"/>
-
-                  {/* Sample points */}
-                  <circle cx="60" cy="45" r="2" fill="currentColor" opacity="0.6"/>
-                  <circle cx="80" cy="55" r="1.5" fill="currentColor" opacity="0.5"/>
-                  <circle cx="75" cy="42" r="1" fill="currentColor" opacity="0.4"/>
-                </svg>
-
-                <div
-                  className="text-sm font-['Fraunces'] mb-3"
-                  style={{
-                    fontStyle: 'italic',
-                    color: 'var(--color-moss)'
-                  }}
-                >
-                  <em>Awaiting Sentinel-2 sample.</em>
-                </div>
-
-                {/* What's coming list */}
-                <div className="text-left max-w-xs mx-auto space-y-1">
-                  {[
-                    'class distribution',
-                    'mean probability',
-                    'sample count',
-                    'polygon area',
-                    'warnings (if any)'
-                  ].map((item) => (
-                    <div
-                      key={item}
-                      className="text-xs font-['Fraunces'] opacity-50 flex items-center gap-2"
-                      style={{
-                        fontStyle: 'italic',
-                        color: 'var(--color-earth-deep)'
-                      }}
-                    >
-                      <span>·</span>
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div
-                  className="text-xs font-['Fraunces'] mt-3 opacity-60"
-                  style={{
-                    fontStyle: 'italic',
-                    color: 'var(--color-moss)'
-                  }}
-                >
-                  expected ~3s after the polygon clears
-                </div>
-              </motion.div>
-            )}
-          </motion.div>
-
-          {/* MARGINAL NOTES section - fills the gap */}
-          <motion.div
-            className="mb-4 border-l-2 border-[var(--color-contour)] pl-3"
-            style={{ borderLeftStyle: 'dashed' }}
-            variants={panelVariants}
-          >
-            <div
-              className="text-[9px] font-['JetBrains_Mono'] uppercase tracking-wide mb-2 opacity-60"
-              style={{ color: 'var(--color-earth-deep)' }}
-            >
-              MARGINAL NOTES
-            </div>
-
-            <div className="space-y-2">
-              {[
-                `${selectedCrop?.name || 'Cabbage'} tolerates pH 6.0–7.0. Below 5.5, lime first.`,
-                'Highland N targets typically 120–150 kg/ha at the Low band.',
-                'Sample density rises with smaller sample_spacing_m.',
-                'Mapbox satellite tile last refreshed: 2024-04-15.'
-              ].map((note, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <div
-                    className="text-xs font-['Fraunces'] opacity-40 flex-shrink-0"
-                    style={{ color: 'var(--color-contour)' }}
-                  >
-                    §
-                  </div>
-                  <div
-                    className="text-xs font-['Fraunces'] leading-relaxed opacity-70"
-                    style={{
-                      fontStyle: 'italic',
-                      color: 'var(--color-earth-deep)'
-                    }}
-                  >
-                    {note}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* ENGINE INPUTS - tightened */}
-          <motion.div
-            className="p-5 rounded-sm border border-[var(--color-contour)] relative"
-            style={{
-              background: `
-                linear-gradient(to right, var(--color-contour) 1px, transparent 1px),
-                linear-gradient(to bottom, var(--color-contour) 1px, transparent 1px),
-                var(--color-paper-card)
-              `,
-              backgroundSize: '8px 8px',
-              opacity: 0.96,
-              boxShadow: '0 1px 0 rgba(0,0,0,0.04), 0 24px 48px -32px rgba(73,40,40,0.08)'
-            }}
-            variants={panelVariants}
-          >
-            <div
-              className="text-xs font-['JetBrains_Mono'] uppercase tracking-[0.2em] mb-4"
-              style={{ color: 'var(--color-earth-deep)' }}
-            >
-              ENGINE INPUTS
-            </div>
-
-            {/* Area input with inline description */}
-            <div className="mb-5">
-              <div
-                className="text-xs font-['Fraunces'] mb-2 opacity-70"
-                style={{
-                  fontStyle: 'italic',
-                  color: 'var(--color-moss)'
-                }}
-              >
-                <em>The polygon&apos;s hectarage. Override if needed.</em>
-              </div>
-
-              <div className="flex items-baseline gap-2">
-                <input
-                  type="number"
-                  value={areaHectares}
-                  onChange={(e) => setAreaHectares(Number(e.target.value) || 0)}
-                  min="0.1"
-                  step="0.1"
-                  className="bg-transparent border-none outline-none text-3xl tabular-nums font-['Fraunces'] w-28 border-b border-dotted border-[var(--color-contour)]"
-                  style={{
-                    fontVariationSettings: '"opsz" 144, "wght" 600',
-                    color: 'var(--color-earth-deep)'
-                  }}
+              {polygonUrl ? (
+                <img
+                  src={polygonUrl}
+                  alt="Drawn field polygon on satellite imagery"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                 />
-                <div
-                  className="text-sm font-['JetBrains_Mono']"
-                  style={{ color: 'var(--color-moss)' }}
-                >
-                  ha
-                </div>
-              </div>
-            </div>
-
-            {/* Grouped fertilizer chips */}
-            <div>
-              {/* PURE NITROGEN group */}
-              <div className="mb-3">
-                <div
-                  className="text-[9px] font-['JetBrains_Mono'] uppercase tracking-wide mb-2 opacity-50"
-                  style={{ color: 'var(--color-earth-deep)' }}
-                >
-                  PURE NITROGEN
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {NITROGEN_PURE.map((fertilizer) => {
-                    const isSelected = selectedFertilizers.has(fertilizer.name);
-                    return (
-                      <motion.button
-                        key={fertilizer.name}
-                        onClick={() => handleFertilizerToggle(fertilizer.name)}
-                        variants={chipVariants}
-                        initial="initial"
-                        whileHover="hover"
-                        whileTap="tap"
-                        className="h-[44px] px-3 py-2 text-left rounded-sm relative transition-colors"
-                        style={{
-                          backgroundColor: isSelected ? 'var(--color-moss)' : 'var(--color-paper)',
-                          border: '1px solid var(--color-contour)',
-                          color: isSelected ? 'var(--color-paper)' : 'var(--color-earth-deep)'
-                        }}
-                      >
-                        <div
-                          className="text-xs font-['Fraunces'] leading-tight"
-                          style={{ fontVariationSettings: '"opsz" 14, "wght" 500' }}
-                        >
-                          {fertilizer.name}
-                        </div>
-                        <div
-                          className="text-[9px] font-['JetBrains_Mono'] mt-1 opacity-60"
-                        >
-                          {fertilizer.npk}
-                        </div>
-                        {isSelected && (
-                          <motion.div
-                            className="absolute top-1 right-2 text-xs"
-                            initial={{ scale: 0, rotate: 180 }}
-                            animate={{ scale: 1, rotate: 0 }}
-                            transition={{ duration: 0.2, ease: [0.68, -0.55, 0.265, 1.55] }}
-                          >
-                            ✓
-                          </motion.div>
-                        )}
-                      </motion.button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* COMPOUND / COMPLETE group */}
-              <div className="mb-3">
-                <div
-                  className="text-[9px] font-['JetBrains_Mono'] uppercase tracking-wide mb-2 opacity-50"
-                  style={{ color: 'var(--color-earth-deep)' }}
-                >
-                  COMPOUND / COMPLETE
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {COMPOUND_COMPLETE.map((fertilizer) => {
-                    const isSelected = selectedFertilizers.has(fertilizer.name);
-                    return (
-                      <motion.button
-                        key={fertilizer.name}
-                        onClick={() => handleFertilizerToggle(fertilizer.name)}
-                        variants={chipVariants}
-                        initial="initial"
-                        whileHover="hover"
-                        whileTap="tap"
-                        className="h-[44px] px-3 py-2 text-left rounded-sm relative transition-colors"
-                        style={{
-                          backgroundColor: isSelected ? 'var(--color-moss)' : 'var(--color-paper)',
-                          border: '1px solid var(--color-contour)',
-                          color: isSelected ? 'var(--color-paper)' : 'var(--color-earth-deep)'
-                        }}
-                      >
-                        <div
-                          className="text-xs font-['Fraunces'] leading-tight"
-                          style={{ fontVariationSettings: '"opsz" 14, "wght" 500' }}
-                        >
-                          {fertilizer.name}
-                        </div>
-                        <div
-                          className="text-[9px] font-['JetBrains_Mono'] mt-1 opacity-60"
-                        >
-                          {fertilizer.npk}
-                        </div>
-                        {isSelected && (
-                          <motion.div
-                            className="absolute top-1 right-2 text-xs"
-                            initial={{ scale: 0, rotate: 180 }}
-                            animate={{ scale: 1, rotate: 0 }}
-                            transition={{ duration: 0.2, ease: [0.68, -0.55, 0.265, 1.55] }}
-                          >
-                            ✓
-                          </motion.div>
-                        )}
-                      </motion.button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* PHOSPHORUS / POTASSIUM group */}
-              <div className="mb-4">
-                <div
-                  className="text-[9px] font-['JetBrains_Mono'] uppercase tracking-wide mb-2 opacity-50"
-                  style={{ color: 'var(--color-earth-deep)' }}
-                >
-                  PHOSPHORUS / POTASSIUM
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {PHOSPHORUS_POTASSIUM.map((fertilizer) => {
-                    const isSelected = selectedFertilizers.has(fertilizer.name);
-                    return (
-                      <motion.button
-                        key={fertilizer.name}
-                        onClick={() => handleFertilizerToggle(fertilizer.name)}
-                        variants={chipVariants}
-                        initial="initial"
-                        whileHover="hover"
-                        whileTap="tap"
-                        className="h-[44px] px-3 py-2 text-left rounded-sm relative transition-colors"
-                        style={{
-                          backgroundColor: isSelected ? 'var(--color-moss)' : 'var(--color-paper)',
-                          border: '1px solid var(--color-contour)',
-                          color: isSelected ? 'var(--color-paper)' : 'var(--color-earth-deep)'
-                        }}
-                      >
-                        <div
-                          className="text-xs font-['Fraunces'] leading-tight"
-                          style={{ fontVariationSettings: '"opsz" 14, "wght" 500' }}
-                        >
-                          {fertilizer.name}
-                        </div>
-                        <div
-                          className="text-[9px] font-['JetBrains_Mono'] mt-1 opacity-60"
-                        >
-                          {fertilizer.npk}
-                        </div>
-                        {isSelected && (
-                          <motion.div
-                            className="absolute top-1 right-2 text-xs"
-                            initial={{ scale: 0, rotate: 180 }}
-                            animate={{ scale: 1, rotate: 0 }}
-                            transition={{ duration: 0.2, ease: [0.68, -0.55, 0.265, 1.55] }}
-                          >
-                            ✓
-                          </motion.div>
-                        )}
-                      </motion.button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div
-                className="text-xs font-['Fraunces']"
-                style={{
-                  fontStyle: 'italic',
-                  color: 'var(--color-moss)'
-                }}
-              >
-                <em>Selected products constrain the engine&apos;s prescription. Leave empty to recommend from any of the 14.</em>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Right Rail - Crop selection with sticky headers */}
-        <div
-          className="w-[36%] border-l border-[var(--color-contour)] relative"
-          style={{ backgroundColor: 'var(--color-paper-card)' }}
-        >
-          <div className="px-6 py-8 h-full flex flex-col">
-            {/* Header */}
-            <motion.div className="mb-4" variants={heroVariants}>
-              {selectedCrop ? (
-                <div
-                  className="p-3 rounded border border-[var(--color-moss)] bg-[var(--color-moss)] text-[var(--color-paper)] mb-4"
-                  style={{
-                    fontFamily: 'Fraunces',
-                    fontVariationSettings: '"opsz" 14, "wght" 500'
-                  }}
-                >
-                  <div className="text-sm">
-                    Picked: {selectedCrop.name}
-                    {selectedCrop.nameFil && ` / ${selectedCrop.nameFil}`}
-                  </div>
-                  <div
-                    className="text-xs mt-1 opacity-80 font-['JetBrains_Mono']"
-                    style={{ textTransform: 'lowercase' }}
-                  >
-                    category: {selectedCrop.category}
-                  </div>
-                </div>
               ) : (
                 <div
-                  className="text-sm font-['Fraunces'] mb-4 opacity-60 text-center"
+                  className="w-full h-full flex items-center justify-center"
                   style={{
+                    fontFamily: '"Fraunces", serif',
                     fontStyle: 'italic',
-                    color: 'var(--color-moss)'
+                    color: 'var(--color-earth-deep)',
+                    opacity: 0.45,
+                    fontSize: '14px'
                   }}
                 >
-                  <em>Choose what&apos;s growing on this field.</em>
+                  No polygon — go back and draw your field.
                 </div>
               )}
 
+              {/* Overlay label, top-left */}
               <div
-                className="text-xs font-['JetBrains_Mono'] uppercase tracking-[0.2em] text-center"
-                style={{ color: 'var(--color-earth-deep)' }}
+                className="absolute top-3 left-3 px-2.5 py-1.5"
+                style={{
+                  background: 'rgba(241, 237, 229, 0.92)',
+                  backdropFilter: 'blur(8px)',
+                  borderRadius: '2px',
+                  fontFamily: '"JetBrains Mono", monospace',
+                  fontSize: '10px',
+                  letterSpacing: '0.18em',
+                  color: 'var(--color-earth-deep)',
+                  fontWeight: 600
+                }}
               >
-                CROP INDEX
+                FIELD · {fieldAreaHa.toFixed(2)} ha
               </div>
-            </motion.div>
 
-            {/* Scrollable grouped crop list */}
-            <motion.div className="flex-1 overflow-y-auto mb-4" variants={panelVariants}>
-              {Object.entries(groupedCrops).map(([category, crops]) => (
-                <div key={category} className="mb-1">
-                  {/* Sticky category header */}
-                  <div
-                    className="sticky top-0 z-10 py-2 border-b border-[var(--color-contour)] text-xs font-['JetBrains_Mono'] uppercase tracking-wide"
+              {/* Centroid coordinates, bottom-right */}
+              {fieldCenter && (
+                <div
+                  className="absolute bottom-3 right-3 px-2.5 py-1.5"
+                  style={{
+                    background: 'rgba(241, 237, 229, 0.92)',
+                    backdropFilter: 'blur(8px)',
+                    borderRadius: '2px',
+                    fontFamily: '"JetBrains Mono", monospace',
+                    fontSize: '10px',
+                    fontVariantNumeric: 'tabular-nums',
+                    color: 'var(--color-earth-deep)'
+                  }}
+                >
+                  {fieldCenter.lat.toFixed(4)}° N · {fieldCenter.lng.toFixed(4)}° E
+                </div>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Telemetry strip — 4 cells, real data */}
+          <motion.div variants={itemVariants} className="mb-6">
+            <div
+              className="grid grid-cols-4 gap-px"
+              style={{ background: 'var(--color-contour)', border: '1px solid var(--color-contour)', borderRadius: '4px', overflow: 'hidden' }}
+            >
+              <TelemetryCell label="LOCATION" value={municipality || 'La Trinidad'} />
+              <TelemetryCell label="AREA" value={`${(areaHectares || fieldAreaHa || 0).toFixed(2)} ha`} mono />
+              <TelemetryCell
+                label="CLIMATE"
+                value={
+                  weather?.current
+                    ? `${Math.round(weather.current.temperature)}° / ${Math.round(weather.current.humidity)}%`
+                    : '—'
+                }
+                mono
+              />
+              <TelemetryCell
+                label="ELEVATION"
+                value={weather?.elevation ? `${weather.elevation} m` : '—'}
+                mono
+              />
+            </div>
+          </motion.div>
+
+          {/* Soil profile — N/P/K + pH with confidence bars when Liam data exists */}
+          <motion.div variants={itemVariants} className="mb-6">
+            <div
+              className="flex items-baseline justify-between"
+              style={{ marginBottom: '10px' }}
+            >
+              <Eyebrow>SOIL PROFILE</Eyebrow>
+              <Caption>
+                {liamRich
+                  ? `n=${liamRich.sample_count ?? '?'} samples · ${(liamRich.polygon_area_ha ?? 0).toFixed(2)} ha`
+                  : soilData?.source === 'placeholder'
+                  ? 'regional estimate'
+                  : 'pending'}
+              </Caption>
+            </div>
+
+            <div
+              style={{
+                background: 'var(--color-paper-card)',
+                border: '1px solid var(--color-contour)',
+                borderRadius: '4px',
+                padding: '20px'
+              }}
+            >
+              <div className="grid grid-cols-4 gap-6">
+                <NutrientCell letter="N" status={nStatus} dist={liamRich?.nitrogen?.class_distribution} />
+                <NutrientCell letter="P" status={pStatus} dist={liamRich?.phosphorus?.class_distribution} />
+                <NutrientCell letter="K" status={kStatus} dist={liamRich?.potassium?.class_distribution} />
+                <PhCell ph={ph} phStr={phStr} />
+              </div>
+
+              {liamRich?.warnings?.length > 0 && (
+                <div
+                  className="mt-4 pt-3"
+                  style={{
+                    borderTop: '1px solid var(--color-contour)',
+                    fontFamily: '"Fraunces", serif',
+                    fontStyle: 'italic',
+                    fontSize: '12px',
+                    color: 'var(--color-rust)'
+                  }}
+                >
+                  {liamRich.warnings.length} warning(s): {liamRich.warnings.slice(0, 2).join('; ')}
+                </div>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Recommended for your soil — 3 crops scored */}
+          {recommendations.length > 0 && (
+            <motion.div variants={itemVariants} className="mb-6">
+              <div className="flex items-baseline justify-between" style={{ marginBottom: '10px' }}>
+                <Eyebrow>RECOMMENDED FOR YOUR SOIL</Eyebrow>
+                <Caption>scored against pH {ph.toFixed(1)} · N={nStatus}</Caption>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {recommendations.map(({ crop, score }) => (
+                  <button
+                    key={crop.id}
+                    onClick={() => setSelectedCrop(crop)}
+                    className="text-left transition-all duration-200"
                     style={{
-                      backgroundColor: 'var(--color-paper-card)',
-                      color: 'var(--color-earth-deep)'
+                      background: selectedCrop?.id === crop.id ? 'var(--color-moss)' : 'var(--color-paper-card)',
+                      color: selectedCrop?.id === crop.id ? 'var(--color-paper)' : 'var(--color-earth-deep)',
+                      border: '1px solid var(--color-contour)',
+                      borderRadius: '4px',
+                      padding: '14px 16px'
                     }}
                   >
-                    {categoryLabels[category]} — {getCropCount(category)}
+                    <div
+                      style={{
+                        fontFamily: '"JetBrains Mono", monospace',
+                        fontSize: '9px',
+                        letterSpacing: '0.18em',
+                        color: selectedCrop?.id === crop.id ? 'var(--color-paper)' : 'var(--color-moss)',
+                        fontWeight: 600,
+                        marginBottom: '6px',
+                        opacity: selectedCrop?.id === crop.id ? 0.85 : 1
+                      }}
+                    >
+                      {fitLabel(score)}
+                    </div>
+                    <div style={{ fontFamily: '"Fraunces", serif', fontSize: '17px', fontVariationSettings: '"opsz" 144, "wght" 500', lineHeight: 1.15 }}>
+                      {crop.name}
+                    </div>
+                    <div
+                      style={{
+                        fontFamily: '"Fraunces", serif',
+                        fontStyle: 'italic',
+                        fontSize: '12px',
+                        opacity: 0.65,
+                        marginTop: '2px'
+                      }}
+                    >
+                      {crop.nameFil}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Engine Inputs — area override + on-hand fertilizer chips */}
+          <motion.div variants={itemVariants} className="mb-6">
+            <div className="flex items-baseline justify-between" style={{ marginBottom: '10px' }}>
+              <Eyebrow>ENGINE INPUTS</Eyebrow>
+              <Caption>passed to Hans&apos;s rule-based engine on Continue</Caption>
+            </div>
+
+            <div
+              style={{
+                background: 'var(--color-paper-card)',
+                border: '1px solid var(--color-contour)',
+                borderRadius: '4px',
+                padding: '20px'
+              }}
+            >
+              {/* Area override */}
+              <div className="mb-5 flex items-end gap-4">
+                <div className="flex-1">
+                  <div
+                    style={{
+                      fontFamily: '"JetBrains Mono", monospace',
+                      fontSize: '10px',
+                      letterSpacing: '0.18em',
+                      color: 'var(--color-earth-deep)',
+                      opacity: 0.55,
+                      marginBottom: '6px'
+                    }}
+                  >
+                    FIELD AREA
                   </div>
-
-                  {crops.map((crop) => {
-                    const isSelected = selectedCrop?.id === crop.id;
-                    const categoryColors = {
-                      vegetables: 'var(--color-moss)',
-                      roots: 'var(--color-earth-deep)',
-                      beans: 'var(--color-rust)',
-                      herbs: 'var(--color-paper-deep)',
-                      highland: 'var(--color-rust)'
-                    };
-                    const stripeColor = categoryColors[crop.category] || 'var(--color-contour)';
-
-                    return (
-                      <motion.button
-                        key={crop.id}
-                        onClick={() => handleCropSelect(crop)}
-                        className="w-full text-left py-3 px-4 border-b border-[var(--color-contour)] relative transition-all group hover:bg-[var(--color-paper-deep)]"
-                        style={{
-                          backgroundColor: isSelected ? 'var(--color-paper-deep)' : 'transparent'
-                        }}
-                        whileHover={{ x: 2 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        {/* Color stripe */}
-                        <div
-                          className="absolute left-0 top-0 bottom-0 transition-all"
-                          style={{
-                            width: isSelected ? '6px' : '3px',
-                            backgroundColor: stripeColor,
-                            opacity: isSelected ? 1 : 0.4
-                          }}
-                        />
-
-                        <div className="pl-4 flex items-center justify-between">
-                          <div>
-                            <div
-                              className="text-sm font-['Fraunces'] leading-tight"
-                              style={{
-                                fontVariationSettings: '"opsz" 14, "wght" 500',
-                                color: 'var(--color-earth-deep)'
-                              }}
-                            >
-                              {crop.name}
-                            </div>
-                            <div
-                              className="text-xs font-['Fraunces'] mt-1 opacity-60"
-                              style={{
-                                fontStyle: 'italic',
-                                color: 'var(--color-moss)'
-                              }}
-                            >
-                              {crop.nameFil}
-                            </div>
-                          </div>
-
-                          {isSelected && (
-                            <div className="text-sm" style={{ color: 'var(--color-moss)' }}>✦</div>
-                          )}
-                        </div>
-                      </motion.button>
-                    );
-                  })}
+                  <div className="flex items-baseline gap-2">
+                    <input
+                      type="number"
+                      value={areaHectares}
+                      onChange={(e) => setAreaHectares(Number(e.target.value) || 0)}
+                      min="0.1"
+                      step="0.1"
+                      style={{
+                        fontFamily: '"Fraunces", serif',
+                        fontSize: '32px',
+                        fontVariationSettings: '"opsz" 144, "wght" 600',
+                        background: 'transparent',
+                        border: 'none',
+                        borderBottom: '1px dotted var(--color-contour)',
+                        outline: 'none',
+                        width: '120px',
+                        color: 'var(--color-earth-deep)'
+                      }}
+                    />
+                    <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '13px', color: 'var(--color-earth-deep)', opacity: 0.6 }}>
+                      ha
+                    </span>
+                  </div>
                 </div>
+                <div
+                  style={{
+                    fontFamily: '"Fraunces", serif',
+                    fontStyle: 'italic',
+                    fontSize: '12px',
+                    color: 'var(--color-earth-deep)',
+                    opacity: 0.55,
+                    paddingBottom: '8px',
+                    flexShrink: 0
+                  }}
+                >
+                  {fieldAreaHa > 0 ? 'from your polygon' : 'set manually'}
+                </div>
+              </div>
+
+              {/* Fertilizer chips — grouped */}
+              <div>
+                <div
+                  style={{
+                    fontFamily: '"JetBrains Mono", monospace',
+                    fontSize: '10px',
+                    letterSpacing: '0.18em',
+                    color: 'var(--color-earth-deep)',
+                    opacity: 0.55,
+                    marginBottom: '10px'
+                  }}
+                >
+                  ON-HAND FERTILIZERS · {selectedFertilizers.size} of {ALL_FERTILIZERS.length} selected
+                </div>
+                <FertilizerGroup label="Pure N" items={NITROGEN_PURE} selected={selectedFertilizers} onToggle={handleFertilizerToggle} />
+                <FertilizerGroup label="Compound / Complete" items={COMPOUND_COMPLETE} selected={selectedFertilizers} onToggle={handleFertilizerToggle} />
+                <FertilizerGroup label="P / K Sources" items={PHOSPHORUS_POTASSIUM} selected={selectedFertilizers} onToggle={handleFertilizerToggle} />
+              </div>
+            </div>
+          </motion.div>
+
+        </motion.div>
+
+        {/* ─────────── RIGHT (38%) — index ─────────── */}
+        <motion.div
+          variants={itemVariants}
+          className="hidden lg:flex w-[38%] flex-col"
+          style={{
+            background: 'var(--color-paper-card)',
+            borderLeft: '1px solid var(--color-contour)',
+            position: 'sticky',
+            top: 0,
+            height: '100vh'
+          }}
+        >
+          <div className="px-8 py-6" style={{ borderBottom: '1px solid var(--color-contour)' }}>
+            <div className="flex items-baseline justify-between mb-3">
+              <Eyebrow>INDEX 02 — CROP</Eyebrow>
+              <Caption>{totalFiltered} of {CROPS_DATA.length}</Caption>
+            </div>
+
+            {/* Search */}
+            <div
+              className="flex items-center"
+              style={{
+                fontFamily: '"JetBrains Mono", monospace',
+                borderBottom: '1px solid var(--color-contour)',
+                paddingBottom: '6px',
+                marginBottom: '14px'
+              }}
+            >
+              <span style={{ color: 'var(--color-moss)', fontSize: '13px', marginRight: '8px' }}>{'>'}</span>
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="search crops..."
+                style={{
+                  flex: 1,
+                  fontFamily: '"JetBrains Mono", monospace',
+                  fontSize: '13px',
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  color: 'var(--color-earth-deep)'
+                }}
+              />
+            </div>
+
+            {/* Category chips */}
+            <div className="flex flex-wrap gap-1.5">
+              <CategoryChip label="All" count={CROPS_DATA.length} active={activeCategory === 'all'} onClick={() => setActiveCategory('all')} />
+              {CATEGORY_ORDER.map((cat) => (
+                <CategoryChip
+                  key={cat}
+                  label={categoryLabels[cat]}
+                  count={(groupedCrops[cat] || []).length}
+                  active={activeCategory === cat}
+                  onClick={() => setActiveCategory(cat)}
+                />
               ))}
-            </motion.div>
-
-            {/* Footer with continue */}
-            <motion.div variants={childVariants}>
-              <div
-                className="text-xs font-['Fraunces'] mb-3 text-center opacity-60"
-                style={{
-                  fontStyle: 'italic',
-                  color: 'var(--color-moss)'
-                }}
-              >
-                <em>Continue to brief Hans&apos;s engine. ~1.2s engine call.</em>
-              </div>
-
-              <motion.button
-                onClick={handleContinue}
-                disabled={!selectedCrop}
-                className="w-full px-6 py-4 rounded-sm transition-all"
-                style={{
-                  backgroundColor: selectedCrop ? 'var(--color-moss)' : 'var(--color-paper-deep)',
-                  border: '1px solid var(--color-contour)',
-                  color: selectedCrop ? 'var(--color-paper)' : 'var(--color-earth-deep)',
-                  opacity: selectedCrop ? 1 : 0.3,
-                  cursor: selectedCrop ? 'pointer' : 'not-allowed',
-                  fontFamily: 'Fraunces',
-                  fontVariationSettings: '"opsz" 14, "wght" 600',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.2em'
-                }}
-                whileHover={selectedCrop ? {
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
-                } : {}}
-              >
-                Continue
-              </motion.button>
-
-              <div
-                className="text-[10px] font-['JetBrains_Mono'] text-center mt-2 opacity-50"
-                style={{ color: 'var(--color-earth-deep)' }}
-              >
-                {selectedCrop
-                  ? `→ ${selectedCrop.name} · ${areaHectares} ha · ${selectedFertilizers.size} fertilizers`
-                  : '→ — · — · —'
-                }
-              </div>
-
-              <div
-                className="text-xs font-['Fraunces'] mt-4 text-center opacity-50"
-                style={{
-                  fontStyle: 'italic',
-                  color: 'var(--color-moss)'
-                }}
-              >
-                <em>42 crops aligned to PhilRice + BSU recommendations.</em>
-              </div>
-            </motion.div>
+            </div>
           </div>
-        </div>
+
+          {/* Crop list */}
+          <div
+            className="flex-1 overflow-y-auto"
+            style={{ fontFamily: '"Fraunces", serif' }}
+          >
+            {Object.keys(filteredGrouped).length === 0 && (
+              <div
+                className="px-8 py-12 text-center"
+                style={{
+                  fontFamily: '"Fraunces", serif',
+                  fontStyle: 'italic',
+                  color: 'var(--color-earth-deep)',
+                  opacity: 0.5,
+                  fontSize: '14px'
+                }}
+              >
+                No crops match &ldquo;{search}&rdquo;.
+              </div>
+            )}
+            {Object.entries(filteredGrouped).map(([cat, crops]) => (
+              <div key={cat}>
+                <div
+                  className="sticky top-0 z-10 px-8 py-2.5"
+                  style={{
+                    background: 'var(--color-paper-card)',
+                    borderBottom: '1px solid var(--color-contour)',
+                    fontFamily: '"JetBrains Mono", monospace',
+                    fontSize: '10px',
+                    letterSpacing: '0.22em',
+                    color: 'var(--color-moss)',
+                    fontWeight: 600,
+                    display: 'flex',
+                    justifyContent: 'space-between'
+                  }}
+                >
+                  <span>{categoryLabels[cat]}</span>
+                  <span style={{ opacity: 0.5 }}>{crops.length}</span>
+                </div>
+                {crops.map((crop) => {
+                  const isSelected = selectedCrop?.id === crop.id;
+                  return (
+                    <button
+                      key={crop.id}
+                      onClick={() => setSelectedCrop(crop)}
+                      className="w-full text-left flex items-center transition-all duration-150"
+                      style={{
+                        padding: '12px 32px',
+                        background: isSelected ? 'var(--color-paper-deep)' : 'transparent',
+                        borderBottom: '1px solid var(--color-contour)',
+                        borderLeft: `3px solid ${isSelected ? 'var(--color-moss)' : 'transparent'}`
+                      }}
+                    >
+                      <div className="flex-1">
+                        <div
+                          style={{
+                            fontFamily: '"Fraunces", serif',
+                            fontSize: '15px',
+                            fontVariationSettings: '"opsz" 144, "wght" 500',
+                            color: 'var(--color-earth-deep)',
+                            lineHeight: 1.2
+                          }}
+                        >
+                          {crop.name}
+                        </div>
+                        <div
+                          style={{
+                            fontFamily: '"Fraunces", serif',
+                            fontStyle: 'italic',
+                            fontSize: '12px',
+                            color: 'var(--color-earth-deep)',
+                            opacity: 0.55,
+                            marginTop: '1px'
+                          }}
+                        >
+                          {crop.nameFil}
+                        </div>
+                      </div>
+                      {isSelected && (
+                        <div
+                          style={{
+                            fontFamily: '"JetBrains Mono", monospace',
+                            fontSize: '9px',
+                            letterSpacing: '0.18em',
+                            color: 'var(--color-moss)',
+                            fontWeight: 600
+                          }}
+                        >
+                          ✓ PICKED
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+
+          {/* Continue */}
+          <div className="px-8 py-5" style={{ borderTop: '1px solid var(--color-contour)' }}>
+            {selectedCrop && (
+              <div
+                style={{
+                  fontFamily: '"JetBrains Mono", monospace',
+                  fontSize: '10px',
+                  letterSpacing: '0.18em',
+                  color: 'var(--color-earth-deep)',
+                  opacity: 0.6,
+                  marginBottom: '8px'
+                }}
+              >
+                → {selectedCrop.engineLabel} · {areaHectares.toFixed(2)} ha · {selectedFertilizers.size} fertilizer(s)
+              </div>
+            )}
+            <button
+              onClick={handleContinue}
+              disabled={!selectedCrop}
+              className="terrace-btn w-full"
+              style={{
+                padding: '1rem 2rem',
+                opacity: selectedCrop ? 1 : 0.4,
+                cursor: selectedCrop ? 'pointer' : 'not-allowed',
+                letterSpacing: '0.18em'
+              }}
+            >
+              {selectedCrop ? 'CONTINUE — REVIEW SOIL' : 'PICK A CROP FIRST'}
+            </button>
+          </div>
+        </motion.div>
       </div>
     </motion.div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Subcomponents
+// ─────────────────────────────────────────────────────────────────────────
+
+function Eyebrow({ children }) {
+  return (
+    <div
+      style={{
+        fontFamily: '"JetBrains Mono", monospace',
+        fontSize: '10px',
+        letterSpacing: '0.22em',
+        color: 'var(--color-moss)',
+        fontWeight: 600
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function Caption({ children }) {
+  return (
+    <div
+      style={{
+        fontFamily: '"Fraunces", serif',
+        fontStyle: 'italic',
+        fontSize: '11px',
+        color: 'var(--color-earth-deep)',
+        opacity: 0.55
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function TelemetryCell({ label, value, mono }) {
+  return (
+    <div
+      style={{
+        background: 'var(--color-paper-card)',
+        padding: '14px 16px'
+      }}
+    >
+      <div
+        style={{
+          fontFamily: '"JetBrains Mono", monospace',
+          fontSize: '9px',
+          letterSpacing: '0.22em',
+          color: 'var(--color-earth-deep)',
+          opacity: 0.5,
+          fontWeight: 600,
+          marginBottom: '6px'
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          fontFamily: mono ? '"JetBrains Mono", monospace' : '"Fraunces", serif',
+          fontSize: mono ? '15px' : '17px',
+          fontVariationSettings: mono ? undefined : '"opsz" 144, "wght" 500',
+          fontVariantNumeric: mono ? 'tabular-nums' : undefined,
+          color: 'var(--color-earth-deep)',
+          lineHeight: 1.1
+        }}
+      >
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function NutrientCell({ letter, status, dist }) {
+  const colorByLevel = {
+    Low: 'var(--color-rust)',
+    Medium: 'var(--color-ochre)',
+    High: 'var(--color-moss)'
+  };
+  const accent = colorByLevel[status] ?? 'var(--color-earth-deep)';
+
+  return (
+    <div>
+      <div className="flex items-baseline gap-2 mb-2">
+        <div
+          style={{
+            fontFamily: '"Fraunces", serif',
+            fontSize: '28px',
+            fontVariationSettings: '"opsz" 144, "wght" 700',
+            color: accent,
+            lineHeight: 1
+          }}
+        >
+          {letter}
+        </div>
+        <div
+          style={{
+            fontFamily: '"JetBrains Mono", monospace',
+            fontSize: '11px',
+            letterSpacing: '0.18em',
+            color: 'var(--color-earth-deep)',
+            fontWeight: 600
+          }}
+        >
+          {status.toUpperCase()}
+        </div>
+      </div>
+
+      {dist ? (
+        <div className="flex h-1.5 overflow-hidden" style={{ borderRadius: '1px', background: 'var(--color-paper-deep)' }}>
+          <div style={{ width: `${(dist.Low ?? 0) * 100}%`, background: 'var(--color-rust)' }} />
+          <div style={{ width: `${(dist.Medium ?? 0) * 100}%`, background: 'var(--color-ochre)' }} />
+          <div style={{ width: `${(dist.High ?? 0) * 100}%`, background: 'var(--color-moss)' }} />
+        </div>
+      ) : (
+        <div
+          style={{
+            fontFamily: '"Fraunces", serif',
+            fontStyle: 'italic',
+            fontSize: '10px',
+            color: 'var(--color-earth-deep)',
+            opacity: 0.45
+          }}
+        >
+          confidence pending
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PhCell({ ph, phStr }) {
+  // pH bar: 4.0 to 8.0 range
+  const pct = Math.max(0, Math.min(100, ((ph - 4) / 4) * 100));
+  return (
+    <div>
+      <div className="flex items-baseline gap-2 mb-2">
+        <div
+          style={{
+            fontFamily: '"Fraunces", serif',
+            fontSize: '28px',
+            fontVariationSettings: '"opsz" 144, "wght" 700',
+            color: 'var(--color-earth-deep)',
+            lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums'
+          }}
+        >
+          {ph.toFixed(1)}
+        </div>
+        <div
+          style={{
+            fontFamily: '"JetBrains Mono", monospace',
+            fontSize: '11px',
+            letterSpacing: '0.18em',
+            color: 'var(--color-earth-deep)',
+            fontWeight: 600
+          }}
+        >
+          pH
+        </div>
+      </div>
+      <div className="relative h-1.5" style={{ borderRadius: '1px', background: 'linear-gradient(to right, var(--color-rust), var(--color-ochre), var(--color-moss), var(--color-ochre), var(--color-rust))' }}>
+        <div
+          className="absolute top-1/2"
+          style={{
+            left: `${pct}%`,
+            transform: 'translate(-50%, -50%)',
+            width: '8px',
+            height: '8px',
+            background: 'var(--color-paper)',
+            border: '2px solid var(--color-earth-deep)',
+            borderRadius: '50%'
+          }}
+        />
+      </div>
+      <div
+        style={{
+          fontFamily: '"Fraunces", serif',
+          fontStyle: 'italic',
+          fontSize: '11px',
+          color: 'var(--color-earth-deep)',
+          opacity: 0.6,
+          marginTop: '4px'
+        }}
+      >
+        {typeof phStr === 'string' && phStr !== '—' ? phStr : 'estimated'}
+      </div>
+    </div>
+  );
+}
+
+function FertilizerGroup({ label, items, selected, onToggle }) {
+  return (
+    <div className="mb-3 last:mb-0">
+      <div
+        style={{
+          fontFamily: '"Fraunces", serif',
+          fontStyle: 'italic',
+          fontSize: '11px',
+          color: 'var(--color-earth-deep)',
+          opacity: 0.55,
+          marginBottom: '6px'
+        }}
+      >
+        {label}
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {items.map((f) => {
+          const on = selected.has(f.name);
+          return (
+            <button
+              key={f.name}
+              onClick={() => onToggle(f.name)}
+              className="transition-colors duration-150"
+              style={{
+                background: on ? 'var(--color-moss)' : 'var(--color-paper)',
+                color: on ? 'var(--color-paper)' : 'var(--color-earth-deep)',
+                border: '1px solid var(--color-contour)',
+                borderRadius: '2px',
+                padding: '6px 10px',
+                fontFamily: '"Fraunces", serif',
+                fontSize: '12px',
+                fontVariationSettings: '"opsz" 14, "wght" 500',
+                lineHeight: 1.1,
+                display: 'inline-flex',
+                alignItems: 'baseline',
+                gap: '6px'
+              }}
+            >
+              <span>{f.name}</span>
+              <span
+                style={{
+                  fontFamily: '"JetBrains Mono", monospace',
+                  fontSize: '9px',
+                  letterSpacing: '0.05em',
+                  opacity: on ? 0.85 : 0.5,
+                  fontVariantNumeric: 'tabular-nums'
+                }}
+              >
+                {f.npk}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function CategoryChip({ label, count, active, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        background: active ? 'var(--color-earth-deep)' : 'transparent',
+        color: active ? 'var(--color-paper)' : 'var(--color-earth-deep)',
+        border: `1px solid ${active ? 'var(--color-earth-deep)' : 'var(--color-contour)'}`,
+        borderRadius: '2px',
+        padding: '4px 8px',
+        fontFamily: '"JetBrains Mono", monospace',
+        fontSize: '9px',
+        letterSpacing: '0.18em',
+        fontWeight: 600,
+        cursor: 'pointer',
+        transition: 'all 150ms'
+      }}
+    >
+      {label} <span style={{ opacity: 0.6 }}>{count}</span>
+    </button>
   );
 }
