@@ -133,6 +133,23 @@ function normalizeEngineResponse(engineRes, soilData, cropKey, areaHectares) {
     return calculateFertilizerRecommendation(soilData, cropKey, areaHectares);
   }
 
+  // Helper to look up a fertilizer's NPK percentages from the engine inventory.
+  // Returns {n, p, k} as percentages (0-46 range, e.g. Urea is {n:46,p:0,k:0}).
+  const inventoryByName = {};
+  if (Array.isArray(engineRes.inventory)) {
+    for (const item of engineRes.inventory) {
+      if (item?.name) inventoryByName[item.name] = item;
+    }
+  }
+  const getNpkPercent = (name) => {
+    const f = inventoryByName[name];
+    return {
+      n: typeof f?.n === 'number' ? f.n : 0,
+      p: typeof f?.p === 'number' ? f.p : 0,
+      k: typeof f?.k === 'number' ? f.k : 0
+    };
+  };
+
   // Process ALL candidates, not just the best one
   const candidates = mixCandidates.map((combo, index) => {
     const prescriptions = (combo.Prescription || [])
@@ -142,11 +159,16 @@ function normalizeEngineResponse(engineRes, soilData, cropKey, areaHectares) {
       .map((p) => {
         const cls = classifyByInventory(p.name, engineRes.inventory);
         const pricePerKg = ENGINE_NAME_TO_PRICE_PHP[p.name] ?? 0;
+        const npkPct = getNpkPercent(p.name);
         return {
           stage: cls.stage,
           sortOrder: cls.sortOrder,
-          fertilizer: { name: p.name, brand: '', pricePerKg },
+          fertilizer: { name: p.name, brand: '', pricePerKg, npkPercent: npkPct },
           amountKg: p.qty,
+          // Per-row nutrient contribution: kg × percentage / 100
+          deliveredN: (p.qty * npkPct.n) / 100,
+          deliveredP: (p.qty * npkPct.p) / 100,
+          deliveredK: (p.qty * npkPct.k) / 100,
           timing: '',
           method: 'Broadcast',
           cost: p.qty * pricePerKg
@@ -164,6 +186,8 @@ function normalizeEngineResponse(engineRes, soilData, cropKey, areaHectares) {
         k: combo['Applied K'] || 0
       },
       prescriptions: recommendations,
+      // Hans's raw Prescription strings — preserved for "engine output" display
+      rawPrescription: combo.Prescription || [],
       cost: recommendations.reduce((s, r) => s + (r.cost || 0), 0)
     };
   });

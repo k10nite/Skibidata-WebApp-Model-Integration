@@ -58,10 +58,19 @@ const itemVariants = {
 //   return 'Medium';
 // }
 
-function readValue(field) {
+// Estimated soil ppm from categorical status — rough heuristic so the
+// TARGETS panel shows a realistic measured/gap instead of "0 / target".
+const STATUS_FRACTION = { Low: 0.25, Medium: 0.55, High: 0.85 };
+function readRatingStr(field) {
+  if (typeof field === 'string') return field;
+  if (field && typeof field === 'object' && typeof field.rating === 'string') return field.rating;
+  return 'Medium';
+}
+function estimateMeasured(field, target) {
   if (typeof field === 'number') return field;
   if (field && typeof field === 'object' && typeof field.value === 'number') return field.value;
-  return 0;
+  const fraction = STATUS_FRACTION[readRatingStr(field)] ?? 0.55;
+  return target * fraction;
 }
 
 function phToNumeric(soilData) {
@@ -132,12 +141,12 @@ export default function FertilizerRecommendations() {
   // Calculate nutrient gaps
   const soil = soilData || DEFAULT_SOIL_DATA;
   const ph = phToNumeric(soil);
-  const nMeasured = readValue(soil.nitrogen);
-  const pMeasured = readValue(soil.phosphorus);
-  const kMeasured = readValue(soil.potassium);
   const nTarget = engineTargets.N || 150;
   const pTarget = engineTargets.P || 60;
   const kTarget = engineTargets.K || 75;
+  const nMeasured = estimateMeasured(soil.nitrogen, nTarget);
+  const pMeasured = estimateMeasured(soil.phosphorus, pTarget);
+  const kMeasured = estimateMeasured(soil.potassium, kTarget);
 
   const handleCandidateSelect = (index) => {
     setSelectedCandidateIndex(index);
@@ -371,33 +380,55 @@ export default function FertilizerRecommendations() {
                     </tr>
                   </thead>
                   <tbody>
-                    {selectedCandidate.prescriptions.map((presc, index) => (
-                      <tr key={index} style={{ borderBottom: '1px solid var(--color-contour)' }}>
-                        <td style={tableCellStyle}>
-                          <div>
-                            <div style={{ fontFamily: '"Fraunces", serif', fontSize: '13px', color: 'var(--color-earth-deep)', fontWeight: 500 }}>
-                              {presc.fertilizer.name}
+                    {selectedCandidate.prescriptions.map((presc, index) => {
+                      const pct = presc.fertilizer.npkPercent || { n: 0, p: 0, k: 0 };
+                      const npkRatio = `${pct.n}-${pct.p}-${pct.k}`;
+                      const dN = presc.deliveredN ?? (presc.amountKg * pct.n) / 100;
+                      const dP = presc.deliveredP ?? (presc.amountKg * pct.p) / 100;
+                      const dK = presc.deliveredK ?? (presc.amountKg * pct.k) / 100;
+                      const dim = (v) => v < 0.05;
+                      return (
+                        <tr key={index} style={{ borderBottom: '1px solid var(--color-contour)' }}>
+                          <td style={tableCellStyle}>
+                            <div>
+                              <div style={{ fontFamily: '"Fraunces", serif', fontSize: '13px', color: 'var(--color-earth-deep)', fontWeight: 500, lineHeight: 1.2 }}>
+                                {presc.fertilizer.name}
+                              </div>
+                              <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '10px', color: 'var(--color-earth-deep)', opacity: 0.55, marginTop: '2px', letterSpacing: '0.05em', fontVariantNumeric: 'tabular-nums' }}>
+                                {npkRatio}
+                              </div>
                             </div>
-                            {/* NPK inline would go here if we had the percentages */}
-                          </div>
-                        </td>
-                        <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
-                          {presc.amountKg.toFixed(1)} kg
-                        </td>
-                        <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
-                          —
-                        </td>
-                        <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
-                          —
-                        </td>
-                        <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
-                          —
-                        </td>
-                        <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
-                          {formatCurrency(presc.cost || 0)}
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                          <td
+                            style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}
+                            title={`${presc.amountKg.toFixed(2)} kg of ${presc.fertilizer.name}`}
+                          >
+                            {presc.amountKg.toFixed(1)} kg
+                          </td>
+                          <td
+                            style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', opacity: dim(dN) ? 0.4 : 1 }}
+                            title={`${presc.amountKg.toFixed(1)} kg × ${pct.n}% N = ${dN.toFixed(2)} kg N`}
+                          >
+                            {dim(dN) ? '0' : dN.toFixed(1)}
+                          </td>
+                          <td
+                            style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', opacity: dim(dP) ? 0.4 : 1 }}
+                            title={`${presc.amountKg.toFixed(1)} kg × ${pct.p}% P = ${dP.toFixed(2)} kg P`}
+                          >
+                            {dim(dP) ? '0' : dP.toFixed(1)}
+                          </td>
+                          <td
+                            style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', opacity: dim(dK) ? 0.4 : 1 }}
+                            title={`${presc.amountKg.toFixed(1)} kg × ${pct.k}% K = ${dK.toFixed(2)} kg K`}
+                          >
+                            {dim(dK) ? '0' : dK.toFixed(1)}
+                          </td>
+                          <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
+                            {presc.cost > 0 ? formatCurrency(presc.cost) : <span style={{ opacity: 0.4 }}>—</span>}
+                          </td>
+                        </tr>
+                      );
+                    })}
                     {/* Totals row */}
                     <tr style={{ background: 'var(--color-paper-deep)', borderBottom: '1px solid var(--color-contour)' }}>
                       <td style={{ ...tableCellStyle, fontWeight: 700 }}>TOTAL</td>
@@ -453,31 +484,113 @@ export default function FertilizerRecommendations() {
             )}
           </div>
 
-          {/* pH adjustment if needed */}
-          {phAction !== 'none' && (
+          {/* Engine-direct output panel — fills the bottom-right space with
+              Hans's raw response so the user can see the engine's exact strings,
+              the pH recommendation message, and the inventory check result. */}
+          <div
+            className="grid grid-cols-2 gap-3"
+            style={{ flex: 1, minHeight: 0 }}
+          >
+            {/* Raw prescription strings — Hans's canonical format */}
             <div
               style={{
-                background: 'rgba(183, 110, 64, 0.1)',
-                border: '1px solid var(--color-rust)',
+                background: 'var(--color-paper-card)',
+                border: '1px solid var(--color-contour)',
                 borderRadius: '4px',
-                padding: '12px 16px'
+                padding: '14px 18px',
+                overflow: 'auto'
               }}
             >
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full" style={{ background: 'var(--color-rust)' }} />
-                <span
-                  style={{
-                    fontFamily: '"Fraunces", serif',
-                    fontSize: '13px',
-                    color: 'var(--color-earth-deep)',
-                    fontWeight: 500
-                  }}
-                >
-                  pH ADJUSTMENT: {phAction} recommended
-                </span>
+              <div className="flex items-baseline justify-between mb-2">
+                <Eyebrow>ENGINE OUTPUT</Eyebrow>
+                <Caption>standard_mix[{selectedCandidateIndex}]</Caption>
+              </div>
+              <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', lineHeight: 1.7 }}>
+                <div style={{ opacity: 0.55, marginBottom: '4px' }}>Source: <span style={{ color: 'var(--color-moss)' }}>{selectedCandidate?.sourceName}</span></div>
+                <div style={{ opacity: 0.55, marginBottom: '8px' }}>Total Weight: {selectedCandidate?.totalWeight?.toFixed(2)} kg</div>
+                <div style={{ opacity: 0.55, marginBottom: '4px' }}>Prescription:</div>
+                <ul style={{ paddingLeft: '14px', margin: 0 }}>
+                  {(selectedCandidate?.rawPrescription || []).map((line, i) => (
+                    <li key={i} style={{ listStyle: 'square', color: 'var(--color-earth-deep)' }}>{line}</li>
+                  ))}
+                </ul>
               </div>
             </div>
-          )}
+
+            {/* pH advisory + inventory check */}
+            <div
+              className="flex flex-col gap-2"
+              style={{ minHeight: 0 }}
+            >
+              {/* pH advisory — always rendered, color shifts with action */}
+              <div
+                style={{
+                  background: phAction === 'none' ? 'var(--color-paper-card)' : 'rgba(183, 110, 64, 0.08)',
+                  border: `1px solid ${phAction === 'none' ? 'var(--color-contour)' : 'var(--color-rust)'}`,
+                  borderRadius: '4px',
+                  padding: '14px 18px'
+                }}
+              >
+                <div className="flex items-baseline justify-between mb-2">
+                  <Eyebrow>pH ADVISORY</Eyebrow>
+                  <Caption>
+                    pH {ph.toFixed(1)} · {fertilizerData?._engineRaw?.ph_result?.ph_status || 'acceptable'}
+                  </Caption>
+                </div>
+                <div style={{ fontFamily: '"Fraunces", serif', fontStyle: 'italic', fontSize: '12px', color: 'var(--color-earth-deep)', opacity: 0.85, lineHeight: 1.45 }}>
+                  {fertilizerData?._engineRaw?.ph_result?.recommendation_message
+                    || (phAction === 'none'
+                          ? 'Soil pH within acceptable range — no amendment required.'
+                          : `${phAction.replace('_', ' ')} before planting.`)}
+                </div>
+              </div>
+
+              {/* Inventory check */}
+              {(() => {
+                const ic = fertilizerData?._engineRaw?.inventory_check;
+                const ic_valid = ic?.valid;
+                const ic_reason = ic?.reason;
+                const inv = fertilizerData?._engineRaw?.user_inventory;
+                const has_user_inv = Array.isArray(inv) && inv.length > 0;
+                if (!has_user_inv && !ic_reason) return (
+                  <div style={{
+                    background: 'var(--color-paper-card)',
+                    border: '1px solid var(--color-contour)',
+                    borderRadius: '4px',
+                    padding: '14px 18px',
+                    flex: 1
+                  }}>
+                    <Eyebrow>INVENTORY CHECK</Eyebrow>
+                    <Caption>no on-hand fertilizers selected — engine drew from full catalog</Caption>
+                  </div>
+                );
+                return (
+                  <div style={{
+                    background: 'var(--color-paper-card)',
+                    border: `1px solid ${ic_valid ? 'var(--color-moss)' : 'var(--color-rust)'}`,
+                    borderRadius: '4px',
+                    padding: '14px 18px',
+                    flex: 1
+                  }}>
+                    <div className="flex items-baseline justify-between mb-2">
+                      <Eyebrow>INVENTORY CHECK</Eyebrow>
+                      <Caption>{ic_valid ? '✓ valid' : '✗ insufficient'}</Caption>
+                    </div>
+                    {has_user_inv && (
+                      <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '10px', color: 'var(--color-earth-deep)', opacity: 0.65, marginBottom: '6px', letterSpacing: '0.03em' }}>
+                        {inv.map((f) => `${f.name} (${f.n}-${f.p}-${f.k})`).join(' · ')}
+                      </div>
+                    )}
+                    {ic_reason && (
+                      <div style={{ fontFamily: '"Fraunces", serif', fontStyle: 'italic', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.85, lineHeight: 1.4 }}>
+                        {ic_reason}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
         </motion.div>
       </div>
 
