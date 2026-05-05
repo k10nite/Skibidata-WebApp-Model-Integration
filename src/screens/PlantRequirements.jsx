@@ -130,12 +130,21 @@ function RequirementRow({ nutrient, requirement, index }) {
         duration: 0.5,
         ease: TERRACE_EASING
       }}
-      className="flex justify-between items-center py-3 border-b border-[var(--color-contour)] last:border-b-0"
+      className="flex justify-between items-center py-3 border-b last:border-b-0"
+      style={{ borderColor: 'var(--color-contour)' }}
     >
-      <div className="terrace-data text-sm text-[var(--color-earth-deep)]">
+      <div className="terrace-data text-sm" style={{
+        color: 'var(--color-earth-deep)',
+        fontFamily: '"JetBrains Mono", monospace',
+        letterSpacing: '0.05em'
+      }}>
         {config.name}
       </div>
-      <div className="terrace-data text-lg text-[var(--color-earth-deep)]">
+      <div className="terrace-data text-lg" style={{
+        color: 'var(--color-earth-deep)',
+        fontFamily: '"JetBrains Mono", monospace',
+        fontVariantNumeric: 'tabular-nums'
+      }}>
         {value} {config.unit}
       </div>
     </motion.div>
@@ -183,10 +192,17 @@ export default function PlantRequirements() {
 
   if (!soilData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--color-paper)]">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-paper)' }}>
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[var(--color-contour)] border-t-[var(--color-moss)] rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-[var(--color-earth-deep)]">Loading...</p>
+          <div className="w-16 h-16 border-4 rounded-full animate-spin mx-auto mb-4" style={{
+            borderColor: 'var(--color-contour)',
+            borderTopColor: 'var(--color-moss)'
+          }} />
+          <p style={{
+            color: 'var(--color-earth-deep)',
+            fontFamily: '"Fraunces", serif',
+            fontVariationSettings: '"opsz" 14, "wght" 400'
+          }}>Loading...</p>
         </div>
       </div>
     );
@@ -201,7 +217,8 @@ export default function PlantRequirements() {
   return (
     <div
       ref={containerRef}
-      className="min-h-screen bg-[var(--color-paper)] relative"
+      className="min-h-screen relative"
+      style={{ background: 'var(--color-paper)' }}
     >
       {/* Topographic background */}
       <div className="fixed inset-0 pointer-events-none">
@@ -216,7 +233,11 @@ export default function PlantRequirements() {
         className="relative z-10 pt-8 pb-4"
       >
         <div className="max-w-7xl mx-auto px-6">
-          <div className="terrace-data text-[var(--color-moss)] text-xs">
+          <div className="terrace-data text-xs" style={{
+            color: 'var(--color-moss)',
+            fontFamily: '"JetBrains Mono", monospace',
+            letterSpacing: '0.05em'
+          }}>
             04 — CROP PROFILE
           </div>
         </div>
@@ -238,7 +259,10 @@ export default function PlantRequirements() {
                 className="terrace-display-italic mb-4"
                 style={{
                   fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
-                  lineHeight: '0.9'
+                  lineHeight: '0.9',
+                  fontFamily: '"Fraunces", serif',
+                  fontStyle: 'italic',
+                  fontVariationSettings: '"opsz" 144, "wght" 400'
                 }}
               >
                 {plant.scientificName}
@@ -247,14 +271,26 @@ export default function PlantRequirements() {
               {/* Common name + regional context */}
               <div className="mb-8">
                 <div className="flex items-center gap-4 mb-2">
-                  <div className="w-12 h-12 bg-[var(--color-moss)] bg-opacity-10 rounded-2xl flex items-center justify-center">
-                    <PlantIcon size={24} className="text-[var(--color-moss)]" />
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{
+                    backgroundColor: 'var(--color-moss)',
+                    opacity: 0.1
+                  }}>
+                    <PlantIcon size={24} style={{ color: 'var(--color-moss)' }} />
                   </div>
                   <div>
-                    <p className="text-xl font-medium text-[var(--color-earth-deep)]">
+                    <p className="text-xl font-medium" style={{
+                      color: 'var(--color-earth-deep)',
+                      fontFamily: '"Fraunces", serif',
+                      fontVariationSettings: '"opsz" 14, "wght" 600'
+                    }}>
                       {plant.commonName}
                     </p>
-                    <p className="text-sm text-[var(--color-moss)]">
+                    <p className="text-sm" style={{
+                      color: 'var(--color-moss)',
+                      fontFamily: '"Fraunces", serif',
+                      fontStyle: 'italic',
+                      fontVariationSettings: '"opsz" 144, "wght" 400'
+                    }}>
                       {plant.filipinoName}
                     </p>
                   </div>
@@ -263,7 +299,11 @@ export default function PlantRequirements() {
 
               {/* Editorial description */}
               <div className="max-w-xl">
-                <p className="text-[var(--color-earth-deep)] text-base leading-relaxed">
+                <p className="text-base leading-relaxed" style={{
+                  color: 'var(--color-earth-deep)',
+                  fontFamily: '"Fraunces", serif',
+                  fontVariationSettings: '"opsz" 14, "wght" 400'
+                }}>
                   {plant.description}
                 </p>
               </div>
@@ -278,7 +318,10 @@ export default function PlantRequirements() {
               transition={{ duration: 0.6, delay: 0.2, ease: TERRACE_EASING }}
             >
               {/* Requirements eyebrow */}
-              <div className="terrace-eyebrow mb-8">
+              <div className="terrace-eyebrow mb-8" style={{
+                fontFamily: '"JetBrains Mono", monospace',
+                letterSpacing: '0.05em'
+              }}>
                 REQUIREMENTS
               </div>
 

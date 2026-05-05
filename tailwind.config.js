@@ -76,11 +76,12 @@ export default {
         },
       },
 
-      // Typography - Inter + Nunito Font System (SF Pro alternative with friendly display)
+      // Typography - Fraunces Font System
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-        display: ['Nunito', 'Inter', 'sans-serif'],
-        mono: ['SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', 'monospace'],
+        sans: ['Fraunces', '"Plus Jakarta Sans"', 'serif'],
+        display: ['Fraunces', 'serif'],
+        serif: ['Fraunces', '"Playfair Display"', 'serif'],
+        mono: ['"JetBrains Mono"', '"Roboto Mono"', 'monospace'],
       },
 
       // Font Weights

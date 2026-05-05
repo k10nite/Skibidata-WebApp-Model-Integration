@@ -267,7 +267,7 @@ function ShareModal({ isOpen, onClose, onShare }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div ref={modalRef} className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-gray-900">Share</h3>
+          <h3 className="text-xl font-bold text-gray-900" style={{ fontFamily: '"Fraunces", serif', fontVariationSettings: '"opsz" 144, "wght" 600' }}>Share</h3>
           <button 
             onClick={onClose}
             className="p-2 rounded-full hover:bg-gray-100 transition-colors"
@@ -473,9 +473,11 @@ For CAR Highland Farmers
 
           {/* Title - Bilingual */}
           <div ref={titleRef} className="text-center mb-3">
-            <h1 
+            <h1
               className="text-4xl md:text-5xl font-bold mb-2"
-              style={{ 
+              style={{
+                fontFamily: '"Fraunces", serif',
+                fontVariationSettings: '"opsz" 144, "wght" 600',
                 color: '#2E7D32',
                 textShadow: '0 2px 10px rgba(46, 125, 50, 0.2)',
                 letterSpacing: '-0.02em'
@@ -483,7 +485,7 @@ For CAR Highland Farmers
             >
               Complete!
             </h1>
-            <h2 className="text-2xl md:text-3xl font-semibold text-gray-700">
+            <h2 className="text-2xl md:text-3xl font-semibold text-gray-700" style={{ fontFamily: '"Fraunces", serif', fontVariationSettings: '"opsz" 144, "wght" 600' }}>
               Analysis Finished
             </h2>
           </div>
@@ -509,7 +511,7 @@ For CAR Highland Farmers
                 <Leaf size={20} className="text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900">Analysis Summary</h3>
+                <h3 className="font-bold text-gray-900" style={{ fontFamily: '"Fraunces", serif', fontVariationSettings: '"opsz" 144, "wght" 600' }}>Analysis Summary</h3>
                 <p className="text-sm text-gray-500">Results overview</p>
               </div>
               <div className="ml-auto">

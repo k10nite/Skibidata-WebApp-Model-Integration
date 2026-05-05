@@ -125,7 +125,7 @@ export default function FertilizerRecommendations() {
   return (
     <motion.div
       className="min-h-screen bg-[var(--color-paper)] relative"
-      style={{ paddingBottom: '6rem' }}
+      style={{ paddingBottom: '3rem' }}
       initial="hidden"
       animate="visible"
       variants={containerVariants}
@@ -156,11 +156,11 @@ export default function FertilizerRecommendations() {
 
         {/* Header Section - paper bg */}
         <motion.div variants={itemVariants} className="mb-16">
-          <div className="terrace-eyebrow mb-6">05 — RECOMMENDATION</div>
-          <h1 className="terrace-display text-5xl md:text-6xl mb-4">
+          <div className="terrace-eyebrow mb-6" style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>05 — RECOMMENDATION</div>
+          <h1 className="terrace-display text-5xl md:text-6xl mb-4" style={{ fontFamily: '"Fraunces", serif', fontVariationSettings: '"opsz" 144, "wght" 600' }}>
             Field Prescription
           </h1>
-          <div className="text-lg text-[var(--color-moss)] leading-relaxed">
+          <div className="text-lg leading-relaxed" style={{ fontFamily: '"Fraunces", serif', fontVariationSettings: '"opsz" 14, "wght" 400', color: 'var(--color-moss)' }}>
             {fertilizerData.crop.name} cultivation guidance · {locationDisplay} · {todayDisplay}
           </div>
         </motion.div>
@@ -168,32 +168,32 @@ export default function FertilizerRecommendations() {
 
         {/* Recommendation Cards - paper bg hero stratum */}
         <motion.div variants={itemVariants} className="mb-16">
-          <div className="terrace-eyebrow mb-8">APPLICATION SCHEDULE</div>
+          <div className="terrace-eyebrow mb-8" style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>APPLICATION SCHEDULE</div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {fertilizerData.recommendations.map((rec, index) => (
               <motion.div
                 key={`${rec.stage}-${rec.fertilizer.name}-${index}`}
                 variants={itemVariants}
-                className="terrace-card p-6 hover:scale-[1.01] transition-transform duration-300"
+                className="terrace-card p-8 hover:scale-[1.01] transition-transform duration-300"
                 whileHover={{ scale: 1.01 }}
                 transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
               >
                 {/* Fertilizer name */}
-                <h3 className="terrace-display text-2xl mb-4" style={{ fontVariationSettings: '"opsz" 144, "wght" 500' }}>
+                <h3 className="terrace-display text-2xl mb-4" style={{ fontFamily: '"Fraunces", serif', fontVariationSettings: '"opsz" 144, "wght" 500' }}>
                   {rec.fertilizer.name}
                 </h3>
 
                 {/* Dosage as DisplayNumber */}
                 <div className="text-center mb-6">
-                  <div className="terrace-display text-4xl" style={{ fontVariationSettings: '"opsz" 144, "wght" 700' }}>
+                  <div className="terrace-display text-4xl" style={{ fontFamily: '"Fraunces", serif', fontVariationSettings: '"opsz" 144, "wght" 700' }}>
                     {rec.amountKg}
                   </div>
-                  <div className="terrace-data text-sm text-[var(--color-moss)] mt-1">kg/ha</div>
+                  <div className="terrace-data text-sm mt-1" style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', color: 'var(--color-moss)' }}>kg/ha</div>
                 </div>
 
                 {/* Application details */}
-                <div className="space-y-3 text-sm leading-relaxed">
+                <div className="terrace-data space-y-3 text-sm leading-relaxed" style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
                   <div><strong>Timing:</strong> {rec.timing}</div>
                   <div><strong>Method:</strong> {rec.method}</div>
                   {rec.fertilizer.brand && (
@@ -203,10 +203,10 @@ export default function FertilizerRecommendations() {
 
                 {/* Cost at bottom */}
                 <div className="mt-6 pt-4 border-t border-[var(--color-contour)]">
-                  <div className="terrace-data text-lg font-semibold">
+                  <div className="terrace-data text-lg font-semibold" style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
                     ₱{rec.cost.toLocaleString()}
                   </div>
-                  <div className="text-xs text-[var(--color-moss)] mt-1">
+                  <div className="text-xs mt-1" style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', color: 'var(--color-moss)' }}>
                     ₱{rec.fertilizer.pricePerKg}/kg
                   </div>
                 </div>
@@ -217,7 +217,7 @@ export default function FertilizerRecommendations() {
           {/* Empty state if no recommendations */}
           {(!fertilizerData.recommendations || fertilizerData.recommendations.length === 0) && (
             <div className="text-center py-12">
-              <div className="terrace-display-italic text-xl text-[var(--color-moss)]">
+              <div className="terrace-display-italic text-xl" style={{ fontFamily: '"Fraunces", serif', fontVariationSettings: '"opsz" 14, "wght" 400', fontStyle: 'italic', color: 'var(--color-moss)' }}>
                 No specific recommendations available for current conditions.
               </div>
             </div>
@@ -236,9 +236,9 @@ export default function FertilizerRecommendations() {
                 <div className="w-3 h-3 rounded-full bg-[var(--color-rust)]"></div>
               </div>
               <div>
-                <h4 className="terrace-display text-lg mb-2">pH Adjustment Required</h4>
-                <p className="text-sm mb-3">{fertilizerData.phAdjustment.reason}</p>
-                <div className="terrace-data text-sm">
+                <h4 className="terrace-display text-lg mb-2" style={{ fontFamily: '"Fraunces", serif', fontVariationSettings: '"opsz" 144, "wght" 500' }}>pH Adjustment Required</h4>
+                <p className="text-sm mb-3" style={{ fontFamily: '"Fraunces", serif', fontVariationSettings: '"opsz" 14, "wght" 400' }}>{fertilizerData.phAdjustment.reason}</p>
+                <div className="terrace-data text-sm" style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
                   <strong>{fertilizerData.phAdjustment.action}:</strong> {fertilizerData.phAdjustment.amount} · {fertilizerData.phAdjustment.timing}
                 </div>
               </div>
@@ -252,30 +252,30 @@ export default function FertilizerRecommendations() {
           className="p-8 rounded-2xl"
           style={{ background: 'var(--color-paper-deep)' }}
         >
-          <div className="terrace-eyebrow mb-6">TOTAL</div>
+          <div className="terrace-eyebrow mb-6" style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>TOTAL</div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div>
-              <div className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider mb-1">
+              <div className="terrace-data text-xs uppercase tracking-wider mb-1" style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', color: 'var(--color-moss)' }}>
                 NITROGEN
               </div>
-              <div className="terrace-data text-2xl font-semibold">
+              <div className="terrace-data text-2xl font-semibold" style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
                 {fertilizerData.summary.totalNutrients.n} kg
               </div>
             </div>
             <div>
-              <div className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider mb-1">
+              <div className="terrace-data text-xs uppercase tracking-wider mb-1" style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', color: 'var(--color-moss)' }}>
                 PHOSPHORUS
               </div>
-              <div className="terrace-data text-2xl font-semibold">
+              <div className="terrace-data text-2xl font-semibold" style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
                 {fertilizerData.summary.totalNutrients.p} kg
               </div>
             </div>
             <div>
-              <div className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider mb-1">
+              <div className="terrace-data text-xs uppercase tracking-wider mb-1" style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', color: 'var(--color-moss)' }}>
                 POTASSIUM
               </div>
-              <div className="terrace-data text-2xl font-semibold">
+              <div className="terrace-data text-2xl font-semibold" style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
                 {fertilizerData.summary.totalNutrients.k} kg
               </div>
             </div>
@@ -283,13 +283,13 @@ export default function FertilizerRecommendations() {
 
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 pt-6 border-t border-[var(--color-contour)]">
             <div>
-              <div className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider mb-1">
+              <div className="terrace-data text-xs uppercase tracking-wider mb-1" style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', color: 'var(--color-moss)' }}>
                 TOTAL COST
               </div>
-              <div className="terrace-display text-3xl" style={{ fontVariationSettings: '"opsz" 144, "wght" 700' }}>
+              <div className="terrace-display text-3xl" style={{ fontFamily: '"Fraunces", serif', fontVariationSettings: '"opsz" 144, "wght" 700' }}>
                 ₱{fertilizerData.summary.totalCostPHP.toLocaleString()}
               </div>
-              <div className="text-sm text-[var(--color-moss)] mt-2">
+              <div className="text-sm mt-2" style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', color: 'var(--color-moss)' }}>
                 Coverage: {fertilizerData.summary.areaHectares} ha · Expected yield: {fertilizerData.summary.expectedYield}
               </div>
             </div>
@@ -312,7 +312,7 @@ export default function FertilizerRecommendations() {
 
           {/* Editorial closing */}
           <div className="mt-8 pt-6 border-t border-[var(--color-contour)]">
-            <p className="text-sm text-[var(--color-moss)] italic">
+            <p className="text-sm" style={{ fontFamily: '"Fraunces", serif', fontVariationSettings: '"opsz" 14, "wght" 400', fontStyle: 'italic', color: 'var(--color-moss)' }}>
               Recommendations based on current soil conditions and selected crop requirements.
               Adjust application timing based on local weather patterns.
             </p>

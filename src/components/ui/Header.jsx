@@ -18,9 +18,10 @@ export default function Header({
 
   return (
     <header
-      className={`bg-white border-b border-gray-200 z-40 ${
+      className={`border-b border-gray-200 z-40 ${
         sticky ? 'sticky top-0' : ''
       } ${className}`}
+      style={{ background: 'var(--color-paper)' }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -38,7 +39,14 @@ export default function Header({
             {title && (
               <Link
                 to="/"
-                className="text-xl font-semibold text-gray-900 hover:text-emerald-600 transition-colors duration-200"
+                className="text-xl font-semibold transition-colors duration-200"
+                style={{
+                  fontFamily: '"Fraunces", serif',
+                  fontVariationSettings: '"opsz" 144, "wght" 600',
+                  color: 'var(--color-earth-deep)',
+                }}
+                onMouseEnter={(e) => e.target.style.color = 'var(--color-earth)'}
+                onMouseLeave={(e) => e.target.style.color = 'var(--color-earth-deep)'}
               >
                 {title}
               </Link>
@@ -90,7 +98,7 @@ export default function Header({
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-gray-200 bg-white">
+        <div className="md:hidden border-t border-gray-200" style={{ background: 'var(--color-paper)' }}>
           <nav className="px-4 py-3 space-y-1">
             {navigation.map((item, index) => (
               <Link
@@ -123,13 +131,20 @@ export default function Header({
 // Simple Header variant (no navigation)
 export function SimpleHeader({ title, leftContent, rightContent, className = '' }) {
   return (
-    <header className={`bg-white border-b border-gray-200 ${className}`}>
+    <header className={`border-b border-gray-200 ${className}`} style={{ background: 'var(--color-paper)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
             {leftContent}
             {title && (
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1
+                className="text-xl font-semibold"
+                style={{
+                  fontFamily: '"Fraunces", serif',
+                  fontVariationSettings: '"opsz" 144, "wght" 600',
+                  color: 'var(--color-earth-deep)'
+                }}
+              >
                 {title}
               </h1>
             )}
@@ -156,12 +171,19 @@ export function HeaderWithSearch({
   className = ''
 }) {
   return (
-    <header className={`bg-white border-b border-gray-200 ${className}`}>
+    <header className={`border-b border-gray-200 ${className}`} style={{ background: 'var(--color-paper)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           <div className="flex items-center gap-6">
             {title && (
-              <h1 className="text-xl font-semibold text-gray-900 whitespace-nowrap">
+              <h1
+                className="text-xl font-semibold whitespace-nowrap"
+                style={{
+                  fontFamily: '"Fraunces", serif',
+                  fontVariationSettings: '"opsz" 144, "wght" 600',
+                  color: 'var(--color-earth-deep)'
+                }}
+              >
                 {title}
               </h1>
             )}

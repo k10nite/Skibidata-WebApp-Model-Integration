@@ -114,10 +114,11 @@ const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
       <div
-        className="px-4 py-3 rounded-lg border border-[var(--color-contour-strong)]"
+        className="px-4 py-3 rounded-lg border"
         style={{
           background: 'var(--color-paper-card)',
-          color: 'var(--color-earth-deep)'
+          color: 'var(--color-earth-deep)',
+          borderColor: 'var(--color-contour-strong)'
         }}
       >
         <p className="terrace-data font-semibold">{payload[0].payload.name}</p>
@@ -228,8 +229,15 @@ export default function SoilStatus() {
           className="text-center"
         >
           <div className="w-16 h-16 border-4 border-[var(--color-moss)] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="terrace-display" style={{ fontSize: '1.5rem' }}>Analyzing Soil Profile</p>
-          <p className="terrace-data text-sm mt-2 opacity-60">Processing field measurements...</p>
+          <p className="terrace-display" style={{
+            fontSize: '1.5rem',
+            fontFamily: '"Fraunces", serif',
+            fontVariationSettings: '"opsz" 144, "wght" 600'
+          }}>Analyzing Soil Profile</p>
+          <p className="terrace-data text-sm mt-2 opacity-60" style={{
+            fontFamily: '"JetBrains Mono", monospace',
+            fontVariantNumeric: 'tabular-nums'
+          }}>Processing field measurements...</p>
         </motion.div>
       </div>
     );
@@ -295,14 +303,20 @@ export default function SoilStatus() {
         </svg>
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <p className="terrace-eyebrow mb-4">03 — SOIL ANALYSIS</p>
+          <p className="terrace-eyebrow mb-4" style={{
+            fontFamily: '"JetBrains Mono", monospace',
+            letterSpacing: '0.05em'
+          }}>03 — SOIL ANALYSIS</p>
           <h1
             className="terrace-display mb-4"
             style={{ fontSize: 'clamp(3rem, 8vw, 6rem)' }}
           >
             {locationName}, Benguet
           </h1>
-          <div className="terrace-data text-lg opacity-80 space-y-1">
+          <div className="terrace-data text-lg opacity-80 space-y-1" style={{
+            fontFamily: '"JetBrains Mono", monospace',
+            fontVariantNumeric: 'tabular-nums'
+          }}>
             <p>{currentDate}</p>
             <p>16°24&prime;N 120°35&prime;E · {soilScenario?.elevation || '1,350'}m elevation</p>
           </div>
@@ -358,7 +372,10 @@ export default function SoilStatus() {
                   </div>
 
                   {/* Editorial description */}
-                  <p className="text-sm leading-relaxed max-w-xs mx-auto opacity-80">
+                  <p className="text-sm leading-relaxed max-w-xs mx-auto opacity-80" style={{
+                    fontFamily: '"Fraunces", serif',
+                    fontVariationSettings: '"opsz" 14, "wght" 400'
+                  }}>
                     {config.description}
                   </p>
                 </motion.div>
@@ -375,7 +392,10 @@ export default function SoilStatus() {
         style={{ background: 'var(--color-paper-deep)' }}
       >
         <div className="max-w-4xl mx-auto">
-          <p className="terrace-eyebrow text-center mb-8">SOIL ACIDITY</p>
+          <p className="terrace-eyebrow text-center mb-8" style={{
+            fontFamily: '"JetBrains Mono", monospace',
+            letterSpacing: '0.05em'
+          }}>SOIL ACIDITY</p>
 
           <div className="text-center space-y-8">
             {/* Large pH display */}
@@ -383,7 +403,9 @@ export default function SoilStatus() {
               className="terrace-display"
               style={{
                 fontSize: 'clamp(5rem, 15vw, 8rem)',
-                color: getPHColor(phValue)
+                color: getPHColor(phValue),
+                fontFamily: '"JetBrains Mono", monospace',
+                fontVariantNumeric: 'tabular-nums'
               }}
             >
               <AnimatedValue value={phValue * 10} duration={1200} />.
@@ -418,14 +440,21 @@ export default function SoilStatus() {
                 />
               </div>
 
-              <div className="flex justify-between mt-2 terrace-data text-xs opacity-60">
+              <div className="flex justify-between mt-2 terrace-data text-xs opacity-60" style={{
+                fontFamily: '"JetBrains Mono", monospace',
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '0.05em'
+              }}>
                 <span>4.0 ACIDIC</span>
                 <span>7.0 NEUTRAL</span>
                 <span>10.0 ALKALINE</span>
               </div>
             </div>
 
-            <p className="text-sm opacity-80 max-w-md mx-auto">
+            <p className="text-sm opacity-80 max-w-md mx-auto" style={{
+              fontFamily: '"Fraunces", serif',
+              fontVariationSettings: '"opsz" 14, "wght" 400'
+            }}>
               {phValue < 6.0 && "Acidic conditions may limit nutrient availability. Consider lime application."}
               {phValue >= 6.0 && phValue <= 7.5 && "Optimal pH range for most crops. Nutrients are readily available."}
               {phValue > 7.5 && "Alkaline conditions may reduce micronutrient uptake. Monitor carefully."}
@@ -443,7 +472,10 @@ export default function SoilStatus() {
         >
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center justify-between mb-8">
-              <p className="terrace-eyebrow">SATELLITE TELEMETRY</p>
+              <p className="terrace-eyebrow" style={{
+                fontFamily: '"JetBrains Mono", monospace',
+                letterSpacing: '0.05em'
+              }}>SATELLITE TELEMETRY</p>
               {error && (
                 <span className="terrace-data text-xs px-3 py-1 rounded-full border border-[var(--color-contour-strong)] opacity-60">
                   regional priors
@@ -459,15 +491,24 @@ export default function SoilStatus() {
                 { label: 'Potassium (K)', value: satelliteData.soil.potassium?.ppm?.toFixed(0) || '125', unit: 'ppm' }
               ].map((item, index) => (
                 <div key={index} className="terrace-card-hairline p-6">
-                  <p className="terrace-data text-xs opacity-60 mb-2">{item.label}</p>
-                  <p className="terrace-data text-2xl font-bold mb-1">
+                  <p className="terrace-data text-xs opacity-60 mb-2" style={{
+                    fontFamily: '"JetBrains Mono", monospace',
+                    letterSpacing: '0.05em'
+                  }}>{item.label}</p>
+                  <p className="terrace-data text-2xl font-bold mb-1" style={{
+                    fontFamily: '"JetBrains Mono", monospace',
+                    fontVariantNumeric: 'tabular-nums'
+                  }}>
                     {item.value} <span className="text-sm opacity-60">{item.unit}</span>
                   </p>
                 </div>
               ))}
             </div>
 
-            <p className="terrace-data text-xs opacity-60 mt-6 text-center">
+            <p className="terrace-data text-xs opacity-60 mt-6 text-center" style={{
+              fontFamily: '"JetBrains Mono", monospace',
+              letterSpacing: '0.05em'
+            }}>
               from regional Sentinel-2 priors
             </p>
           </div>
@@ -484,7 +525,10 @@ export default function SoilStatus() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Radar Chart */}
             <div className="terrace-card p-8">
-              <h3 className="terrace-display text-2xl mb-6">Nutrient Profile</h3>
+              <h3 className="terrace-display text-2xl mb-6" style={{
+                fontFamily: '"Fraunces", serif',
+                fontVariationSettings: '"opsz" 144, "wght" 600'
+              }}>Nutrient Profile</h3>
 
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
@@ -521,7 +565,10 @@ export default function SoilStatus() {
 
             {/* Bar Chart */}
             <div className="terrace-card p-8">
-              <h3 className="terrace-display text-2xl mb-6">Current vs Target</h3>
+              <h3 className="terrace-display text-2xl mb-6" style={{
+                fontFamily: '"Fraunces", serif',
+                fontVariationSettings: '"opsz" 144, "wght" 600'
+              }}>Current vs Target</h3>
 
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">

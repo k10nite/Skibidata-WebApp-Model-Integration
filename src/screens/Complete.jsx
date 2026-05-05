@@ -84,7 +84,7 @@ Para sa mga Magsasaka ng CAR Highland Farms
   };
 
   return (
-    <div className="min-h-screen bg-white p-6 flex items-center justify-center">
+    <div className="min-h-screen p-6 flex items-center justify-center" style={{ background: 'var(--color-paper)' }}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -112,11 +112,11 @@ Para sa mga Magsasaka ng CAR Highland Farms
             </svg>
           </motion.div>
 
-          <h1 className="font-semibold text-3xl text-gray-900 mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
+          <h1 className="font-semibold text-3xl mb-2" style={{ fontFamily: '"Fraunces", serif', fontVariationSettings: '"opsz" 144, "wght" 600', color: 'var(--color-earth-deep)' }}>
             Analysis Complete
           </h1>
 
-          <p className="text-gray-600 text-base" style={{ fontFamily: 'Inter, sans-serif' }}>
+          <p className="text-base" style={{ color: 'var(--color-earth-deep)', opacity: 0.7 }}>
             Your fertilizer plan is ready
           </p>
         </div>
@@ -126,9 +126,9 @@ Para sa mga Magsasaka ng CAR Highland Farms
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white border border-gray-200 rounded-2xl p-6 mb-6 shadow-sm"
+          className="border border-gray-200 rounded-2xl p-6 mb-6 shadow-sm" style={{ background: 'var(--color-paper)' }}
         >
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
+          <h2 className="text-sm font-semibold uppercase tracking-wide mb-4" style={{ color: 'var(--color-earth-deep)', opacity: 0.6 }}>
             Summary
           </h2>
 
@@ -136,7 +136,7 @@ Para sa mga Magsasaka ng CAR Highland Farms
             {/* Crop */}
             <div className="flex items-center gap-3">
               <span className="text-2xl">{selectedPlant?.icon || '🍅'}</span>
-              <span className="text-gray-900 font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <span className="font-medium" style={{ color: 'var(--color-earth-deep)' }}>
                 {selectedPlant?.name || 'Kamatis'}
               </span>
             </div>
@@ -144,7 +144,7 @@ Para sa mga Magsasaka ng CAR Highland Farms
             {/* Location */}
             <div className="flex items-center gap-3">
               <span className="text-2xl">📍</span>
-              <span className="text-gray-900 font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <span className="font-medium" style={{ color: 'var(--color-earth-deep)' }}>
                 {municipality || 'La Trinidad, Benguet'}
               </span>
             </div>
@@ -152,7 +152,7 @@ Para sa mga Magsasaka ng CAR Highland Farms
             {/* Products */}
             <div className="flex items-center gap-3">
               <span className="text-2xl">💊</span>
-              <span className="text-gray-900 font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <span className="font-medium" style={{ color: 'var(--color-earth-deep)' }}>
                 {recommendationSummary?.totalProducts || 4} Products Recommended
               </span>
             </div>
@@ -160,8 +160,8 @@ Para sa mga Magsasaka ng CAR Highland Farms
             {/* Cost */}
             <div className="flex items-center gap-3">
               <span className="text-2xl">💰</span>
-              <span className="text-gray-900 font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
-                Estimated Cost: ₱{recommendationSummary?.estimatedCost?.toLocaleString() || '8,395'}
+              <span className="font-medium" style={{ color: 'var(--color-earth-deep)' }}>
+                Estimated Cost: ₱<span style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>{recommendationSummary?.estimatedCost?.toLocaleString() || '8,395'}</span>
               </span>
             </div>
           </div>
@@ -175,11 +175,10 @@ Para sa mga Magsasaka ng CAR Highland Farms
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             onClick={handleDownloadReport}
-            className="w-full bg-white border border-gray-200 rounded-2xl p-5 flex items-center gap-4 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
-            style={{ fontFamily: 'Inter, sans-serif' }}
+            className="w-full border border-gray-200 rounded-2xl p-5 flex items-center gap-4 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm" style={{ background: 'var(--color-paper)' }}
           >
             <span className="text-2xl">📥</span>
-            <span className="text-gray-900 font-medium text-left flex-1">
+            <span className="font-medium text-left flex-1" style={{ color: 'var(--color-earth-deep)' }}>
               Download Full Report
             </span>
           </motion.button>
@@ -190,11 +189,10 @@ Para sa mga Magsasaka ng CAR Highland Farms
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             onClick={handleAnalyzeAnother}
-            className="w-full bg-white border border-gray-200 rounded-2xl p-5 flex items-center gap-4 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
-            style={{ fontFamily: 'Inter, sans-serif' }}
+            className="w-full border border-gray-200 rounded-2xl p-5 flex items-center gap-4 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm" style={{ background: 'var(--color-paper)' }}
           >
             <span className="text-2xl">🔄</span>
-            <span className="text-gray-900 font-medium text-left flex-1">
+            <span className="font-medium text-left flex-1" style={{ color: 'var(--color-earth-deep)' }}>
               Analyze Another Crop
             </span>
           </motion.button>
@@ -205,11 +203,10 @@ Para sa mga Magsasaka ng CAR Highland Farms
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
             onClick={handleNewLocation}
-            className="w-full bg-white border border-gray-200 rounded-2xl p-5 flex items-center gap-4 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
-            style={{ fontFamily: 'Inter, sans-serif' }}
+            className="w-full border border-gray-200 rounded-2xl p-5 flex items-center gap-4 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm" style={{ background: 'var(--color-paper)' }}
           >
             <span className="text-2xl">🗺️</span>
-            <span className="text-gray-900 font-medium text-left flex-1">
+            <span className="font-medium text-left flex-1" style={{ color: 'var(--color-earth-deep)' }}>
               New Location
             </span>
           </motion.button>
