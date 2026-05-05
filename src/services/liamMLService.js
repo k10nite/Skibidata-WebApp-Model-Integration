@@ -72,10 +72,20 @@ export async function predictForField(polygon, opts = {}) {
       warnings: (data.warnings || []).length
     });
 
+    // Liam's dominant_class started returning labels with mg/kg ranges
+    // ("Low (<11 mg/kg)") instead of plain "Low". Hans's rule engine + the
+    // webapp normalizer do string equality on the bare class name, so strip
+    // anything in parens.
+    const stripRange = (s) => {
+      if (typeof s !== 'string') return 'Medium';
+      const m = s.match(/^([^(]+)/);
+      return (m ? m[1] : s).trim();
+    };
+
     const normalized = {
-      nitrogen: data.nitrogen?.dominant_class || 'Medium',
-      phosphorus: data.phosphorus?.dominant_class || 'Medium',
-      potassium: data.potassium?.dominant_class || 'Medium',
+      nitrogen: stripRange(data.nitrogen?.dominant_class),
+      phosphorus: stripRange(data.phosphorus?.dominant_class),
+      potassium: stripRange(data.potassium?.dominant_class),
       pH: data.ph?.dominant_class ? parseFloat(data.ph.dominant_class) : 6.0,
       source: 'liam-ml',
       liam: {
