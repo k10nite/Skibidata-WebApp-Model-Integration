@@ -240,7 +240,11 @@ body::before {
 }
 
 body {
-  font-family: var(--font-heading);
+  /* Fraunces is the canonical body fallback for the Terrace design system.
+     Any element without an explicit fontFamily inherits Fraunces, NOT system sans.
+     Previous value var(--font-heading) resolved to Plus Jakarta Sans → Inter → system-ui,
+     which was the source of the "wrong fonts" rendering across screens. */
+  font-family: var(--font-display-serif);
   background-color: var(--color-bg);
   color: var(--color-earth);
   line-height: 1.6;
