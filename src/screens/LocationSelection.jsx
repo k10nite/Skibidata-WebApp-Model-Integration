@@ -170,6 +170,17 @@ export default function LocationSelection() {
     navigate('/processing');
   };
 
+  const flyToLocation = (loc) => {
+    if (!mapRef.current) return;
+    mapRef.current.flyTo({
+      center: [loc.lng, loc.lat],
+      zoom: 15,
+      pitch: 25,
+      duration: 1500,
+      essential: true
+    });
+  };
+
   const tokenMissing = !MAPBOX_TOKEN;
   const canContinue = !tokenMissing && areaHa > 0;
 
@@ -221,15 +232,22 @@ export default function LocationSelection() {
                     <div ref={mapContainerRef} className="absolute inset-0" />
                     <button
                       onClick={() => setIsMagicMode((v) => !v)}
-                      className={`absolute bottom-6 left-6 z-10 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg transition-colors ${
+                      className={`absolute bottom-6 left-6 z-10 flex items-center gap-2 px-4 py-2.5 transition-all duration-200 ${
                         isMagicMode
-                          ? 'bg-[var(--color-rust)] text-white'
-                          : 'bg-[var(--color-moss)] text-white hover:bg-[var(--color-earth-deep)]'
+                          ? 'bg-[var(--color-rust)] text-[var(--color-paper)]'
+                          : 'bg-[var(--color-paper)] text-[var(--color-earth-deep)] hover:bg-[var(--color-earth-deep)] hover:text-[var(--color-paper)]'
                       }`}
+                      style={{
+                        boxShadow: '0 4px 12px rgba(62,42,31,0.15), 0 1px 0 rgba(62,42,31,0.06)',
+                        borderRadius: '2px'
+                      }}
                     >
-                      <Wand2 className="w-4 h-4" />
-                      <span className="text-sm font-semibold">
-                        {isMagicMode ? 'Cancel Magic Click' : 'Magic Click'}
+                      <Wand2 className="w-3.5 h-3.5" />
+                      <span
+                        className="terrace-data text-xs uppercase"
+                        style={{ letterSpacing: '0.18em', fontWeight: 600 }}
+                      >
+                        {isMagicMode ? 'Cancel' : 'Magic Click'}
                       </span>
                     </button>
                   </>
@@ -240,59 +258,271 @@ export default function LocationSelection() {
         </motion.div>
 
         {/* Editorial Rail — 38% */}
-        <motion.div variants={itemVariants} className="hidden lg:block w-[38%] bg-[var(--color-paper-card)] relative">
-          <div className="h-screen p-12 flex flex-col justify-between">
-            <div className="space-y-8">
-              <motion.div variants={itemVariants} className="space-y-4">
-                <p className="text-[var(--color-earth-deep)] leading-relaxed">
-                  Your selected polygon defines exactly which Sentinel-2 pixels we sample for soil composition.
-                </p>
-                <p className="text-[var(--color-earth-deep)]/80 text-sm">
-                  The Cordillera region&apos;s terraced landscapes need precise field boundaries for accurate soil heritage mapping.
-                </p>
-              </motion.div>
+        <motion.div
+          variants={itemVariants}
+          className="hidden lg:block w-[38%] relative"
+          style={{
+            background: 'var(--color-paper-card)',
+            borderLeft: '1px solid var(--color-contour)'
+          }}
+        >
+          <div className="h-screen px-10 py-10 flex flex-col">
 
-              <motion.div variants={itemVariants} className="space-y-6">
+            {/* Step indicator strip */}
+            <motion.div
+              variants={itemVariants}
+              className="flex items-center justify-between pb-6 mb-8"
+              style={{ borderBottom: '1px solid var(--color-contour)' }}
+            >
+              <div
+                className="terrace-data text-xs"
+                style={{ letterSpacing: '0.22em', color: 'var(--color-moss)', fontWeight: 600 }}
+              >
+                STEP 01 / 04
+              </div>
+              <div
+                className="terrace-data text-[10px]"
+                style={{ letterSpacing: '0.18em', color: 'var(--color-earth-deep)', opacity: 0.5 }}
+              >
+                FIELD &nbsp;·&nbsp; CROP &nbsp;·&nbsp; SOIL &nbsp;·&nbsp; PRESCRIPTION
+              </div>
+            </motion.div>
+
+            {/* Editorial intro — Fraunces italic */}
+            <motion.div variants={itemVariants} className="mb-10">
+              <div
+                className="text-2xl leading-snug mb-4"
+                style={{
+                  fontFamily: '"Fraunces", serif',
+                  fontStyle: 'italic',
+                  fontVariationSettings: '"opsz" 144, "wght" 400',
+                  color: 'var(--color-earth-deep)'
+                }}
+              >
+                The polygon you draw is the exact patch of earth we sample.
+              </div>
+              <div
+                className="text-sm italic"
+                style={{
+                  fontFamily: '"Fraunces", serif',
+                  fontVariationSettings: '"opsz" 14, "wght" 400',
+                  color: 'var(--color-earth-deep)',
+                  opacity: 0.65
+                }}
+              >
+                Cordillera terraces need precise boundaries — anything blurry shows up as noise downstream.
+              </div>
+            </motion.div>
+
+            {/* Numbered instruction strip */}
+            <motion.div variants={itemVariants} className="mb-10">
+              <div className="terrace-eyebrow mb-4">HOW</div>
+              <ol className="space-y-2.5">
+                {[
+                  ['01', 'Search your area in the top-left field.'],
+                  ['02', 'Outline your field with the polygon tool.'],
+                  ['03', 'Or click', { em: 'Magic Click', tail: ' for a quick demo polygon.' }]
+                ].map(([n, body, more]) => (
+                  <li
+                    key={n}
+                    className="flex items-baseline gap-3 text-sm"
+                    style={{
+                      fontFamily: '"Fraunces", serif',
+                      fontVariationSettings: '"opsz" 14, "wght" 400',
+                      color: 'var(--color-earth-deep)'
+                    }}
+                  >
+                    <span
+                      className="terrace-data text-[10px]"
+                      style={{
+                        color: 'var(--color-moss)',
+                        letterSpacing: '0.15em',
+                        fontWeight: 600,
+                        flexShrink: 0
+                      }}
+                    >
+                      {n}
+                    </span>
+                    <span>
+                      {body}
+                      {more && (
+                        <>
+                          {' '}
+                          <em style={{ color: 'var(--color-moss)' }}>{more.em}</em>
+                          {more.tail}
+                        </>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </motion.div>
+
+            {/* FIELD AREA hero */}
+            <motion.div variants={itemVariants} className="mb-10">
+              <div className="flex items-baseline justify-between mb-3">
                 <div className="terrace-eyebrow">FIELD AREA</div>
-                <div className="space-y-1">
+                {areaHa > 0 && (
                   <div
-                    className="terrace-data text-5xl lg:text-6xl text-[var(--color-moss)]"
-                    style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}
+                    className="terrace-data text-[10px]"
+                    style={{ color: 'var(--color-moss)', letterSpacing: '0.18em', fontWeight: 600 }}
                   >
-                    {areaHa.toFixed(2)}
+                    READY
                   </div>
-                  <div className="terrace-data text-sm text-[var(--color-earth-deep)]/60">hectares</div>
+                )}
+              </div>
+              <div className="flex items-baseline gap-3">
+                <div
+                  className="terrace-data tabular-nums"
+                  style={{
+                    fontFamily: '"Fraunces", serif',
+                    fontVariationSettings: '"opsz" 144, "wght" 600',
+                    fontSize: '4rem',
+                    lineHeight: 0.9,
+                    color: areaHa > 0 ? 'var(--color-moss)' : 'var(--color-earth-deep)',
+                    opacity: areaHa > 0 ? 1 : 0.3,
+                    fontVariantNumeric: 'tabular-nums',
+                    transition: 'all 400ms ease'
+                  }}
+                >
+                  {areaHa.toFixed(2)}
                 </div>
-              </motion.div>
-
-              {centroid && (
-                <motion.div variants={itemVariants} className="space-y-3">
-                  <div className="terrace-eyebrow">CENTROID</div>
+                <div
+                  className="terrace-data text-xs"
+                  style={{ color: 'var(--color-earth-deep)', opacity: 0.6, letterSpacing: '0.18em' }}
+                >
+                  ha
+                </div>
+              </div>
+              {centroid ? (
+                <div className="mt-4 space-y-1">
                   <div
-                    className="terrace-data text-lg text-[var(--color-earth-deep)]"
-                    style={{ fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}
+                    className="terrace-data text-xs"
+                    style={{ color: 'var(--color-earth-deep)', opacity: 0.55, letterSpacing: '0.05em' }}
                   >
-                    {centroid.lat.toFixed(4)}° N, {centroid.lng.toFixed(4)}° E
+                    {centroid.lat.toFixed(4)}° N &nbsp;·&nbsp; {centroid.lng.toFixed(4)}° E
                   </div>
                   {municipalityName && (
-                    <div className="text-sm text-[var(--color-earth-deep)]/70">
-                      Nearest known location: <strong>{municipalityName}</strong>
+                    <div
+                      className="text-xs italic"
+                      style={{
+                        fontFamily: '"Fraunces", serif',
+                        color: 'var(--color-earth-deep)',
+                        opacity: 0.7
+                      }}
+                    >
+                      nearest known: <strong style={{ fontStyle: 'normal', fontWeight: 600 }}>{municipalityName}</strong>
                     </div>
                   )}
-                </motion.div>
+                </div>
+              ) : (
+                <div
+                  className="mt-4 text-xs italic"
+                  style={{
+                    fontFamily: '"Fraunces", serif',
+                    color: 'var(--color-earth-deep)',
+                    opacity: 0.5
+                  }}
+                >
+                  draw a polygon to populate
+                </div>
               )}
-            </div>
+            </motion.div>
 
-            <motion.div variants={itemVariants} className="pt-8 border-t border-[var(--color-contour)]">
+            {/* Quick-locations grid — fills the empty space + adds utility */}
+            <motion.div variants={itemVariants} className="mb-10">
+              <div className="flex items-baseline justify-between mb-4">
+                <div className="terrace-eyebrow">QUICK LOCATIONS</div>
+                <div
+                  className="terrace-data text-[10px]"
+                  style={{ color: 'var(--color-earth-deep)', opacity: 0.4, letterSpacing: '0.15em' }}
+                >
+                  CAR — 8
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-1.5">
+                {CAR_LOCATIONS.map((loc) => {
+                  const isNearest = municipalityName === loc.name;
+                  return (
+                    <button
+                      key={loc.name}
+                      onClick={() => flyToLocation(loc)}
+                      className="text-left px-3 py-2.5 transition-all duration-200 group"
+                      style={{
+                        background: isNearest ? 'var(--color-moss)' : 'var(--color-paper)',
+                        color: isNearest ? 'var(--color-paper)' : 'var(--color-earth-deep)',
+                        border: '1px solid var(--color-contour)',
+                        borderRadius: '2px'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isNearest) {
+                          e.currentTarget.style.background = 'var(--color-paper-deep)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isNearest) {
+                          e.currentTarget.style.background = 'var(--color-paper)';
+                        }
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontFamily: '"Fraunces", serif',
+                          fontSize: '13px',
+                          fontVariationSettings: '"opsz" 14, "wght" 500',
+                          lineHeight: 1.2
+                        }}
+                      >
+                        {loc.name}
+                      </div>
+                      <div
+                        className="terrace-data tabular-nums"
+                        style={{
+                          fontSize: '9px',
+                          letterSpacing: '0.05em',
+                          opacity: isNearest ? 0.85 : 0.5,
+                          marginTop: '2px',
+                          fontVariantNumeric: 'tabular-nums'
+                        }}
+                      >
+                        {loc.lat.toFixed(2)}°N · {loc.lng.toFixed(2)}°E
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+
+            {/* Spacer pushes Continue to bottom */}
+            <div className="flex-1" />
+
+            {/* Continue */}
+            <motion.div
+              variants={itemVariants}
+              className="pt-6"
+              style={{ borderTop: '1px solid var(--color-contour)' }}
+            >
               <button
                 onClick={handleContinue}
                 disabled={!canContinue}
-                className="terrace-btn w-full group disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.01] transition-all duration-300"
-                style={{ padding: '1.2rem 2rem' }}
+                className="terrace-btn w-full group disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300"
+                style={{ padding: '1.1rem 2rem' }}
               >
-                {areaHa > 0 ? 'Continue to Plant Selection' : 'Draw or Magic-Click a field first'}
-                {canContinue && <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />}
+                <span style={{ letterSpacing: '0.18em' }}>
+                  {areaHa > 0 ? 'CONTINUE — INFER SOIL' : 'DRAW A FIELD FIRST'}
+                </span>
+                {canContinue && <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" />}
               </button>
+              <div
+                className="text-[10px] mt-2.5 italic text-center"
+                style={{
+                  fontFamily: '"Fraunces", serif',
+                  color: 'var(--color-earth-deep)',
+                  opacity: 0.4
+                }}
+              >
+                next: Sentinel-2 sampling, ~3 seconds
+              </div>
             </motion.div>
           </div>
         </motion.div>
