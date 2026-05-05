@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import useAppStore from '../store/appStore';
 import { getSatelliteAnalysis } from '../services/satelliteService';
 import { predictForLocation } from '../services/mlPredictionService';
+import { predictForField, getLiamApiUrl } from '../services/liamMLService';
 
 // Cinematic inference stages - each shown for ~700-900ms
 const INFERENCE_STAGES = [
@@ -28,7 +29,7 @@ const TELEMETRY_DATA = [
 
 export default function Processing() {
   const navigate = useNavigate();
-  const { municipality, setMLPrediction, setSatelliteData } = useAppStore();
+  const { municipality, field, setMLPrediction, setSatelliteData } = useAppStore();
 
   // State for cinematic staging
   const [currentStage, setCurrentStage] = useState(0);
@@ -84,15 +85,29 @@ export default function Processing() {
     return () => clearInterval(stageInterval);
   }, []);
 
-  // ML prediction and navigation logic (preserve exactly)
+  // ML prediction and navigation logic
   const executeMLPrediction = useCallback(async () => {
     // Store satellite data in app state
     if (satelliteDataRef.current) {
       setSatelliteData(satelliteDataRef.current);
     }
 
-    // Get soil prediction from ML service (Liam's SoilScan-Sentinel2 model output)
-    const prediction = await predictForLocation(municipality || 'La Trinidad');
+    let prediction;
+
+    // Try Liam's API if field polygon is available and API URL is configured
+    if (field && getLiamApiUrl()) {
+      try {
+        prediction = await predictForField(field);
+        console.log('[Processing] Liam ML prediction successful:', prediction);
+      } catch (error) {
+        console.warn('[Processing] Liam predict failed, falling back to placeholder:', error.message);
+        // Fall back to existing placeholder service
+        prediction = await predictForLocation(municipality || 'La Trinidad');
+      }
+    } else {
+      // Use existing placeholder service
+      prediction = await predictForLocation(municipality || 'La Trinidad');
+    }
 
     // Store in app state — ML prediction wins over satellite-derived soil estimates
     setMLPrediction(prediction);
@@ -100,7 +115,7 @@ export default function Processing() {
 
     // Navigate after brief fade
     setTimeout(() => navigate('/plant-selection'), 400);
-  }, [municipality, setMLPrediction, setSatelliteData, navigate]);
+  }, [municipality, field, setMLPrediction, setSatelliteData, navigate]);
 
   // Trigger ML prediction when stages complete or after timeout
   useEffect(() => {
