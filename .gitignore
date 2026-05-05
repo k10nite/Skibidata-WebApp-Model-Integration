@@ -69,3 +69,9 @@ MC Folder/
 
 # Other projects
 AgriCapture/
+
+# Webapp-irrelevant subprojects (not imported by src/, untracked 2026-05-05)
+analysis/
+backend/
+config/
+datasets/
