@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>AgriMap Pro - Smart Polygon Tool</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    
+    <!-- Mapbox GL JS -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.css" rel="stylesheet">
+    
+    <!-- Mapbox Geocoder -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
+    
+    <!-- Mapbox GL Draw -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css" type="text/css">
+    
+    <!-- Turf.js for Area and Bounding Box -->
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        
+        /* Base box styles */
+        .panel {
+            position: absolute;
+            bottom: 30px;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            z-index: 1;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* Left Info Box */
+        .info-box { left: 30px; width: 280px; transition: all 0.3s ease; }
+        .info-box h3 { margin-top: 0; color: #2c3e50; font-size: 18px; }
+        .info-box p { color: #7f8c8d; font-size: 14px; line-height: 1.5; margin-bottom: 5px;}
+        .stat-row { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;}
+        .stat-label { font-weight: bold; color: #34495e; }
+        .stat-value { font-size: 20px; color: #27ae60; font-weight: bold; }
+
+        /* Right GeoJSON Box */
+        .geojson-box { right: 30px; width: 320px; display: flex; flex-direction: column; }
+        .geojson-box h3 { margin-top: 0; color: #2c3e50; font-size: 16px; margin-bottom: 10px; }
+        #geojson-output {
+            width: 100%; height: 200px; resize: none; font-family: monospace;
+            font-size: 12px; padding: 10px; border: 1px solid #ddd;
+            border-radius: 6px; background: #f9f9f9; box-sizing: border-box; color: #333;
+        }
+
+        /* Custom Buttons */
+        .btn {
+            color: white; border: none; padding: 10px 15px; border-radius: 8px;
+            cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .magic-btn { background-color: #27ae60; }
+        .magic-btn:hover { background-color: #219150; }
+        .magic-btn.active { background-color: #e74c3c; } 
+        .copy-btn { background-color: #3498db; }
+        .copy-btn:hover { background-color: #2980b9; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- Left Panel -->
+<div class="panel info-box" id="info">
+    <h3>Field Manager</h3>
+    <p>1. Search for rural land.<br>2. Click 'Activate Magic Click'.<br>3. Click inside a field.</p>
+    
+    <button class="btn magic-btn" id="magic-toggle">Activate Magic Click</button>
+
+    <div class="stat-row">
+        <span class="stat-label">Area:</span>
+        <span class="stat-value"><span id="calculated-area">0</span> ha</span>
+    </div>
+</div>
+
+<!-- Right Panel for GeoJSON -->
+<div class="panel geojson-box">
+    <h3>API Payload (GeoJSON)</h3>
+    <textarea id="geojson-output" readonly placeholder="Draw a polygon to see the geometry here..."></textarea>
+    <button class="btn copy-btn" id="copy-btn">Copy JSON</button>
+</div>
+
+<script>
+    // --- CONFIGURATION ---
+    // 1. ADD YOUR MAPBOX TOKEN HERE
+    mapboxgl.accessToken = '';
+    let isMagicMode = false;
+
+    // 2. Initialize the Map centered on La Trinidad, Benguet
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/satellite-streets-v12', 
+        center: [120.5878, 16.4550], // La Trinidad coordinates
+        zoom: 14, // Zoomed in close enough to see fields
+        pitch: 0 
+    });
+
+    // 3. Add Geocoder (Search Bar) with animation
+    const geocoder = new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl,
+        marker: false,
+        placeholder: 'Search farm address...'
+    });
+    map.addControl(geocoder, 'top-left');
+
+    geocoder.on('result', (e) => {
+        const coords = e.result.geometry.coordinates;
+        map.flyTo({ center: coords, zoom: 15, pitch: 30, essential: true });
+    });
+
+    // 4. Add Standard Drawing Tools (top-right)
+    const draw = new MapboxDraw({
+        displayControlsDefault: false,
+        controls: { polygon: true, trash: true }
+    });
+    map.addControl(draw, 'top-right');
+
+    // 5. Setup event listeners for drawing
+    map.on('draw.create', updateFieldStats);
+    map.on('draw.update', updateFieldStats);
+    map.on('draw.delete', updateFieldStats);
+
+    // 6. Handle "Magic Click" functionality
+    const magicBtn = document.getElementById('magic-toggle');
+    
+    magicBtn.addEventListener('click', () => {
+        isMagicMode = !isMagicMode; 
+        if (isMagicMode) {
+            magicBtn.textContent = 'Deactivate Magic Click';
+            magicBtn.classList.add('active');
+            map.getCanvas().style.cursor = 'crosshair';
+            draw.changeMode('simple_select');
+        } else {
+            magicBtn.textContent = 'Activate Magic Click';
+            magicBtn.classList.remove('active');
+            map.getCanvas().style.cursor = '';
+        }
+    });
+
+    map.on('click', (e) => {
+        if (!isMagicMode) return; 
+        if (draw.getMode() === 'draw_polygon') return; 
+
+        const clickCoords = [e.lngLat.lng, e.lngLat.lat];
+        const simulatedField = createSimulatedField(clickCoords);
+        draw.add(simulatedField);
+        focusOnPolygon(simulatedField);
+        updateFieldStats();
+        magicBtn.click(); // Auto-deactivate
+    });
+
+    // 7. Copy Button Logic
+    document.getElementById('copy-btn').addEventListener('click', () => {
+        const textArea = document.getElementById('geojson-output');
+        if(!textArea.value) return;
+        
+        textArea.select();
+        document.execCommand('copy');
+        
+        const btn = document.getElementById('copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy JSON', 2000);
+    });
+
+
+    // 8. Functions: Logic & Animations
+
+    // Calculates area and updates both UI panels
+    function updateFieldStats() {
+        const data = draw.getAll();
+        const areaAnswer = document.getElementById('calculated-area');
+        const geojsonBox = document.getElementById('geojson-output');
+        
+        if (data.features.length > 0) {
+            // Update Area
+            const area = turf.area(data);
+            areaAnswer.innerHTML = Math.round((area / 10000) * 100) / 100;
+
+            // Extract ONLY the geometry (which is what your API needs)
+            const polygonGeometry = data.features[0].geometry;
+            
+            // Output pretty-printed JSON to the textbox
+            geojsonBox.value = JSON.stringify(polygonGeometry, null, 2);
+
+        } else {
+            areaAnswer.innerHTML = '0';
+            geojsonBox.value = ''; // Clear text box if field deleted
+        }
+    }
+
+    function focusOnPolygon(geojson) {
+        const bbox = turf.bbox(geojson);
+        map.fitBounds(bbox, { padding: 50, pitch: 20, duration: 2000 });
+    }
+
+    function createSimulatedField(center) {
+        // Reduced radius since La Trinidad fields are generally smaller
+        const radius = (Math.random() * 0.05) + 0.02; 
+        const options = {steps: 10, units: 'kilometers', options: {}};
+        const circle = turf.circle(center, radius, options);
+        
+        circle.geometry.coordinates[0].forEach((coord, i) => {
+            if (i % 2 === 0) {
+                coord[0] += (Math.random() - 0.5) * 0.0005;
+                coord[1] += (Math.random() - 0.5) * 0.0005;
+            }
+        });
+        return circle;
+    }
+
+</script>
+
+</body>
+</html>
