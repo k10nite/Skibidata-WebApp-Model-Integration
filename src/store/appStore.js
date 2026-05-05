@@ -11,6 +11,9 @@ const useAppStore = create((set) => ({
   location: null,
   municipality: null,
   barangay: null,
+  field: null,           // GeoJSON Polygon (mapbox-draw output) — sent to Liam's POST /predict
+  fieldAreaHa: 0,        // hectares (turf.area / 10000)
+  fieldCenter: null,     // { lat, lng } — centroid of polygon, for fallback name lookup
 
   // Selected plant (Screen 2)
   selectedPlant: null,
@@ -36,6 +39,12 @@ const useAppStore = create((set) => ({
   // Actions
   setLocation: (location, municipality, barangay) =>
     set({ location, municipality, barangay }),
+
+  setField: (field, areaHa, center) =>
+    set({ field, fieldAreaHa: areaHa, fieldCenter: center }),
+
+  clearField: () =>
+    set({ field: null, fieldAreaHa: 0, fieldCenter: null }),
 
   setSelectedPlant: (plant, requirements) =>
     set({ selectedPlant: plant, plantRequirements: requirements }),
@@ -80,6 +89,9 @@ const useAppStore = create((set) => ({
       location: null,
       municipality: null,
       barangay: null,
+      field: null,
+      fieldAreaHa: 0,
+      fieldCenter: null,
       selectedPlant: null,
       plantRequirements: null,
       soilData: null,
