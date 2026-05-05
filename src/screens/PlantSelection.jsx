@@ -1,600 +1,352 @@
-/**
- * PlantSelection Screen
- * 
- * A stunning crop selection screen for AgriCapture - Filipino Farm App.
- * Features 20+ crops organized by category with premium design,
- * GSAP animations, and Tailwind CSS styling.
- * 
- * Design System:
- * - Colors: Rice Green (#84934A), Clay Dark (#492828), Golden Harvest (#DAA520)
- * - Typography: Inter font family with tight tracking
- * - Animations: GSAP stagger reveals, hover effects, selection transitions
- */
+// Screen 3: Crop Selection - Terrace Design System
+// Direct dropdown + filters interface following Hans's rule-based engine UI philosophy
+// Editorial-cartographic, topographic-map vibes with 62/38 hero+rail layout
 
-import { useRef, useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { gsap } from 'gsap';
-import { useGSAP } from '@gsap/react';
-import {
-  Search,
-  Leaf,
-  Wheat,
-  Carrot,
-  Apple,
-  Cherry,
-  Check,
-  ArrowRight,
-  Sprout,
-  Filter,
-  X,
-  ChevronRight
-} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Search, ChevronRight } from 'lucide-react';
+import useAppStore from '../store/appStore';
 
-// ============================================
-// CROP DATA - 20+ Filipino Crops by Category
-// ============================================
-const CROP_CATEGORIES = [
-  { id: 'all', name: 'Lahat', nameEn: 'All', icon: Filter },
-  { id: 'grains', name: 'Palay at Mais', nameEn: 'Rice & Corn', icon: Wheat },
-  { id: 'vegetables', name: 'Gulay', nameEn: 'Vegetables', icon: Carrot },
-  { id: 'fruits', name: 'Prutas', nameEn: 'Fruits', icon: Apple },
-  { id: 'highvalue', name: 'High Value', nameEn: 'High Value Crops', icon: Cherry },
-  { id: 'rootcrops', name: 'Root Crops', nameEn: 'Root Crops', icon: Sprout },
-];
-
+// Complete crop data - 44 entries matching Hans's THESIS_CROP_MAP
 const CROPS_DATA = [
-  // Rice & Grains
-  { id: 'rice', name: 'Palay', nameEn: 'Rice', category: 'grains', icon: '🌾', color: '#84A946', season: 'Tag-ulan', duration: '3-4 buwan' },
-  { id: 'corn', name: 'Mais', nameEn: 'Corn', category: 'grains', icon: '🌽', color: '#F4D03F', season: 'Tag-init', duration: '2-3 buwan' },
-  { id: 'sorghum', name: 'Sorghum', nameEn: 'Sorghum', category: 'grains', icon: '🌾', color: '#D4A574', season: 'Tag-init', duration: '3-4 buwan' },
-  
-  // Vegetables
-  { id: 'tomato', name: 'Kamatis', nameEn: 'Tomato', category: 'vegetables', icon: '🍅', color: '#E74C3C', season: 'Tag-init', duration: '2-3 buwan' },
-  { id: 'eggplant', name: 'Talong', nameEn: 'Eggplant', category: 'vegetables', icon: '🍆', color: '#8E44AD', season: 'Buong taon', duration: '3-4 buwan' },
-  { id: 'okra', name: 'Okra', nameEn: 'Okra', category: 'vegetables', icon: '🥬', color: '#27AE60', season: 'Tag-init', duration: '2-3 buwan' },
-  { id: 'ampalaya', name: 'Ampalaya', nameEn: 'Bitter Gourd', category: 'vegetables', icon: '🥒', color: '#2ECC71', season: 'Tag-ulan', duration: '3-4 buwan' },
-  { id: 'squash', name: 'Kalabasa', nameEn: 'Squash', category: 'vegetables', icon: '🎃', color: '#E67E22', season: 'Tag-init', duration: '3-4 buwan' },
-  { id: 'pechay', name: 'Pechay', nameEn: 'Peck Choi', category: 'vegetables', icon: '🥬', color: '#16A085', season: 'Buong taon', duration: '1-2 buwan' },
-  { id: 'sitaw', name: 'Sitaw', nameEn: 'String Beans', category: 'vegetables', icon: '🫘', color: '#52BE80', season: 'Tag-ulan', duration: '2-3 buwan' },
-  { id: 'pepper', name: 'Sili', nameEn: 'Chili Pepper', category: 'vegetables', icon: '🌶️', color: '#C0392B', season: 'Tag-init', duration: '3-4 buwan' },
-  
-  // Fruits
-  { id: 'banana', name: 'Saging', nameEn: 'Banana', category: 'fruits', icon: '🍌', color: '#F1C40F', season: 'Buong taon', duration: '9-12 buwan' },
-  { id: 'mango', name: 'Mangga', nameEn: 'Mango', category: 'fruits', icon: '🥭', color: '#F39C12', season: 'Tag-init', duration: '3-5 taon' },
-  { id: 'papaya', name: 'Papaya', nameEn: 'Papaya', category: 'fruits', icon: '🫐', color: '#E74C3C', season: 'Buong taon', duration: '6-9 buwan' },
-  { id: 'pineapple', name: 'Pinya', nameEn: 'Pineapple', category: 'fruits', icon: '🍍', color: '#F1C40F', season: 'Tag-init', duration: '12-18 buwan' },
-  { id: 'coconut', name: 'Niyog', nameEn: 'Coconut', category: 'fruits', icon: '🥥', color: '#D7CCC8', season: 'Buong taon', duration: '3-5 taon' },
-  
-  // High Value Crops
-  { id: 'coffee', name: 'Kape', nameEn: 'Coffee', category: 'highvalue', icon: '☕', color: '#6D4C41', season: 'Tag-ulan', duration: '2-3 taon' },
-  { id: 'cacao', name: 'Kakaw', nameEn: 'Cacao', category: 'highvalue', icon: '🍫', color: '#5D4037', season: 'Buong taon', duration: '2-3 taon' },
-  { id: 'vanilla', name: 'Vanilla', nameEn: 'Vanilla', category: 'highvalue', icon: '🌿', color: '#D7CCC8', season: 'Tag-init', duration: '2-3 taon' },
-  
-  // Root Crops
-  { id: 'cassava', name: 'Kamoteng Kahoy', nameEn: 'Cassava', category: 'rootcrops', icon: '🍠', color: '#D7CCC8', season: 'Buong taon', duration: '8-12 buwan' },
-  { id: 'sweetpotato', name: 'Kamote', nameEn: 'Sweet Potato', category: 'rootcrops', icon: '🍠', color: '#E67E22', season: 'Buong taon', duration: '3-4 buwan' },
-  { id: 'ginger', name: 'Luya', nameEn: 'Ginger', category: 'rootcrops', icon: '🫚', color: '#F5DEB3', season: 'Tag-ulan', duration: '8-10 buwan' },
-  { id: 'taro', name: 'Gabi', nameEn: 'Taro', category: 'rootcrops', icon: '🥔', color: '#8D6E63', season: 'Tag-ulan', duration: '6-9 buwan' },
-  { id: 'carrot', name: 'Karot', nameEn: 'Carrot', category: 'rootcrops', icon: '🥕', color: '#E67E22', season: 'Tag-init', duration: '2-3 buwan' },
+  // Vegetables (21 crops)
+  { id: 'cabbage', name: 'Cabbage', nameFil: 'Repolyo', category: 'vegetables', engineLabel: 'Cabbage' },
+  { id: 'cabbage_head', name: 'Cabbage (Head)', nameFil: 'Repolyong Ulo', category: 'vegetables', engineLabel: 'Cabbage (Head)' },
+  { id: 'pechay', name: 'Pechay', nameFil: 'Pechay', category: 'vegetables', engineLabel: 'Pechay' },
+  { id: 'mustard', name: 'Mustard', nameFil: 'Mustasa', category: 'vegetables', engineLabel: 'Mustard' },
+  { id: 'cauliflower', name: 'Cauliflower', nameFil: 'Cauliflower', category: 'vegetables', engineLabel: 'Cauliflower' },
+  { id: 'broccoli', name: 'Broccoli', nameFil: 'Broccoli', category: 'vegetables', engineLabel: 'Broccoli' },
+  { id: 'lettuce', name: 'Lettuce', nameFil: 'Lettuce', category: 'vegetables', engineLabel: 'Lettuce' },
+  { id: 'celery', name: 'Celery', nameFil: 'Celery', category: 'vegetables', engineLabel: 'Celery' },
+  { id: 'eggplant', name: 'Eggplant', nameFil: 'Talong', category: 'vegetables', engineLabel: 'Eggplant' },
+  { id: 'tomato', name: 'Tomato', nameFil: 'Kamatis', category: 'vegetables', engineLabel: 'Tomato' },
+  { id: 'bell_pepper', name: 'Bell Pepper', nameFil: 'Bell Pepper', category: 'vegetables', engineLabel: 'Bell Pepper' },
+  { id: 'pepper', name: 'Pepper', nameFil: 'Sili', category: 'vegetables', engineLabel: 'Pepper' },
+  { id: 'green_pepper', name: 'Green (siling-haba) Pepper', nameFil: 'Siling Haba', category: 'vegetables', engineLabel: 'Green (siling-haba) Pepper' },
+  { id: 'black_pepper', name: 'Black Pepper', nameFil: 'Paminta', category: 'vegetables', engineLabel: 'Black Pepper' },
+  { id: 'squash', name: 'Squash', nameFil: 'Kalabasa', category: 'vegetables', engineLabel: 'Squash' },
+  { id: 'cucumber', name: 'Cucumber', nameFil: 'Pepino', category: 'vegetables', engineLabel: 'Cucumber' },
+  { id: 'patola', name: 'Patola', nameFil: 'Patola', category: 'vegetables', engineLabel: 'Patola' },
+  { id: 'okra_local', name: 'Okra (Local)', nameFil: 'Okra', category: 'vegetables', engineLabel: 'Okra (Local)' },
+  { id: 'okra_hybrid', name: 'Okra (Hybrid)', nameFil: 'Okra Hybrid', category: 'vegetables', engineLabel: 'Okra (Hybrid)' },
+  { id: 'ampalaya', name: 'Ampalaya', nameFil: 'Ampalaya', category: 'vegetables', engineLabel: 'Ampalaya' },
+  { id: 'chayote', name: 'Chayote', nameFil: 'Sayote', category: 'vegetables', engineLabel: 'Chayote' },
+
+  // Root crops (8 crops)
+  { id: 'potato', name: 'Potato', nameFil: 'Patatas', category: 'roots', engineLabel: 'Potato' },
+  { id: 'carrot', name: 'Carrot', nameFil: 'Karot', category: 'roots', engineLabel: 'Carrot' },
+  { id: 'radish', name: 'Radish/Turnips', nameFil: 'Labanos', category: 'roots', engineLabel: 'Radish/Turnips' },
+  { id: 'parsnip', name: 'Parsnip', nameFil: 'Parsnip', category: 'roots', engineLabel: 'Parsnip' },
+  { id: 'garlic', name: 'Garlic', nameFil: 'Bawang', category: 'roots', engineLabel: 'Garlic' },
+  { id: 'onion', name: 'Onion', nameFil: 'Sibuyas', category: 'roots', engineLabel: 'Onion' },
+  { id: 'ginger_local', name: 'Ginger (Local)', nameFil: 'Luya', category: 'roots', engineLabel: 'Ginger (Local)' },
+  { id: 'ginger_improved', name: 'Ginger (Improved)', nameFil: 'Luyang Bago', category: 'roots', engineLabel: 'Ginger (Improved)' },
+
+  // Beans/Pulses (12 crops)
+  { id: 'string_beans', name: 'String Beans', nameFil: 'Sitaw', category: 'beans', engineLabel: 'String Beans' },
+  { id: 'snap_bean', name: 'Snap Bean', nameFil: 'Snap Bean', category: 'beans', engineLabel: 'Snap Bean' },
+  { id: 'baguio_beans', name: 'Baguio Beans', nameFil: 'Baguio Beans', category: 'beans', engineLabel: 'Baguio Beans' },
+  { id: 'lima', name: 'Lima (Patani)', nameFil: 'Patani', category: 'beans', engineLabel: 'Lima (Patani)' },
+  { id: 'patani', name: 'Patani', nameFil: 'Patani', category: 'beans', engineLabel: 'Patani' },
+  { id: 'winged_beans', name: 'Winged Beans', nameFil: 'Sigarilyas', category: 'beans', engineLabel: 'Winged Beans' },
+  { id: 'seguidillas', name: 'Seguidillas', nameFil: 'Seguidillas', category: 'beans', engineLabel: 'Seguidillas' },
+  { id: 'dwarf_beans', name: 'Dwarf Beans', nameFil: 'Dwarf Beans', category: 'beans', engineLabel: 'Dwarf Beans' },
+  { id: 'batao', name: 'Batao', nameFil: 'Batao', category: 'beans', engineLabel: 'Batao' },
+  { id: 'peas', name: 'Peas', nameFil: 'Gisantes', category: 'beans', engineLabel: 'Peas' },
+
+  // Herbs (2 crops)
+  { id: 'basil', name: 'Basil', nameFil: 'Balanoy', category: 'herbs', engineLabel: 'Basil' },
+  { id: 'mint', name: 'Mint herb', nameFil: 'Mint', category: 'herbs', engineLabel: 'Mint herb' },
+
+  // Highland/Fruits (1 crop)
+  { id: 'asparagus', name: 'Asparagus', nameFil: 'Asparagus', category: 'highland', engineLabel: 'Asparagus' }
 ];
 
-// ============================================
-// MAIN COMPONENT
-// ============================================
-export default function PlantSelection({ onSelect, onBack }) {
+const CATEGORIES = [
+  { id: 'all', name: 'All' },
+  { id: 'vegetables', name: 'Vegetables' },
+  { id: 'roots', name: 'Root crops' },
+  { id: 'beans', name: 'Beans/Pulses' },
+  { id: 'herbs', name: 'Herbs' },
+  { id: 'highland', name: 'Highland' }
+];
+
+const containerVariants = {
+  initial: {},
+  animate: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } }
+};
+
+const itemVariants = {
+  initial: { y: 16, opacity: 0 },
+  animate: { y: 0, opacity: 1, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } }
+};
+
+// Helper to read rating from both flat string and nested object formats
+function readRating(field) {
+  if (typeof field === 'string') return field;
+  if (field && typeof field === 'object' && typeof field.rating === 'string') return field.rating;
+  return 'Unknown';
+}
+
+export default function PlantSelection() {
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const { setSelectedPlant, soilData, municipality } = useAppStore();
+
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedCrop, setSelectedCrop] = useState(null);
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  const containerRef = useRef(null);
-  const headerRef = useRef(null);
-  const categoriesRef = useRef(null);
-  const cropsGridRef = useRef(null);
-  const floatingButtonRef = useRef(null);
-
-  // Filter crops based on category and search
+  // Filter crops
   const filteredCrops = useMemo(() => {
     return CROPS_DATA.filter(crop => {
       const matchesCategory = selectedCategory === 'all' || crop.category === selectedCategory;
       const matchesSearch = crop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           crop.nameEn.toLowerCase().includes(searchQuery.toLowerCase());
+                          crop.nameFil.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     });
   }, [selectedCategory, searchQuery]);
 
-  // Header entrance animation
-  useGSAP(() => {
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-
-      tl.fromTo(headerRef.current,
-        { opacity: 0, y: -30 },
-        { opacity: 1, y: 0, duration: 0.8 }
-      );
-    }, containerRef);
-
-    return () => ctx.revert();
+  const categoryCounts = useMemo(() => {
+    const counts = {};
+    CATEGORIES.forEach(cat => {
+      counts[cat.id] = cat.id === 'all'
+        ? CROPS_DATA.length
+        : CROPS_DATA.filter(crop => crop.category === cat.id).length;
+    });
+    return counts;
   }, []);
 
-  // Categories stagger animation
-  useGSAP(() => {
-    const ctx = gsap.context(() => {
-      const categories = categoriesRef.current?.querySelectorAll('.category-chip');
-      if (!categories) return;
-
-      gsap.fromTo(categories,
-        { opacity: 0, y: 20, scale: 0.9 },
-        { 
-          opacity: 1, 
-          y: 0, 
-          scale: 1,
-          duration: 0.5, 
-          stagger: 0.08,
-          ease: 'back.out(1.7)',
-          delay: 0.3
-        }
-      );
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, []);
-
-  // Crops grid animation
-  useGSAP(() => {
-    const ctx = gsap.context(() => {
-      const cards = cropsGridRef.current?.querySelectorAll('.crop-card');
-      if (!cards) return;
-
-      gsap.fromTo(cards,
-        { opacity: 0, y: 30 },
-        { 
-          opacity: 1, 
-          y: 0, 
-          duration: 0.5, 
-          stagger: 0.06,
-          ease: 'power2.out'
-        }
-      );
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, [filteredCrops, selectedCategory]);
-
-  // Floating button animation
-  useGSAP(() => {
-    const ctx = gsap.context(() => {
-      if (selectedCrop) {
-        gsap.fromTo(floatingButtonRef.current,
-          { opacity: 0, y: 50, scale: 0.8 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: 'back.out(1.7)' }
-        );
-      } else {
-        gsap.to(floatingButtonRef.current,
-          { opacity: 0, y: 50, duration: 0.3, ease: 'power2.in' }
-        );
-      }
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, [selectedCrop]);
-
-  // Handle crop selection with animation
-  const handleCropSelect = (crop, cardElement) => {
-    // Animate the selected card
-    if (cardElement) {
-      gsap.to(cardElement, {
-        scale: 0.95,
-        duration: 0.1,
-        yoyo: true,
-        repeat: 1,
-        ease: 'power2.inOut',
-        onComplete: () => {
-          setSelectedCrop(crop.id === selectedCrop?.id ? null : crop);
-        }
-      });
-    } else {
-      setSelectedCrop(crop.id === selectedCrop?.id ? null : crop);
-    }
+  const handleCropSelect = (crop) => {
+    setSelectedCrop(crop);
   };
 
-  // Handle continue button
   const handleContinue = () => {
     if (selectedCrop) {
-      gsap.to(floatingButtonRef.current, {
-        scale: 0.95,
-        duration: 0.1,
-        yoyo: true,
-        repeat: 1,
-        onComplete: () => {
-          if (onSelect) {
-            onSelect(selectedCrop);
-          } else {
-            navigate('/processing', { state: { crop: selectedCrop } });
-          }
-        }
-      });
+      // Store wiring: setSelectedPlant expects { name: engineLabel, id, nameFil, category }
+      // The name field MUST be the engineLabel for downstream recommendationService.js
+      setSelectedPlant({
+        name: selectedCrop.engineLabel,
+        id: selectedCrop.id,
+        nameFil: selectedCrop.nameFil,
+        category: selectedCrop.category
+      }, null);
+      navigate('/soil-status');
     }
   };
 
-  // Handle category change
-  const handleCategoryChange = (categoryId) => {
-    // Animate out current crops
-    const cards = cropsGridRef.current?.querySelectorAll('.crop-card');
-    if (cards) {
-      gsap.to(cards, {
-        opacity: 0,
-        y: -20,
-        duration: 0.3,
-        stagger: 0.03,
-        ease: 'power2.in',
-        onComplete: () => setSelectedCategory(categoryId)
-      });
-    } else {
-      setSelectedCategory(categoryId);
-    }
-  };
+  const locationDisplay = municipality || 'La Trinidad, Benguet';
 
   return (
-    <div 
-      ref={containerRef}
-      className="min-h-screen bg-gradient-to-b from-[#FAF9F6] to-[#F5F3EF]"
+    <motion.div
+      className="min-h-screen bg-[var(--color-paper)] flex"
+      initial="initial"
+      animate="animate"
+      variants={containerVariants}
     >
-      {/* Header Section */}
-      <header 
-        ref={headerRef}
-        className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 sm:h-20">
-            {/* Back Button */}
-            <button
-              onClick={onBack}
-              className="flex items-center gap-2 text-gray-600 hover:text-[#492828] transition-colors duration-200 group"
-            >
-              <div className="p-2 rounded-full bg-gray-100 group-hover:bg-[#84934A]/10 transition-colors">
-                <ArrowRight className="w-5 h-5 rotate-180" />
-              </div>
-              <span className="hidden sm:inline font-medium">Back</span>
-            </button>
+      {/* Background topographic contours */}
+      <svg className="terrace-topo opacity-[0.04] fixed inset-0 pointer-events-none" viewBox="0 0 800 600" fill="none">
+        <path
+          d="M50 150C150 120, 250 180, 350 150C450 120, 550 180, 650 150"
+          stroke="currentColor"
+          strokeWidth="1"
+        />
+        <path
+          d="M30 280C130 250, 230 310, 330 280C430 250, 530 310, 630 280"
+          stroke="currentColor"
+          strokeWidth="1"
+        />
+        <path
+          d="M70 420C170 390, 270 450, 370 420C470 390, 570 450, 670 420"
+          stroke="currentColor"
+          strokeWidth="1"
+        />
+      </svg>
 
-            {/* Title */}
-            <div className="text-center">
-              <h1 className="text-xl sm:text-2xl font-bold text-[#492828] tracking-tight">
-                Select Your Crop
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">
-                Select Your Crop
-              </p>
-            </div>
+      {/* Left Column (62%) - Soil Profile */}
+      <motion.div className="w-[62%] px-8 py-12" variants={itemVariants}>
+        <div className="max-w-2xl">
+          <div className="terrace-eyebrow mb-6">02 — CROP</div>
+          <h1 className="terrace-display text-5xl md:text-6xl mb-8">
+            What&apos;s growing here?
+          </h1>
 
-            {/* Spacer for balance */}
-            <div className="w-20" />
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32">
-        {/* Hero Section */}
-        <div className="py-8 sm:py-12 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#84934A]/10 rounded-full text-[#84934A] text-sm font-medium mb-4">
-            <Sprout className="w-4 h-4" />
-            <span>20+ Crop Varieties</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#492828] tracking-tight mb-4">
-            What would you like to <span className="text-[#84934A]">plant</span>?
-          </h2>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Select a crop for personalized fertilizer recommendations
-            tailored to your farm.
-          </p>
-        </div>
-
-        {/* Search Bar */}
-        <div className="max-w-xl mx-auto mb-8">
-          <div 
-            className={`
-              relative flex items-center bg-white rounded-2xl shadow-sm border-2 transition-all duration-300
-              ${isSearchFocused ? 'border-[#84934A] shadow-lg shadow-[#84934A]/10' : 'border-gray-200'}
-            `}
+          {/* Field Profile Panel */}
+          <motion.div
+            className="terrace-card-hairline p-6 mb-8"
+            style={{ background: 'var(--color-paper-card)' }}
+            variants={itemVariants}
           >
-            <Search className="w-5 h-5 text-gray-400 ml-4" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setIsSearchFocused(false)}
-              placeholder="Search for crops..."
-              className="flex-1 py-4 px-3 bg-transparent outline-none text-gray-800 placeholder-gray-400"
-            />
-            {searchQuery && (
+            <div className="terrace-eyebrow mb-4">FIELD PROFILE</div>
+
+            {soilData ? (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider mb-1">
+                    LOCATION
+                  </div>
+                  <div className="font-mono text-sm text-[var(--color-earth-deep)]">
+                    {locationDisplay}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider mb-1">
+                    pH LEVEL
+                  </div>
+                  <div className="font-mono text-sm text-[var(--color-earth-deep)]">
+                    {typeof soilData.pH === 'string' ? soilData.pH :
+                     typeof soilData.ph === 'string' ? soilData.ph :
+                     'Neutral'}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider mb-1">
+                    N STATUS
+                  </div>
+                  <div className="font-mono text-sm text-[var(--color-earth-deep)]">
+                    {readRating(soilData.nitrogen)}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider mb-1">
+                    P STATUS
+                  </div>
+                  <div className="font-mono text-sm text-[var(--color-earth-deep)]">
+                    {readRating(soilData.phosphorus)}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="terrace-data text-xs text-[var(--color-moss)] uppercase tracking-wider mb-1">
+                    K STATUS
+                  </div>
+                  <div className="font-mono text-sm text-[var(--color-earth-deep)]">
+                    {readRating(soilData.potassium)}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-[var(--color-moss)] text-sm mb-2">Soil profile pending</div>
+                <div className="terrace-data text-xs text-[var(--color-contour)]">
+                  Machine learning analysis in progress
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Right Column (38%) - Crop Selection */}
+      <motion.div
+        className="w-[38%] bg-[var(--color-paper-deep)] px-6 py-12 border-l"
+        style={{ borderColor: 'var(--color-contour)' }}
+        variants={itemVariants}
+      >
+        <div className="terrace-eyebrow mb-4">SELECT CROP</div>
+
+        {/* Search Input */}
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--color-moss)]" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search crops..."
+            className="terrace-input pl-10 w-full"
+          />
+        </div>
+
+        {/* Category Filter */}
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((category) => (
               <button
-                onClick={() => setSearchQuery('')}
-                className="p-2 mr-2 rounded-full hover:bg-gray-100 transition-colors"
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`
+                  px-3 py-1 rounded text-xs font-medium transition-colors
+                  ${selectedCategory === category.id
+                    ? 'bg-[var(--color-moss)] text-white'
+                    : 'bg-[var(--color-paper-card)] text-[var(--color-earth-deep)] hover:bg-[var(--color-moss)] hover:text-white'
+                  }
+                `}
               >
-                <X className="w-4 h-4 text-gray-400" />
+                {category.name} ({categoryCounts[category.id]})
               </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Crops List */}
+        <div className="mb-6 flex-1 overflow-hidden">
+          <div className="h-80 overflow-y-auto">
+            {filteredCrops.map((crop) => (
+              <button
+                key={crop.id}
+                onClick={() => handleCropSelect(crop)}
+                className={`
+                  w-full text-left px-3 py-3 border-b transition-colors
+                  ${selectedCrop?.id === crop.id
+                    ? 'bg-[var(--color-paper-deep)] border-l-2 border-l-[var(--color-moss)]'
+                    : 'hover:bg-[var(--color-paper-card)]'
+                  }
+                `}
+                style={{
+                  borderBottomColor: 'var(--color-contour)',
+                  borderLeftColor: selectedCrop?.id === crop.id ? 'var(--color-moss)' : 'transparent'
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-medium text-sm text-[var(--color-earth-deep)]">
+                      {crop.name}
+                    </div>
+                    {crop.nameFil && (
+                      <div className="text-xs text-[var(--color-moss)] mt-0.5">
+                        {crop.nameFil}
+                      </div>
+                    )}
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-[var(--color-contour)]" />
+                </div>
+              </button>
+            ))}
+
+            {filteredCrops.length === 0 && (
+              <div className="text-center py-8">
+                <div className="text-[var(--color-moss)] text-sm mb-1">No crops found</div>
+                <div className="terrace-data text-xs text-[var(--color-contour)]">
+                  Try different keywords
+                </div>
+              </div>
             )}
           </div>
         </div>
 
-        {/* Category Chips */}
-        <div 
-          ref={categoriesRef}
-          className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12"
+        {/* Continue Button */}
+        <button
+          onClick={handleContinue}
+          disabled={!selectedCrop}
+          className={`
+            terrace-btn w-full flex items-center justify-center gap-2
+            ${!selectedCrop ? 'opacity-50 cursor-not-allowed' : ''}
+          `}
         >
-          {CROP_CATEGORIES.map((category) => {
-            const Icon = category.icon;
-            const isActive = selectedCategory === category.id;
-            
-            return (
-              <button
-                key={category.id}
-                onClick={() => handleCategoryChange(category.id)}
-                className={`
-                  category-chip flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full
-                  font-medium text-sm sm:text-base transition-all duration-300
-                  ${isActive 
-                    ? 'bg-[#492828] text-white shadow-lg shadow-[#492828]/25 scale-105' 
-                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 hover:border-gray-300'
-                  }
-                `}
-              >
-                <Icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{category.name}</span>
-                <span className="sm:hidden">{category.nameEn}</span>
-              </button>
-            );
-          })}
-        </div>
+          <span>Continue</span>
+          <ChevronRight className="w-4 h-4" />
+        </button>
 
-        {/* Results Count */}
-        <div className="flex items-center justify-between mb-6">
-          <p className="text-gray-600">
-            <span className="font-semibold text-[#492828]">{filteredCrops.length}</span>
-            {' '}na pananim nakita
-          </p>
-          {selectedCrop && (
-            <div className="flex items-center gap-2 text-[#84934A] font-medium">
-              <Check className="w-4 h-4" />
-              <span>{selectedCrop.name} napili</span>
-            </div>
-          )}
-        </div>
-
-        {/* Crops Grid */}
-        <div 
-          ref={cropsGridRef}
-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6"
-        >
-          {filteredCrops.map((crop) => {
-            const isSelected = selectedCrop?.id === crop.id;
-            
-            return (
-              <CropCard
-                key={crop.id}
-                crop={crop}
-                isSelected={isSelected}
-                onSelect={(e) => handleCropSelect(crop, e.currentTarget)}
-              />
-            );
-          })}
-        </div>
-
-        {/* Empty State */}
-        {filteredCrops.length === 0 && (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-              <Search className="w-10 h-10 text-gray-400" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">
-              Walang nahanap na pananim
-            </h3>
-            <p className="text-gray-500">
-          Subukang maghanap ng ibang keyword
-            </p>
+        {selectedCrop && (
+          <div className="mt-3 text-center text-xs text-[var(--color-moss)]">
+            Selected: {selectedCrop.name}
+            {selectedCrop.nameFil && ` (${selectedCrop.nameFil})`}
           </div>
         )}
-      </main>
-
-      {/* Floating Action Button */}
-      <div
-        ref={floatingButtonRef}
-        className="fixed bottom-6 left-0 right-0 px-4 z-50 pointer-events-none"
-        style={{ opacity: 0 }}
-      >
-        <div className="max-w-md mx-auto">
-          <button
-            onClick={handleContinue}
-            className="
-              w-full pointer-events-auto
-              flex items-center justify-center gap-3
-              bg-[#492828] hover:bg-[#3d2222] text-white
-              py-4 px-8 rounded-2xl
-              font-semibold text-lg
-              shadow-2xl shadow-[#492828]/30
-              transform transition-all duration-200
-              hover:scale-[1.02] active:scale-[0.98]
-            "
-          >
-            <span>Continue with {selectedCrop?.nameEn || selectedCrop?.name}</span>
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
-      {/* Selected Crop Details Modal (Inline) */}
-      {selectedCrop && (
-        <CropDetailsBar 
-          crop={selectedCrop} 
-          onClose={() => setSelectedCrop(null)}
-        />
-      )}
-    </div>
-  );
-}
-
-// ============================================
-// CROP CARD COMPONENT
-// ============================================
-function CropCard({ crop, isSelected, onSelect }) {
-  const cardRef = useRef(null);
-  const overlayRef = useRef(null);
-
-  useGSAP(() => {
-    const card = cardRef.current;
-    const overlay = overlayRef.current;
-    if (!card || !overlay) return;
-
-    // Initial state
-    gsap.set(overlay, { x: '-100%' });
-
-    const handleMouseEnter = () => {
-      gsap.to(overlay, { x: '100%', duration: 0.5, ease: 'power2.inOut' });
-      gsap.to(card, { y: -4, duration: 0.3, ease: 'power2.out' });
-    };
-
-    const handleMouseLeave = () => {
-      gsap.set(overlay, { x: '-100%' });
-      gsap.to(card, { y: 0, duration: 0.3, ease: 'power2.out' });
-    };
-
-    card.addEventListener('mouseenter', handleMouseEnter);
-    card.addEventListener('mouseleave', handleMouseLeave);
-
-    return () => {
-      card.removeEventListener('mouseenter', handleMouseEnter);
-      card.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, []);
-
-  return (
-    <div
-      ref={cardRef}
-      onClick={onSelect}
-      className={`
-        crop-card relative overflow-hidden cursor-pointer
-        rounded-2xl sm:rounded-3xl p-4 sm:p-6
-        transition-all duration-300
-        ${isSelected 
-          ? 'bg-[#84934A] text-white shadow-xl shadow-[#84934A]/30 ring-2 ring-[#84934A] ring-offset-2' 
-          : 'bg-white hover:shadow-lg border border-gray-100 hover:border-gray-200'
-        }
-      `}
-    >
-      {/* Hover Overlay Effect */}
-      <div
-        ref={overlayRef}
-        className="absolute inset-0 pointer-events-none opacity-10"
-        style={{
-          background: `linear-gradient(90deg, transparent, ${crop.color}, transparent)`,
-        }}
-      />
-
-      {/* Selection Indicator */}
-      {isSelected && (
-        <div className="absolute top-3 right-3 w-6 h-6 bg-white rounded-full flex items-center justify-center">
-          <Check className="w-4 h-4 text-[#84934A]" />
-        </div>
-      )}
-
-      {/* Content */}
-      <div className="relative z-10">
-        {/* Icon */}
-        <div 
-          className={`
-            w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-3xl sm:text-4xl mb-4
-            ${isSelected ? 'bg-white/20' : 'bg-gray-50'}
-          `}
-          style={{ backgroundColor: isSelected ? undefined : `${crop.color}15` }}
-        >
-          {crop.icon}
-        </div>
-
-        {/* Names */}
-        <h3 className={`
-          font-bold text-base sm:text-lg mb-1
-          ${isSelected ? 'text-white' : 'text-[#492828]'}
-        `}>
-          {crop.name}
-        </h3>
-        <p className={`
-          text-xs sm:text-sm
-          ${isSelected ? 'text-white/80' : 'text-gray-500'}
-        `}>
-          {crop.nameEn}
-        </p>
-
-        {/* Season Badge */}
-        <div className={`
-          inline-flex items-center gap-1 mt-3 px-2 py-1 rounded-full text-xs font-medium
-          ${isSelected 
-            ? 'bg-white/20 text-white' 
-            : 'bg-gray-100 text-gray-600'
-          }
-        `}>
-          <Leaf className="w-3 h-3" />
-          <span className="hidden sm:inline">{crop.season}</span>
-          <span className="sm:hidden">{crop.duration}</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ============================================
-// CROP DETAILS BAR COMPONENT
-// ============================================
-function CropDetailsBar({ crop, onClose }) {
-  const barRef = useRef(null);
-
-  useGSAP(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(barRef.current,
-        { y: 100, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }
-      );
-    });
-
-    return () => ctx.revert();
-  }, []);
-
-  return (
-    <div
-      ref={barRef}
-      className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl z-40"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div 
-              className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
-              style={{ backgroundColor: `${crop.color}20` }}
-            >
-              {crop.icon}
-            </div>
-            <div>
-              <h4 className="font-bold text-[#492828] text-lg">{crop.name}</h4>
-              <p className="text-gray-500 text-sm">{crop.nameEn} • {crop.season}</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:block text-right">
-              <p className="text-sm text-gray-500">Growing Duration</p>
-              <p className="font-semibold text-[#492828]">{crop.duration}</p>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-            >
-              <X className="w-5 h-5 text-gray-500" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

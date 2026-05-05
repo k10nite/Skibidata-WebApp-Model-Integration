@@ -6,7 +6,6 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import useAppStore from '../store/appStore';
-import { getRecommendationsForScenario, getRecommendationSummary } from '../data/fertilizerRecommendations';
 import { getSatelliteAnalysis } from '../services/satelliteService';
 import { predictForLocation } from '../services/mlPredictionService';
 
@@ -29,7 +28,7 @@ const TELEMETRY_DATA = [
 
 export default function Processing() {
   const navigate = useNavigate();
-  const { municipality, selectedPlant, plantRequirements, setMLPrediction, setRecommendations, setSatelliteData } = useAppStore();
+  const { municipality, setMLPrediction, setSatelliteData } = useAppStore();
 
   // State for cinematic staging
   const [currentStage, setCurrentStage] = useState(0);
@@ -94,21 +93,14 @@ export default function Processing() {
 
     // Get soil prediction from ML service (Liam's SoilScan-Sentinel2 model output)
     const prediction = await predictForLocation(municipality || 'La Trinidad');
-    const recommendations = getRecommendationsForScenario(
-      prediction,
-      plantRequirements,
-      selectedPlant.name
-    );
-    const summary = getRecommendationSummary(recommendations);
 
     // Store in app state — ML prediction wins over satellite-derived soil estimates
     setMLPrediction(prediction);
-    setRecommendations(recommendations, summary);
     setMLComplete(true);
 
     // Navigate after brief fade
-    setTimeout(() => navigate('/soil-status'), 400);
-  }, [municipality, plantRequirements, selectedPlant?.name, setMLPrediction, setRecommendations, setSatelliteData, navigate]);
+    setTimeout(() => navigate('/plant-selection'), 400);
+  }, [municipality, setMLPrediction, setSatelliteData, navigate]);
 
   // Trigger ML prediction when stages complete or after timeout
   useEffect(() => {

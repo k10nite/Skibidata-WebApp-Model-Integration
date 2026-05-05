@@ -167,7 +167,7 @@ export default function LocationSelection() {
       // Fallback: La Trinidad default for the rest of the flow.
       setLocation({ lat: 16.4619, lng: 120.5874 }, 'La Trinidad', null);
     }
-    navigate('/plant-selection');
+    navigate('/processing');
   };
 
   const tokenMissing = !MAPBOX_TOKEN;

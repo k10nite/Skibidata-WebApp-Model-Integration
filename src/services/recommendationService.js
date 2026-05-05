@@ -30,10 +30,18 @@ function parseAvailableFertilizers(text) {
   return names.length ? names : null;
 }
 
+// Tolerate both shapes: flat string ({ nitrogen: "Low" }) emitted by mlPredictionService /
+// mlPredictions.json, AND nested ({ nitrogen: { rating: "Low" } }) used by older fixtures.
+function readRating(field) {
+  if (typeof field === 'string') return field;
+  if (field && typeof field === 'object' && typeof field.rating === 'string') return field.rating;
+  return 'Medium';
+}
+
 function mapSoilToEngine(soilData, cropKey, areaHectares, availableFertilizers) {
-  const nRating = soilData?.nitrogen?.rating ?? 'Medium';
-  const pRating = soilData?.phosphorus?.rating ?? 'Medium';
-  const kRating = soilData?.potassium?.rating ?? 'Medium';
+  const nRating = readRating(soilData?.nitrogen);
+  const pRating = readRating(soilData?.phosphorus);
+  const kRating = readRating(soilData?.potassium);
   return {
     crop_label: CROP_LABEL_MAP[cropKey] ?? 'Cabbage',
     n_status: N_STATUS_MAP[nRating] ?? 'Medium',
