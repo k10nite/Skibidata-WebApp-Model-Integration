@@ -1,12 +1,11 @@
 import React from 'react';
-   import FertilizerForm from './FertilizerForm';
+import FertilizerForm from './FertilizerForm';
 
-   function App() {
-     return (
-       <div className="min-h-screen bg-gray-100 py-10">
-         <FertilizerForm/>
-       </div>
-     );
-   }
-
-   export default App;
+function App() {
+  return (
+    <div style={{ background: 'var(--color-paper)', minHeight: '100vh' }}>
+      <FertilizerForm />
+    </div>
+  );
+}
+export default App;
