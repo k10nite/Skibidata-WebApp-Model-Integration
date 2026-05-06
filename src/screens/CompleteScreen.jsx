@@ -115,7 +115,6 @@ RECOMMENDATIONS SUMMARY
 Total Products:      ${recommendationSummary?.totalProducts || 0}
 High Priority:       ${recommendationSummary?.highPriority || 0}
 Medium Priority:     ${recommendationSummary?.mediumPriority || 0}
-Estimated Cost:      ₱${(recommendationSummary?.estimatedCost || 0).toLocaleString()} (1 hectare)
 
 FERTILIZER PRODUCTS
 --------------------------------------------------------------------------------
@@ -353,36 +352,25 @@ For CAR Highland Farmers
                     {rec.fertilizer?.name || rec.name}:
                   </span>
                   <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
-                    {rec.amount || '25'} kg · ₱{rec.cost?.toLocaleString() || '1,250'}
+                    {rec.amount || rec.amountKg ? `${(rec.amount || rec.amountKg).toFixed?.(1) ?? rec.amount} kg` : '— kg'}
                   </span>
                 </div>
               )) || (
                 <>
                   <div className="flex justify-between items-baseline" style={{ marginBottom: '4px' }}>
                     <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.7 }}>Urea:</span>
-                    <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>25 kg · ₱1,250</span>
+                    <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>25 kg</span>
                   </div>
                   <div className="flex justify-between items-baseline" style={{ marginBottom: '4px' }}>
                     <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.7 }}>14-14-14:</span>
-                    <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>30 kg · ₱1,800</span>
+                    <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>30 kg</span>
                   </div>
                   <div className="flex justify-between items-baseline" style={{ marginBottom: '4px' }}>
                     <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.7 }}>Muriate:</span>
-                    <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>15 kg · ₱900</span>
+                    <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>15 kg</span>
                   </div>
                 </>
               )}
-              <div
-                className="flex justify-between items-baseline pt-2 mt-2"
-                style={{ borderTop: '1px solid var(--color-contour)' }}
-              >
-                <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', fontWeight: 700, letterSpacing: '0.1em' }}>
-                  TOTAL COST:
-                </span>
-                <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '12px', color: 'var(--color-moss)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-                  ₱{recommendationSummary?.estimatedCost?.toLocaleString() || '8,350'}
-                </span>
-              </div>
             </ReportCell>
           </div>
 

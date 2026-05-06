@@ -94,7 +94,6 @@ BUOD NG REKOMENDASYON (Recommendations Summary)
 Kabuuang Produkto:   ${recommendationSummary?.totalProducts || 0}
 Mataas na Priyoridad: ${recommendationSummary?.highPriority || 0}
 Katamtamang Priyoridad: ${recommendationSummary?.mediumPriority || 0}
-Tinatayang Gastos:   ₱${recommendationSummary?.estimatedCost?.toLocaleString() || '0'} (1 ektarya)
 
 MGA PRODUKTONG PATABA (Fertilizer Products)
 --------------------------------------------------------------------------------
@@ -104,7 +103,6 @@ ${i + 1}. ${rec.fertilizer?.name || rec.name} (${rec.fertilizer?.formula || rec.
    Nutrient: ${rec.nutrient}
    Dahilan: ${rec.reason}
    Paggamit: ${rec.fertilizer?.applicationRate || rec.applicationRate}
-   Presyo: ₱${rec.fertilizer?.pricePerBag || rec.pricePerBag} bawat ${rec.fertilizer?.bagSize || rec.bagSize}
 `).join('\n') || 'Walang kailangang pataba - perpekto na ang lupa!'}
 
 ================================================================================
@@ -223,17 +221,6 @@ Para sa mga Magsasaka ng CAR Highland Farms
                   <TelemetryRow label="Muriate:" value="15 kg" />
                 </>
               )}
-              <div
-                className="flex justify-between pt-2 mt-2"
-                style={{ borderTop: '1px solid var(--color-contour)' }}
-              >
-                <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', fontWeight: 600 }}>
-                  TOTAL:
-                </span>
-                <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
-                  ₱{recommendationSummary?.estimatedCost?.toLocaleString() || '8,350'}
-                </span>
-              </div>
             </ReportCell>
           </motion.div>
 

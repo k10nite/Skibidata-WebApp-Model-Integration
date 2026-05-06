@@ -80,10 +80,6 @@ function phToNumeric(soilData) {
   return 5.6;
 }
 
-function formatCurrency(amount) {
-  return `₱${amount.toLocaleString()}`;
-}
-
 // ─────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────
@@ -170,7 +166,6 @@ export default function FertilizerRecommendations() {
     // Update store with selected candidate's data
     if (selectedCandidate) {
       setRecommendations(selectedCandidate.prescriptions, {
-        totalCostPHP: selectedCandidate.cost,
         totalNutrients: selectedCandidate.applied,
         areaHectares: fertilizerData.summary.areaHectares,
         expectedYield: fertilizerData.summary.expectedYield
@@ -342,16 +337,6 @@ export default function FertilizerRecommendations() {
                     >
                       {candidate.totalWeight.toFixed(0)} kg
                     </span>
-                    <span
-                      style={{
-                        fontFamily: '"JetBrains Mono", monospace',
-                        fontSize: '11px',
-                        color: 'var(--color-earth-deep)',
-                        fontVariantNumeric: 'tabular-nums'
-                      }}
-                    >
-                      {formatCurrency(candidate.cost)}
-                    </span>
                   </div>
                 </motion.div>
               ))}
@@ -390,7 +375,6 @@ export default function FertilizerRecommendations() {
                       <th style={tableHeaderStyle}>N kg</th>
                       <th style={tableHeaderStyle}>P kg</th>
                       <th style={tableHeaderStyle}>K kg</th>
-                      <th style={tableHeaderStyle}>₱</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -437,9 +421,6 @@ export default function FertilizerRecommendations() {
                           >
                             {dim(dK) ? '0' : dK.toFixed(1)}
                           </td>
-                          <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
-                            {presc.cost > 0 ? formatCurrency(presc.cost) : <span style={{ opacity: 0.4 }}>—</span>}
-                          </td>
                         </tr>
                       );
                     })}
@@ -458,9 +439,6 @@ export default function FertilizerRecommendations() {
                       <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', fontWeight: 700 }}>
                         {selectedCandidate.applied.k.toFixed(0)}
                       </td>
-                      <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', fontWeight: 700 }}>
-                        {formatCurrency(selectedCandidate.cost)}
-                      </td>
                     </tr>
                     {/* Target row */}
                     <tr style={{ borderBottom: '1px solid var(--color-contour)' }}>
@@ -475,7 +453,6 @@ export default function FertilizerRecommendations() {
                       <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
                         {kTarget}
                       </td>
-                      <td style={tableCellStyle}>—</td>
                     </tr>
                     {/* Met % row */}
                     <tr>
@@ -490,7 +467,6 @@ export default function FertilizerRecommendations() {
                       <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
                         <MetPercentage value={selectedCandidate.applied.k} target={kTarget} />
                       </td>
-                      <td style={tableCellStyle}>—</td>
                     </tr>
                   </tbody>
                 </table>

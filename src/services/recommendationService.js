@@ -108,20 +108,9 @@ function mapSoilToEngine(soilData, cropKey, areaHectares, availableFertilizers) 
 // The format is defined in engine_rules.json: "{qty} kg/{area} {unit} of {fertilizer_name}".
 const PRESCRIPTION_RE = /^([\d.]+)\s*kg\/([\d.]+)\s+(\S+)\s+of\s+(.+)$/;
 
-// Engine response includes inventory but no prices. Best-effort PHP/kg lookup
-// against the products in fertilizerEngine.PH_FERTILIZERS. Unknowns fall to 0.
-const ENGINE_NAME_TO_PRICE_PHP = {
-  'Urea': 45,
-  'Ammonium Sulfate': 35,
-  'Complete (14-14-14)': 55,
-  'Complete (16-16-16)': 60,
-  'Muriate of Potash': 50,
-  'Single Superphosphate (18)': 40,
-  'Single Superphosphate (20)': 42,
-  'Single Superphosphate (22)': 44,
-  'Ammophos': 50,
-  'Calcium Nitrate': 70
-};
+// (Pricing/cost is intentionally NOT computed in this service — the panel
+// asked the webapp to drop ₱ display end-to-end. Engine response carries
+// nutrient quantities; cost data isn't part of the agronomic claim.)
 
 function classifyByInventory(name, inventory) {
   const f = Array.isArray(inventory) ? inventory.find((x) => x.name === name) : null;
@@ -198,20 +187,17 @@ function normalizeEngineResponse(engineRes, soilData, cropKey, areaHectares) {
     const recommendations = prescriptions
       .map((p) => {
         const cls = classifyByInventory(p.name, engineRes.inventory);
-        const pricePerKg = ENGINE_NAME_TO_PRICE_PHP[p.name] ?? 0;
         const npkPct = getNpkPercent(p.name);
         return {
           stage: cls.stage,
           sortOrder: cls.sortOrder,
-          fertilizer: { name: p.name, brand: '', pricePerKg, npkPercent: npkPct },
+          fertilizer: { name: p.name, brand: '', npkPercent: npkPct },
           amountKg: p.qty,
-          // Per-row nutrient contribution: kg × percentage / 100
           deliveredN: (p.qty * npkPct.n) / 100,
           deliveredP: (p.qty * npkPct.p) / 100,
           deliveredK: (p.qty * npkPct.k) / 100,
           timing: '',
-          method: 'Broadcast',
-          cost: p.qty * pricePerKg
+          method: 'Broadcast'
         };
       })
       .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -226,9 +212,7 @@ function normalizeEngineResponse(engineRes, soilData, cropKey, areaHectares) {
         k: combo['Applied K'] || 0
       },
       prescriptions: recommendations,
-      // Hans's raw Prescription strings — preserved for "engine output" display
-      rawPrescription: combo.Prescription || [],
-      cost: recommendations.reduce((s, r) => s + (r.cost || 0), 0)
+      rawPrescription: combo.Prescription || []
     };
   });
 
@@ -240,15 +224,14 @@ function normalizeEngineResponse(engineRes, soilData, cropKey, areaHectares) {
   const recommendations = prescriptions
     .map((p) => {
       const cls = classifyByInventory(p.name, engineRes.inventory);
-      const pricePerKg = ENGINE_NAME_TO_PRICE_PHP[p.name] ?? 0;
+      const npkPct = getNpkPercent(p.name);
       return {
         stage: cls.stage,
         sortOrder: cls.sortOrder,
-        fertilizer: { name: p.name, brand: '', pricePerKg },
+        fertilizer: { name: p.name, brand: '', npkPercent: npkPct },
         amountKg: p.qty,
         timing: '',
-        method: 'Broadcast',
-        cost: p.qty * pricePerKg
+        method: 'Broadcast'
       };
     })
     .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -262,7 +245,6 @@ function normalizeEngineResponse(engineRes, soilData, cropKey, areaHectares) {
     selectedCandidateIndex: 0,
     candidates,
     summary: {
-      totalCostPHP: recommendations.reduce((s, r) => s + (r.cost || 0), 0),
       totalNutrients: {
         n: Number(totalBase.N ?? 0),
         p: Number(totalBase.P ?? 0),
