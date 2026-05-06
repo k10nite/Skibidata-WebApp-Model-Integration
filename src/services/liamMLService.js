@@ -4,8 +4,55 @@
 
 import { log } from './logger';
 
-const API_URL = import.meta.env.VITE_LIAM_API_URL;
+const DIRECT_URL = import.meta.env.VITE_LIAM_API_URL;
+const PROXY_URL = import.meta.env.VITE_LIAM_PROXY_URL;
 const FETCH_TIMEOUT_MS = 30000;
+
+// Smart URL resolution — probe Liam's CORS once at first call. If GET /health
+// succeeds in CORS mode → use direct URL (zero hop). If it fails (current
+// state, until Liam adds CORSMiddleware) → fall back to our proxy. Cached
+// for the session so we only probe once. When Liam ships CORS upstream, the
+// next reload picks up direct automatically with no env-var changes here.
+let _resolvedUrl = null;
+let _resolvePromise = null;
+
+async function _probeDirectCors() {
+  if (!DIRECT_URL) return null;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 4000);
+    const res = await fetch(`${DIRECT_URL.replace(/\/$/, '')}/health`, {
+      method: 'GET',
+      mode: 'cors',
+      signal: ctrl.signal
+    });
+    clearTimeout(t);
+    if (res.ok) {
+      log.ml('CORS probe: direct URL works', { url: DIRECT_URL });
+      return DIRECT_URL;
+    }
+    log.warn('CORS probe: direct returned non-OK', { status: res.status });
+  } catch (err) {
+    log.warn('CORS probe: direct rejected (likely missing ACAO)', { error: err?.message });
+  }
+  if (PROXY_URL) {
+    log.ml('CORS probe: falling back to proxy URL', { url: PROXY_URL });
+    return PROXY_URL;
+  }
+  log.warn('CORS probe: no proxy configured — direct will be used and may fail');
+  return DIRECT_URL;
+}
+
+async function getResolvedUrl() {
+  if (_resolvedUrl) return _resolvedUrl;
+  if (!_resolvePromise) {
+    _resolvePromise = _probeDirectCors().then((url) => {
+      _resolvedUrl = url;
+      return url;
+    });
+  }
+  return _resolvePromise;
+}
 
 /**
  * Predict soil nutrients for a GeoJSON polygon via Liam's Sentinel-2 ML API
@@ -20,8 +67,9 @@ const FETCH_TIMEOUT_MS = 30000;
  * @throws {Error} If API_URL not configured or request fails
  */
 export async function predictForField(polygon, opts = {}) {
-  if (!API_URL) {
-    throw new Error('VITE_LIAM_API_URL not configured');
+  const apiBase = await getResolvedUrl();
+  if (!apiBase) {
+    throw new Error('VITE_LIAM_API_URL not configured (and no proxy URL available)');
   }
 
   const {
@@ -46,9 +94,12 @@ export async function predictForField(polygon, opts = {}) {
       sample_spacing_m: sampleSpacingM
     };
 
-    log.ml('POST /predict → Liam', { url: API_URL, polygonVertices: polygon?.coordinates?.[0]?.length, cropType });
+    const usingProxy = apiBase === PROXY_URL;
+    log.ml(`POST /predict → ${usingProxy ? 'PROXY' : 'DIRECT'}`, {
+      url: apiBase, polygonVertices: polygon?.coordinates?.[0]?.length, cropType
+    });
     const t0 = performance.now();
-    const response = await fetch(`${API_URL}/predict`, {
+    const response = await fetch(`${apiBase.replace(/\/$/, '')}/predict`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -113,5 +164,5 @@ export async function predictForField(polygon, opts = {}) {
  * @returns {string|null} API URL or null if not configured
  */
 export function getLiamApiUrl() {
-  return API_URL || null;
+  return DIRECT_URL || PROXY_URL || null;
 }
