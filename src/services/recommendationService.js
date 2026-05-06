@@ -10,20 +10,20 @@ const FETCH_TIMEOUT_MS = 8000;
 // (the response only includes user_inventory, which is empty when the
 // user hasn't picked any chips).
 const MASTER_INVENTORY = {
-  'Urea':                       { n: 46,   p: 0,  k: 0 },
-  'Ammonium Sulfate':           { n: 21,   p: 0,  k: 0 },
-  'Calcium Nitrate':            { n: 15.4, p: 0,  k: 0 },
-  'Complete (14-14-14)':        { n: 14,   p: 14, k: 14 },
-  'Complete (16-16-16)':        { n: 16,   p: 16, k: 16 },
-  'Ammophos':                   { n: 16,   p: 20, k: 0 },
-  '15-9-20 Compound':           { n: 15,   p: 9,  k: 20 },
-  '13-33-21 Compound':          { n: 13,   p: 33, k: 21 },
-  '13-31-21 Compound':          { n: 13,   p: 31, k: 21 },
-  '19-4-19 Compound':           { n: 19,   p: 4,  k: 19 },
-  'Single Superphosphate (18)': { n: 0,    p: 18, k: 0 },
-  'Single Superphosphate (20)': { n: 0,    p: 20, k: 0 },
-  'Single Superphosphate (22)': { n: 0,    p: 22, k: 0 },
-  'Muriate of Potash':          { n: 0,    p: 0,  k: 60 }
+  'Urea':                        { n: 46,   p: 0,  k: 0 },
+  'Ammonium Sulfate':            { n: 21,   p: 0,  k: 0 },
+  'Nitrabor':                    { n: 15.4, p: 0,  k: 0 },
+  'T-14 (Complete)':             { n: 14,   p: 14, k: 14 },
+  'Yara Unik (16-16-16)':        { n: 16,   p: 16, k: 16 },
+  'Ammonium Phosphate':          { n: 16,   p: 20, k: 0 },
+  'Yara Mila Winner (15-9-20)':  { n: 15,   p: 9,  k: 20 },
+  'Yara Mila Palme (13-33-21)':  { n: 13,   p: 33, k: 21 },
+  'Yara Mila Grower (13-31-21)': { n: 13,   p: 31, k: 21 },
+  'Yara Mila Hydran (19-4-19)':  { n: 19,   p: 4,  k: 19 },
+  'Solophos (18)':               { n: 0,    p: 18, k: 0 },
+  'Super phosphate(20)':         { n: 0,    p: 20, k: 0 },
+  'Duofos (22)':                 { n: 0,    p: 22, k: 0 },
+  'Muriate of Potash':           { n: 0,    p: 0,  k: 60 }
 };
 
 // Hans's engine advertises L/M/H/VH status codes via OpenAPI, but crop_npk_rules.json
@@ -113,14 +113,14 @@ const PRESCRIPTION_RE = /^([\d.]+)\s*kg\/([\d.]+)\s+(\S+)\s+of\s+(.+)$/;
 const ENGINE_NAME_TO_PRICE_PHP = {
   'Urea': 45,
   'Ammonium Sulfate': 35,
-  'Complete (14-14-14)': 55,
-  'Complete (16-16-16)': 60,
+  'T-14 (Complete)': 55,
+  'Yara Unik (16-16-16)': 60,
   'Muriate of Potash': 50,
-  'Single Superphosphate (18)': 40,
-  'Single Superphosphate (20)': 42,
-  'Single Superphosphate (22)': 44,
-  'Ammophos': 50,
-  'Calcium Nitrate': 70
+  'Solophos (18)': 40,
+  'Super phosphate(20)': 42,
+  'Duofos (22)': 44,
+  'Ammonium Phosphate': 50,
+  'Nitrabor': 70
 };
 
 function classifyByInventory(name, inventory) {

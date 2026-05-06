@@ -71,21 +71,21 @@ const CROPS_DATA = [
 const NITROGEN_PURE = [
   { name: 'Urea', npk: '46-0-0' },
   { name: 'Ammonium Sulfate', npk: '21-0-0' },
-  { name: 'Calcium Nitrate', npk: '15.4-0-0' }
+  { name: 'Nitrabor', npk: '15.4-0-0' }
 ];
 const COMPOUND_COMPLETE = [
-  { name: 'Complete (14-14-14)', npk: '14-14-14' },
-  { name: 'Complete (16-16-16)', npk: '16-16-16' },
-  { name: 'Ammophos', npk: '16-20-0' },
-  { name: '15-9-20 Compound', npk: '15-9-20' },
-  { name: '13-33-21 Compound', npk: '13-33-21' },
-  { name: '13-31-21 Compound', npk: '13-31-21' },
-  { name: '19-4-19 Compound', npk: '19-4-19' }
+  { name: 'T-14 (Complete)', npk: '14-14-14' },
+  { name: 'Yara Unik (16-16-16)', npk: '16-16-16' },
+  { name: 'Ammonium Phosphate', npk: '16-20-0' },
+  { name: 'Yara Mila Winner (15-9-20)', npk: '15-9-20' },
+  { name: 'Yara Mila Palme (13-33-21)', npk: '13-33-21' },
+  { name: 'Yara Mila Grower (13-31-21)', npk: '13-31-21' },
+  { name: 'Yara Mila Hydran (19-4-19)', npk: '19-4-19' }
 ];
 const PHOSPHORUS_POTASSIUM = [
-  { name: 'Single Superphosphate (18)', npk: '0-18-0' },
-  { name: 'Single Superphosphate (20)', npk: '0-20-0' },
-  { name: 'Single Superphosphate (22)', npk: '0-22-0' },
+  { name: 'Solophos (18)', npk: '0-18-0' },
+  { name: 'Super phosphate(20)', npk: '0-20-0' },
+  { name: 'Duofos (22)', npk: '0-22-0' },
   { name: 'Muriate of Potash', npk: '0-0-60' }
 ];
 const ALL_FERTILIZERS = [...NITROGEN_PURE, ...COMPOUND_COMPLETE, ...PHOSPHORUS_POTASSIUM];
