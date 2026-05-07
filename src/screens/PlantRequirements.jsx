@@ -209,6 +209,42 @@ const PLANT_DATA = {
   }
 };
 
+// Per-crop swatch colors keyed off the same ids PlantSelection sets.
+// Picked to evoke the actual vegetable rather than an arbitrary palette
+// (carrot orange, tomato red, eggplant aubergine, etc.). Used for both
+// the icon stroke and a soft tinted background on the badge circle.
+const CROP_COLORS = {
+  cabbage:      '#7C9A4D', // pale leafy green
+  cabbage_head: '#86A05A', // slightly warmer green-yellow
+  pechay:       '#5A8A3A', // bright leaf green
+  lettuce:      '#9DB76A', // lime green
+  potato:       '#B08A5C', // earthy tan
+  carrot:       '#D87E2C', // carrot orange
+  tomato:       '#C9442E', // tomato red
+  string_beans: '#5D8C4A', // forest green
+  baguio_beans: '#7FA260', // mid green
+  broccoli:     '#3F6B36', // deep green
+  cauliflower:  '#E5DCC2', // ivory cream
+  eggplant:     '#6B3D6E', // aubergine purple
+  squash:       '#E0832E', // pumpkin orange
+  ampalaya:     '#6E9148', // medium green-yellow
+  chayote:      '#A8BE7C', // pale jade
+  asparagus:    '#6F8B45', // muted green
+  rice:         '#C9A867', // wheat gold
+  corn:         '#E8B43C', // sweet-corn yellow
+  vegetables:   '#7B9B6E'  // generic moss
+};
+
+const DEFAULT_CROP_COLOR = '#7B9B6E';
+
+function hexToRgba(hex, alpha) {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 // Nutrient configuration for the requirements ledger
 const NUTRIENT_CONFIG = {
   nitrogen: {
@@ -322,6 +358,7 @@ export default function PlantRequirements() {
     return PLANT_DATA.vegetables;
   })();
   const PlantIcon = plant.icon;
+  const cropColor = CROP_COLORS[selectedPlant?.id] || DEFAULT_CROP_COLOR;
 
   if (!soilData) {
     return (
@@ -404,11 +441,14 @@ export default function PlantRequirements() {
               {/* Common name + regional context */}
               <div className="mb-8">
                 <div className="flex items-center gap-4 mb-2">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{
-                    backgroundColor: 'var(--color-moss)',
-                    opacity: 0.1
-                  }}>
-                    <PlantIcon size={24} style={{ color: 'var(--color-moss)' }} />
+                  <div
+                    className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                    style={{
+                      backgroundColor: hexToRgba(cropColor, 0.18),
+                      border: `1px solid ${hexToRgba(cropColor, 0.45)}`
+                    }}
+                  >
+                    <PlantIcon size={24} style={{ color: cropColor }} />
                   </div>
                   <div>
                     <p className="text-xl font-medium" style={{
@@ -419,7 +459,7 @@ export default function PlantRequirements() {
                       {plant.commonName}
                     </p>
                     <p className="text-sm" style={{
-                      color: 'var(--color-moss)',
+                      color: cropColor,
                       fontFamily: '"Fraunces", serif',
                       fontStyle: 'italic',
                       fontVariationSettings: '"opsz" 144, "wght" 400'
