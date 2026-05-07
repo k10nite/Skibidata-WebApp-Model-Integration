@@ -26,13 +26,13 @@ all deployed on Railway in the same `asia-southeast1-eqsg3a` region.
         ┌──────────────┼──────────────────────────────────┐
         │              │                                  │
         ▼              ▼                                  ▼
-┌──────────────┐  ┌────────────────┐          ┌─────────────────────┐
-│ Open-Meteo   │  │ Liam's ML API  │          │ Hans's Rule Engine  │
-│ NASA POWER   │  │ Sentinel-2 +   │          │ FastAPI service     │
-│ (weather +   │  │ scikit-learn   │          │ Crop NPK rules +    │
-│  elevation)  │  │ (NPK + pH      │          │ multi-candidate     │
-│              │  │  classifiers)  │          │ fertilizer mixing   │
-└──────────────┘  └────────────────┘          └─────────────────────┘
+┌──────────────┐  ┌────────────────────┐      ┌─────────────────────┐
+│ Open-Meteo   │  │ ML Inference API   │      │ Rule-based Engine   │
+│ NASA POWER   │  │ (Sentinel-2 +      │      │ (FastAPI service)   │
+│ (weather +   │  │  scikit-learn:     │      │ Crop NPK rules +    │
+│  elevation)  │  │  NPK + pH          │      │ multi-candidate     │
+│              │  │  classifiers)      │      │ fertilizer mixing   │
+└──────────────┘  └────────────────────┘      └─────────────────────┘
 ```
 
 | Service | Repo | Deployment |
@@ -72,9 +72,9 @@ External APIs:
    centroid, and nearest known CAR municipality are saved to the store.
 2. **Processing** (`/processing`) — Active loading state showing a 4-step
    pipeline checklist (satellite → spectral extraction → ML prediction →
-   normalize). The Liam ML call fires here. ML SOURCE pill shows live
-   status: `LIAM-ML` (real inference), `PLACEHOLDER` (fallback), or
-   `PENDING`.
+   normalize). The Sentinel-2 ML inference call fires here. ML SOURCE
+   pill shows live status: `ML-INFERENCE` (real inference), `PLACEHOLDER`
+   (fallback), or `PENDING`.
 3. **Plant Selection** (`/plant-selection`) — Two-panel screen. Left: field
    profile + soil profile + recommended-for-your-soil + engine inputs.
    Right: searchable index of 44 crops grouped by category, English +
@@ -84,13 +84,46 @@ External APIs:
    (N/P/K/pH with status badges + confidence bars), ML metadata strip,
    targets-vs-measured horizontal bar chart.
 5. **Plant Requirements** (`/plant-requirements`) — Crop nutrient demands
-   in scientific-notebook ledger format.
+   in scientific-notebook ledger format. Per-crop color swatch on the
+   common-name badge (tomato red, carrot orange, eggplant aubergine, etc.)
+   keyed off `selectedPlant.id`.
 6. **Fertilizer Recommendations** (`/fertilizer-recommendations`) — POSTs
-   to Hans's rule engine, displays up to 10 candidate combinations with a
-   per-fertilizer NPK breakdown table. Hover any cell for the explicit
-   `qty × NPK% = result` math.
-7. **Complete Summary** (`/complete`) — Field report in 2×2 hairline grid
-   (FIELD / SOIL / CROP / PRESCRIPTION).
+   to the rule engine, displays up to 10 candidate combinations with a
+   per-fertilizer NPK breakdown table. TARGETS card shows stable kg/ha
+   targets from `engine.base_targets_per_ha` plus a total-kg conversion
+   for the actual field area. INVENTORY CHECK panel surfaces a concrete
+   `WHY IT'S INSUFFICIENT` diagnostic when validation fails (which
+   nutrients are missing, which catalog fertilizers cover them, and
+   the structural pure-N/pure-K filler rule).
+7. **Complete Summary** (`/complete`) — Prescription-first field report:
+   compact 3-cell info strip (FIELD / SOIL / CROP) above a full-width
+   `PRESCRIPTION` hero block with a real per-row table
+   (`FERTILIZER | AMOUNT | N kg | P kg | K kg`), a TOTAL row, and an
+   APPLIED N/P/K telemetry strip.
+
+---
+
+## Mobile / responsive
+
+Every screen is usable on a phone. Two shared CSS utilities in
+`src/styles/index.css` drive the pattern:
+
+- `.terrace-mobile-actions` — pins the primary CTA(s) to the bottom of
+  the viewport on `<lg` (with iOS safe-area padding), inline flow on
+  `lg+`. The CTA is always above the fold without scrolling.
+- `.terrace-page-with-mobile-actions` — bottom padding on the page
+  container so content isn't hidden under the fixed action bar.
+
+Per-screen pattern: stack columns vertically on mobile
+(`flex-col lg:flex-row`, `grid-cols-1 sm:grid-cols-X`), shrink padding
+from `px-8/px-12` to `px-4 sm:px-6 lg:px-12`, and provide a sticky-bottom
+CTA with a disabled state when the user can't yet proceed (`DRAW A
+FIELD FIRST`, `PICK A CROP FIRST`, etc.) so the action surface is
+discoverable on a phone.
+
+The map screen caps Mapbox to `88vh` on mobile so the editorial rail
+isn't crushed; PlantSelection's right rail (catalog + Continue) was
+previously `hidden lg:flex` and is now visible-and-stacked on mobile.
 
 ---
 
@@ -137,7 +170,7 @@ thesis/
 │   │   ├── SoilStatus.jsx                   # Screen 4 — instrument panel
 │   │   ├── PlantRequirements.jsx            # Screen 5 — crop demands
 │   │   ├── FertilizerRecommendations.jsx    # Screen 6 — engine call + breakdown
-│   │   └── Complete.jsx                     # Screen 7 — summary + download
+│   │   └── Complete.jsx                     # Screen 7 — prescription-first summary
 │   ├── services/
 │   │   ├── sentinelMLService.js             # POST /predict to the Sentinel-2 inference API
 │   │   ├── recommendationService.js         # POST /recommendation to the rule-based engine
@@ -154,7 +187,7 @@ thesis/
 │   ├── results-discussion.md                # Thesis Chapter 3 draft
 │   ├── results-performance.md               # Performance subsection (real numbers)
 │   └── testing/liam-api.md                  # API testing how-to
-├── liam-soilscan-api-postman-collection.json # Postman collection for Liam's API
+├── liam-soilscan-api-postman-collection.json # Postman collection for the Sentinel-2 inference API
 ├── .env.example
 ├── package.json
 ├── vite.config.js
@@ -173,8 +206,8 @@ thesis/
   draft, screen-by-screen. Honest about scope-met vs scope-pending.
 - **`docs/results-performance.md`** — Real measured latency numbers for all
   three services on 2026-05-07.
-- **`docs/testing/liam-api.md`** — How to test Liam's `/predict` endpoint
-  with curl + Postman.
+- **`docs/testing/liam-api.md`** — How to test the Sentinel-2 ML
+  inference `/predict` endpoint with curl + Postman.
 
 ---
 
@@ -206,12 +239,12 @@ flow:
 
 ```
 SoilScan dev logging enabled
-STORE  fertilizer chip added         {name: "Urea", count: 1}
-FLOW   PlantSelection → /soil-status {crop: "Cabbage", areaHectares: 0.5}
-ML     POST /predict → DIRECT        {url, polygonVertices: 8}
-ML     Liam response 200 in 230ms    {sampleCount, n: "Low", ...}
-RULE   POST /recommendation → engine {body: {selected_inventory_names: ["Urea", ...]}}
-RULE   engine response 200 in 187ms  {candidates: 10, inventory_check_valid: true}
+STORE  fertilizer chip added           {name: "Urea", count: 1}
+FLOW   PlantSelection → /soil-status   {crop: "Cabbage", areaHectares: 0.5}
+ML     POST /predict                   {url, polygonVertices: 8}
+ML     Response 200 in 230ms           {sampleCount, n: "Low", ...}
+RULE   POST /recommendation → engine   {body: {selected_inventory_names: ["Urea", ...]}}
+RULE   engine response 200 in 187ms    {candidates: 10, inventory_check_valid: true}
 ```
 
 Set `VITE_DEBUG_LOGS=false` in `.env` to silence.
