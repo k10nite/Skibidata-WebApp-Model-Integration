@@ -197,20 +197,25 @@ export default function LocationSelection() {
         <path d="M0,500 Q200,450 500,500 T1200,500" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.3" />
       </svg>
 
-      <div className="relative z-10 min-h-screen flex">
+      <div className="relative z-10 min-h-screen flex flex-col lg:flex-row terrace-page-with-mobile-actions">
         {/* Map Section — 62% Hero */}
         <motion.div variants={itemVariants} className="w-full lg:w-[62%] relative">
-          <div className="h-screen p-6 lg:p-12 flex flex-col">
-            <motion.div variants={itemVariants} className="mb-6">
-              <div className="terrace-eyebrow mb-4">01 — LOCATION</div>
+          <div className="h-[88vh] lg:h-screen p-4 sm:p-6 lg:p-12 flex flex-col">
+            <motion.div variants={itemVariants} className="mb-4 lg:mb-6">
+              <div className="terrace-eyebrow mb-2 lg:mb-4">01 — LOCATION</div>
               <h1
-                className="terrace-display text-4xl lg:text-6xl mb-2"
-                style={{ fontFamily: '"Fraunces", serif', fontVariationSettings: '"opsz" 144, "wght" 600' }}
+                className="terrace-display mb-1 lg:mb-2"
+                style={{
+                  fontFamily: '"Fraunces", serif',
+                  fontVariationSettings: '"opsz" 144, "wght" 600',
+                  fontSize: 'clamp(1.75rem, 6vw, 3.75rem)',
+                  lineHeight: 1.05
+                }}
               >
                 Where is your field?
               </h1>
               <p className="text-sm text-[var(--color-earth-deep)]/60">
-                Search for your area, then draw the polygon — or click <em>Magic Click</em> for a quick demo field.
+                Search for your area, then draw the polygon — or tap <em>Magic Click</em> for a quick demo field.
               </p>
             </motion.div>
 
@@ -528,17 +533,23 @@ export default function LocationSelection() {
         </motion.div>
       </div>
 
-      {canContinue && (
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 p-6 bg-gradient-to-t from-[var(--color-paper)] via-[var(--color-paper)] to-transparent">
-          <button
-            onClick={handleContinue}
-            className="terrace-btn w-full group flex items-center justify-between px-6 py-4"
-          >
-            <span>Continue to Plant Selection</span>
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-      )}
+      {/* Mobile sticky CTA — always visible so user knows what to do next */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 px-4 py-3 border-t" style={{
+        background: 'var(--color-paper-card)',
+        borderColor: 'var(--color-contour)',
+        boxShadow: '0 -8px 20px -8px rgba(45,32,22,0.08)',
+        paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0))'
+      }}>
+        <button
+          onClick={handleContinue}
+          disabled={!canContinue}
+          className="terrace-btn w-full group flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{ padding: '0.95rem 1.25rem', letterSpacing: '0.18em' }}
+        >
+          <span>{canContinue ? `CONTINUE · ${areaHa.toFixed(2)} HA` : 'DRAW A FIELD FIRST'}</span>
+          {canContinue && <ChevronRight className="w-4 h-4 ml-2" />}
+        </button>
+      </div>
     </motion.div>
   );
 }

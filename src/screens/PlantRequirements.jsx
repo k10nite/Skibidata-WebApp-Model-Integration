@@ -387,7 +387,7 @@ export default function PlantRequirements() {
   return (
     <div
       ref={containerRef}
-      className="min-h-screen relative"
+      className="min-h-screen relative terrace-page-with-mobile-actions"
       style={{ background: 'var(--color-paper)' }}
     >
       {/* Topographic background */}
@@ -414,8 +414,8 @@ export default function PlantRequirements() {
       </motion.div>
 
       {/* Main editorial split-spread */}
-      <main className="relative z-10 max-w-7xl mx-auto px-6 pb-12">
-        <div className="grid grid-cols-12 gap-12 min-h-[70vh]">
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pb-12">
+        <div className="grid grid-cols-12 gap-6 lg:gap-12 lg:min-h-[70vh]">
 
           {/* LEFT SIDE - Primary Editorial Mass (58%) */}
           <div className="col-span-12 lg:col-span-7 flex flex-col justify-center">
@@ -515,12 +515,12 @@ export default function PlantRequirements() {
           </div>
         </div>
 
-        {/* Continue button */}
+        {/* Continue button — inline on desktop, sticky-bottom on mobile */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.8, ease: TERRACE_EASING }}
-          className="flex justify-center mt-16"
+          className="hidden lg:flex justify-center mt-16"
         >
           <motion.button
             onClick={handleContinue}
@@ -536,6 +536,26 @@ export default function PlantRequirements() {
           </motion.button>
         </motion.div>
       </main>
+
+      {/* Mobile sticky-bottom CTA */}
+      <div
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 px-4 py-3 border-t"
+        style={{
+          background: 'var(--color-paper-card)',
+          borderColor: 'var(--color-contour)',
+          boxShadow: '0 -8px 20px -8px rgba(45,32,22,0.08)',
+          paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0))'
+        }}
+      >
+        <button
+          onClick={handleContinue}
+          className="terrace-btn w-full justify-center"
+          style={{ padding: '0.95rem 1rem', letterSpacing: '0.18em' }}
+        >
+          CONTINUE → RECOMMENDATIONS
+          <ArrowRight size={16} className="ml-2" />
+        </button>
+      </div>
     </div>
   );
 }

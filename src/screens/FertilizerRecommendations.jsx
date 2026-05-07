@@ -194,7 +194,7 @@ export default function FertilizerRecommendations() {
       initial="initial"
       animate="animate"
       variants={containerVariants}
-      className="h-screen flex flex-col relative overflow-hidden"
+      className="min-h-screen lg:h-screen flex flex-col relative lg:overflow-hidden terrace-page-with-mobile-actions"
       style={{ background: 'var(--color-paper)', fontFamily: '"Fraunces", serif' }}
     >
       {/* Subtle topo backdrop */}
@@ -207,7 +207,7 @@ export default function FertilizerRecommendations() {
       {/* ─── Top breadcrumb strip ─── */}
       <motion.header
         variants={itemVariants}
-        className="flex items-center justify-between px-8 lg:px-12 py-3"
+        className="flex items-center justify-between px-4 sm:px-6 lg:px-12 py-3"
         style={{
           borderBottom: '1px solid var(--color-contour)',
           background: 'var(--color-paper-card)',
@@ -215,6 +215,7 @@ export default function FertilizerRecommendations() {
         }}
       >
         <div
+          className="overflow-x-auto whitespace-nowrap"
           style={{
             fontFamily: '"JetBrains Mono", monospace',
             fontSize: '11px',
@@ -234,16 +235,13 @@ export default function FertilizerRecommendations() {
       </motion.header>
 
       {/* ─── Main grid ─── */}
-      <div className="flex-1 flex min-h-0">
+      <div className="flex-1 flex flex-col lg:flex-row lg:min-h-0">
 
         {/* LEFT — targets + combos list */}
         <motion.div
           variants={itemVariants}
-          className="flex flex-col gap-4 px-8 lg:px-12 py-6"
-          style={{
-            width: '38%',
-            borderRight: '1px solid var(--color-contour)'
-          }}
+          className="flex flex-col gap-4 px-4 sm:px-6 lg:px-12 py-4 lg:py-6 w-full lg:w-[38%] border-b lg:border-b-0 lg:border-r"
+          style={{ borderColor: 'var(--color-contour)' }}
         >
           {/* Targets panel */}
           <div
@@ -381,8 +379,7 @@ export default function FertilizerRecommendations() {
         {/* RIGHT — selected combo breakdown */}
         <motion.div
           variants={itemVariants}
-          className="flex-1 flex flex-col gap-4 px-8 lg:px-12 py-6 min-h-0"
-          style={{ width: '62%' }}
+          className="flex-1 flex flex-col gap-4 px-4 sm:px-6 lg:px-12 py-4 lg:py-6 lg:min-h-0 w-full lg:w-[62%]"
         >
           <div>
             <div className="flex items-baseline justify-between mb-2">
@@ -512,7 +509,7 @@ export default function FertilizerRecommendations() {
               the engine's raw response so the user can see its exact strings,
               the pH recommendation message, and the inventory check result. */}
           <div
-            className="grid grid-cols-2 gap-3"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-3"
             style={{ flex: 1, minHeight: 0 }}
           >
             {/* Raw prescription strings — engine's canonical format */}
@@ -740,22 +737,25 @@ export default function FertilizerRecommendations() {
       {/* ─── Bottom strip ─── */}
       <motion.footer
         variants={itemVariants}
-        className="flex items-center justify-between px-8 lg:px-12 py-4"
+        className="flex items-center justify-between gap-3 px-4 sm:px-6 lg:px-12 py-3 lg:py-4 fixed lg:relative bottom-0 left-0 right-0 z-50"
         style={{
           borderTop: '1px solid var(--color-contour)',
           background: 'var(--color-paper-card)',
-          flexShrink: 0
+          flexShrink: 0,
+          paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0))',
+          boxShadow: '0 -8px 20px -8px rgba(45,32,22,0.08)'
         }}
       >
         <button
           onClick={handleBack}
           className="terrace-btn-ghost"
+          style={{ padding: '0.85rem 1.2rem' }}
         >
           ← Back
         </button>
         <button
           onClick={handleContinue}
-          className="terrace-btn group"
+          className="terrace-btn group flex-1 lg:flex-none justify-center"
           style={{ padding: '0.85rem 1.6rem', letterSpacing: '0.18em', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
         >
           Continue → Summary

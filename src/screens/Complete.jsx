@@ -68,7 +68,7 @@ export default function Complete() {
       initial="initial"
       animate="animate"
       variants={containerVariants}
-      className="min-h-screen flex flex-col relative"
+      className="min-h-screen flex flex-col relative terrace-page-with-mobile-actions"
       style={{ background: 'var(--color-paper)', fontFamily: '"Fraunces", serif' }}
     >
       <svg className="terrace-topo opacity-[0.04] absolute inset-0 pointer-events-none" viewBox="0 0 1200 800" preserveAspectRatio="none">
@@ -80,7 +80,7 @@ export default function Complete() {
       {/* ─── Top session strip ─── */}
       <motion.header
         variants={itemVariants}
-        className="flex items-center justify-between px-8 lg:px-12 py-3"
+        className="flex items-center justify-between px-4 sm:px-6 lg:px-12 py-3"
         style={{
           borderBottom: '1px solid var(--color-contour)',
           background: 'var(--color-paper-card)',
@@ -101,7 +101,7 @@ export default function Complete() {
       </motion.header>
 
       {/* ─── Main content ─── */}
-      <div className="flex-1 px-8 lg:px-12 py-8">
+      <div className="flex-1 px-4 sm:px-6 lg:px-12 py-6 lg:py-8">
         <div className="w-full max-w-5xl mx-auto">
           {/* Title */}
           <motion.div variants={itemVariants} className="mb-6">
@@ -109,10 +109,11 @@ export default function Complete() {
               style={{
                 fontFamily: '"Fraunces", serif',
                 fontVariationSettings: '"opsz" 144, "wght" 600',
-                fontSize: '32px',
+                fontSize: 'clamp(22px, 5vw, 32px)',
                 color: 'var(--color-earth-deep)',
                 letterSpacing: '-0.01em',
-                marginBottom: '4px'
+                marginBottom: '4px',
+                lineHeight: 1.1
               }}
             >
               FIELD REPORT — {municipality || 'La Trinidad, Benguet'}
@@ -122,7 +123,7 @@ export default function Complete() {
           {/* ─── Compact info strip (FIELD / SOIL / CROP) ─── */}
           <motion.div
             variants={itemVariants}
-            className="grid grid-cols-3 gap-px mb-6"
+            className="grid grid-cols-1 sm:grid-cols-3 gap-px mb-6"
             style={{
               background: 'var(--color-contour)',
               border: '1px solid var(--color-contour)',
@@ -155,12 +156,11 @@ export default function Complete() {
           {/* ─── HERO: PRESCRIPTION ─── */}
           <motion.div
             variants={itemVariants}
-            className="mb-6"
+            className="mb-6 px-5 py-5 sm:px-7 sm:py-6"
             style={{
               background: 'var(--color-paper-card)',
               border: `1px solid ${hasPrescription ? 'var(--color-moss)' : 'var(--color-contour)'}`,
-              borderRadius: '4px',
-              padding: '24px 28px'
+              borderRadius: '4px'
             }}
           >
             <div className="flex items-baseline justify-between mb-4" style={{ borderBottom: '1px solid var(--color-contour)', paddingBottom: '12px' }}>
@@ -192,8 +192,8 @@ export default function Complete() {
 
             {hasPrescription ? (
               <>
-                {/* Per-row breakdown table */}
-                <div className="grid mb-5" style={{ gridTemplateColumns: '1fr 90px 60px 60px 60px', gap: '8px 16px' }}>
+                {/* Per-row breakdown table — horizontal scroll on small screens */}
+                <div className="grid mb-5 overflow-x-auto" style={{ gridTemplateColumns: 'minmax(140px, 1fr) 80px 56px 56px 56px', gap: '8px 12px' }}>
                   <ColHead>FERTILIZER</ColHead>
                   <ColHead align="right">AMOUNT</ColHead>
                   <ColHead align="right">N kg</ColHead>
@@ -248,10 +248,10 @@ export default function Complete() {
             )}
           </motion.div>
 
-          {/* Actions */}
+          {/* Actions — sticky-bottom on mobile via .terrace-mobile-actions */}
           <motion.div variants={itemVariants}>
             <Eyebrow>ACTIONS</Eyebrow>
-            <div className="flex gap-4 mt-3">
+            <div className="terrace-mobile-actions mt-3">
               <button
                 onClick={handleNewAnalysis}
                 className="terrace-btn"

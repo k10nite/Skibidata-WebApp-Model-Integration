@@ -338,7 +338,7 @@ export default function PlantSelection() {
       initial="initial"
       animate="animate"
       variants={containerVariants}
-      className="min-h-screen relative"
+      className="min-h-screen relative terrace-page-with-mobile-actions"
       style={{
         background: 'var(--color-paper)',
         fontFamily: '"Fraunces", serif'
@@ -351,12 +351,12 @@ export default function PlantSelection() {
         <path d="M0,520 Q200,470 500,520 T1200,520" fill="none" stroke="currentColor" strokeWidth="1" />
       </svg>
 
-      <div className="relative z-10 flex min-h-screen">
+      <div className="relative z-10 flex flex-col lg:flex-row min-h-screen">
 
         {/* ─────────── LEFT (62%) — content-first composition ─────────── */}
         <motion.div
           variants={itemVariants}
-          className="w-full lg:w-[62%] px-8 lg:px-14 py-10"
+          className="w-full lg:w-[62%] px-4 sm:px-6 lg:px-14 py-6 lg:py-10"
         >
           {/* Hero — slim, no giant ornament */}
           <div className="mb-6">
@@ -460,7 +460,7 @@ export default function PlantSelection() {
           {/* Telemetry strip — 4 cells, real data */}
           <motion.div variants={itemVariants} className="mb-6">
             <div
-              className="grid grid-cols-4 gap-px"
+              className="grid grid-cols-2 sm:grid-cols-4 gap-px"
               style={{ background: 'var(--color-contour)', border: '1px solid var(--color-contour)', borderRadius: '4px', overflow: 'hidden' }}
             >
               <TelemetryCell label="LOCATION" value={municipality || 'La Trinidad'} />
@@ -506,7 +506,7 @@ export default function PlantSelection() {
                 padding: '20px'
               }}
             >
-              <div className="grid grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
                 <NutrientCell letter="N" status={nStatus} dist={liamRich?.nitrogen?.class_distribution} />
                 <NutrientCell letter="P" status={pStatus} dist={liamRich?.phosphorus?.class_distribution} />
                 <NutrientCell letter="K" status={kStatus} dist={liamRich?.potassium?.class_distribution} />
@@ -537,7 +537,7 @@ export default function PlantSelection() {
                 <Eyebrow>RECOMMENDED FOR YOUR SOIL</Eyebrow>
                 <Caption>scored against pH {ph.toFixed(1)} · N={nStatus}</Caption>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {recommendations.map(({ crop, score }) => (
                   <button
                     key={crop.id}
@@ -679,13 +679,11 @@ export default function PlantSelection() {
         {/* ─────────── RIGHT (38%) — index ─────────── */}
         <motion.div
           variants={itemVariants}
-          className="hidden lg:flex w-[38%] flex-col"
+          className="w-full lg:w-[38%] flex flex-col lg:sticky lg:top-0 lg:h-screen"
           style={{
             background: 'var(--color-paper-card)',
-            borderLeft: '1px solid var(--color-contour)',
-            position: 'sticky',
-            top: 0,
-            height: '100vh'
+            borderTop: '1px solid var(--color-contour)',
+            borderLeft: '1px solid var(--color-contour)'
           }}
         >
           <div className="px-8 py-6" style={{ borderBottom: '1px solid var(--color-contour)' }}>
@@ -833,8 +831,8 @@ export default function PlantSelection() {
             ))}
           </div>
 
-          {/* Continue */}
-          <div className="px-8 py-5" style={{ borderTop: '1px solid var(--color-contour)' }}>
+          {/* Continue — sticky-bottom on mobile via terrace-mobile-actions */}
+          <div className="hidden lg:block px-8 py-5" style={{ borderTop: '1px solid var(--color-contour)' }}>
             {selectedCrop && (
               <div
                 style={{
@@ -864,6 +862,47 @@ export default function PlantSelection() {
             </button>
           </div>
         </motion.div>
+      </div>
+
+      {/* Mobile sticky bottom CTA — duplicates the desktop continue button so
+          mobile users always have the action visible without scrolling. */}
+      <div
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 px-4 py-3 border-t"
+        style={{
+          background: 'var(--color-paper-card)',
+          borderColor: 'var(--color-contour)',
+          boxShadow: '0 -8px 20px -8px rgba(45,32,22,0.08)',
+          paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0))'
+        }}
+      >
+        {selectedCrop && (
+          <div
+            style={{
+              fontFamily: '"JetBrains Mono", monospace',
+              fontSize: '9px',
+              letterSpacing: '0.18em',
+              color: 'var(--color-earth-deep)',
+              opacity: 0.6,
+              marginBottom: '6px',
+              textAlign: 'center'
+            }}
+          >
+            → {selectedCrop.engineLabel} · {areaHectares.toFixed(2)} HA · {selectedFertilizers.size} FERT
+          </div>
+        )}
+        <button
+          onClick={handleContinue}
+          disabled={!selectedCrop}
+          className="terrace-btn w-full justify-center"
+          style={{
+            padding: '0.95rem 1rem',
+            opacity: selectedCrop ? 1 : 0.4,
+            cursor: selectedCrop ? 'pointer' : 'not-allowed',
+            letterSpacing: '0.18em'
+          }}
+        >
+          {selectedCrop ? 'CONTINUE — REVIEW SOIL' : 'PICK A CROP FIRST'}
+        </button>
       </div>
     </motion.div>
   );

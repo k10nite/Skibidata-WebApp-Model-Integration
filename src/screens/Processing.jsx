@@ -161,7 +161,7 @@ export default function Processing() {
 
       {/* Top breadcrumb strip — matches downstream screens */}
       <header
-        className="flex items-center justify-between px-8 lg:px-12 py-3"
+        className="flex items-center justify-between px-4 sm:px-6 lg:px-12 py-3"
         style={{
           borderBottom: '1px solid var(--color-contour)',
           background: 'var(--color-paper-card)'
@@ -196,7 +196,7 @@ export default function Processing() {
         </div>
       </header>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-8 lg:px-12 py-10">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-12 py-6 lg:py-10">
 
         {/* Hero strip */}
         <motion.div
@@ -350,7 +350,7 @@ export default function Processing() {
 
             {/* Soil readout — fills in after step 4 */}
             <div
-              className="mt-4 grid grid-cols-4 gap-px"
+              className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-px"
               style={{ background: 'var(--color-contour)', border: '1px solid var(--color-contour)', borderRadius: '4px', overflow: 'hidden' }}
             >
               <SoilCell label="N" value={telemetry.n} />

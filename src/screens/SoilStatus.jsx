@@ -137,7 +137,7 @@ export default function SoilStatus() {
       initial="initial"
       animate="animate"
       variants={containerVariants}
-      className="h-screen flex flex-col relative overflow-hidden"
+      className="min-h-screen lg:h-screen flex flex-col relative lg:overflow-hidden terrace-page-with-mobile-actions"
       style={{ background: 'var(--color-paper)', fontFamily: '"Fraunces", serif' }}
     >
       {/* Subtle topo backdrop */}
@@ -150,7 +150,7 @@ export default function SoilStatus() {
       {/* ─── Top breadcrumb strip ─── */}
       <motion.header
         variants={itemVariants}
-        className="flex items-center justify-between px-8 lg:px-12 py-3"
+        className="flex items-center justify-between px-4 sm:px-6 lg:px-12 py-3 flex-wrap gap-2"
         style={{
           borderBottom: '1px solid var(--color-contour)',
           background: 'var(--color-paper-card)',
@@ -190,16 +190,13 @@ export default function SoilStatus() {
       </motion.header>
 
       {/* ─── Main grid ─── */}
-      <div className="flex-1 flex min-h-0">
+      <div className="flex-1 flex flex-col lg:flex-row lg:min-h-0">
 
         {/* LEFT — polygon thumbnail + telemetry */}
         <motion.div
           variants={itemVariants}
-          className="flex flex-col gap-3 px-8 lg:px-12 py-6"
-          style={{
-            width: '38%',
-            borderRight: '1px solid var(--color-contour)'
-          }}
+          className="flex flex-col gap-3 px-4 sm:px-6 lg:px-12 py-4 lg:py-6 w-full lg:w-[38%] border-b lg:border-b-0 lg:border-r"
+          style={{ borderColor: 'var(--color-contour)' }}
         >
           {/* Polygon thumbnail */}
           <div
@@ -293,7 +290,7 @@ export default function SoilStatus() {
         {/* RIGHT — measurements + chart */}
         <motion.div
           variants={itemVariants}
-          className="flex-1 flex flex-col gap-4 px-8 lg:px-12 py-6 min-h-0"
+          className="flex-1 flex flex-col gap-4 px-4 sm:px-6 lg:px-12 py-4 lg:py-6 lg:min-h-0"
           style={{ width: '62%' }}
         >
           {/* Primary measurements */}
@@ -303,7 +300,7 @@ export default function SoilStatus() {
               <Caption>4 nutrients · ML soil-survey output</Caption>
             </div>
             <div
-              className="grid grid-cols-4 gap-px"
+              className="grid grid-cols-2 sm:grid-cols-4 gap-px"
               style={{
                 background: 'var(--color-contour)',
                 border: '1px solid var(--color-contour)',
@@ -394,20 +391,22 @@ export default function SoilStatus() {
       {/* ─── Bottom strip ─── */}
       <motion.footer
         variants={itemVariants}
-        className="flex items-center justify-between px-8 lg:px-12 py-4"
+        className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 px-4 sm:px-6 lg:px-12 py-3 lg:py-4 fixed lg:relative bottom-0 left-0 right-0 z-50"
         style={{
           borderTop: '1px solid var(--color-contour)',
           background: 'var(--color-paper-card)',
-          flexShrink: 0
+          flexShrink: 0,
+          paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0))',
+          boxShadow: '0 -8px 20px -8px rgba(45,32,22,0.08)'
         }}
       >
-        <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '10px', letterSpacing: '0.18em', color: 'var(--color-earth-deep)', opacity: 0.55 }}>
+        <div className="hidden lg:block" style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '10px', letterSpacing: '0.18em', color: 'var(--color-earth-deep)', opacity: 0.55 }}>
           NEXT → CROP REQUIREMENTS · then engine call
         </div>
         <button
           onClick={() => navigate('/plant-requirements')}
-          className="terrace-btn group"
-          style={{ padding: '0.85rem 1.6rem', letterSpacing: '0.18em', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+          className="terrace-btn group w-full lg:w-auto justify-center"
+          style={{ padding: '0.95rem 1.6rem', letterSpacing: '0.18em', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
         >
           CONTINUE → REQUIREMENTS
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

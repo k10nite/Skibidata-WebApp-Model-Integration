@@ -218,6 +218,42 @@
   transform: translateY(-1px);
 }
 
+/* ===== MOBILE ACTION BAR =====
+   Pins the primary CTA(s) to the bottom of the viewport on mobile so they
+   stay visible above the fold without scroll. On lg+ it falls back to
+   inline flow so the desktop layout is unchanged. */
+.terrace-mobile-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+@media (max-width: 1023px) {
+  .terrace-mobile-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom, 0));
+    background: var(--color-paper-card);
+    border-top: 1px solid var(--color-contour);
+    box-shadow: 0 -8px 20px -8px rgba(45, 32, 22, 0.08);
+    z-index: 50;
+  }
+  .terrace-mobile-actions > .terrace-btn,
+  .terrace-mobile-actions > .terrace-btn-ghost {
+    flex: 1;
+    justify-content: center;
+    padding: 0.85rem 1rem;
+  }
+}
+
+/* Pages that mount a mobile action bar need bottom padding so content
+   isn't hidden under the fixed bar. */
+@media (max-width: 1023px) {
+  .terrace-page-with-mobile-actions {
+    padding-bottom: 5.5rem;
+  }
+}
+
 /* ===== GLOBAL SOIL GRAIN TEXTURE ===== */
 body::before {
   content: '';
