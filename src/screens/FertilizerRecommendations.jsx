@@ -165,15 +165,31 @@ export default function FertilizerRecommendations() {
   };
 
   const handleContinue = () => {
-    // Update store with selected candidate's data
-    if (selectedCandidate) {
-      setRecommendations(selectedCandidate.prescriptions, {
-        totalNutrients: selectedCandidate.applied,
-        areaHectares: fertilizerData.summary.areaHectares,
-        expectedYield: fertilizerData.summary.expectedYield
+    // Update store with the selected engine candidate. If the engine falls
+    // back to the local calculator, pass that prescription through as well.
+    const candidateRows = selectedCandidate?.prescriptions || [];
+    const fallbackRows = fertilizerData?.recommendations || [];
+    const prescriptionRows = candidateRows.length ? candidateRows : fallbackRows;
+    const summary = selectedCandidate
+      ? {
+          totalNutrients: selectedCandidate.applied,
+          areaHectares: fertilizerData.summary.areaHectares,
+          expectedYield: fertilizerData.summary.expectedYield,
+          sourceName: selectedCandidate.sourceName,
+          totalWeight: selectedCandidate.totalWeight,
+          rawPrescription: selectedCandidate.rawPrescription
+        }
+      : fertilizerData?.summary;
+
+    if (prescriptionRows.length) {
+      setRecommendations(prescriptionRows, summary);
+      navigate('/complete');
+    } else {
+      log.warn('summary navigation blocked: no parsed prescription rows', {
+        sourceName: selectedCandidate?.sourceName,
+        rawPrescription: selectedCandidate?.rawPrescription
       });
     }
-    navigate('/complete');
   };
 
   const handleBack = () => {
