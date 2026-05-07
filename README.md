@@ -310,11 +310,11 @@ Detailed measurement in `docs/results-performance.md`.
 - **Bravo, Matt Danielle** — Rule-based engine support
 - **Cayton, Neil Clarence** — Web application + system integration (this repo)
 - **Fabe, Milton Junsel** — UI prototyping (`fertilizer-ui/`, `mapbox/`)
-- **Magpili, Dylan Yeoj** — Field data collection
+- **Magpili, Dylan Yeoj** — Field data acquisition & ground-truth dataset curation
 - **Morados, Lou Diamond** — Mobile app & backend, fertilizer inventory naming
 - **Morales, Liam Jiro** — ML model + Sentinel-2 inference API
   (`SoilScan-Sentinel2-API`)
-- **Palacio, Malmar** — Field operations
+- **Palacio, Malmar** — Field methodology documentation & validation protocol
 
 Advisor: Saint Louis University Computer Science Department, in
 coordination with Benguet State University and DA-Cordillera
