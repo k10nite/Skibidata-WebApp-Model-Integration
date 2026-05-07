@@ -11,7 +11,7 @@ const useAppStore = create((set) => ({
   location: null,
   municipality: null,
   barangay: null,
-  field: null,           // GeoJSON Polygon (mapbox-draw output) — sent to Liam's POST /predict
+  field: null,           // GeoJSON Polygon (mapbox-draw output) — sent to inference POST /predict
   fieldAreaHa: 0,        // hectares (turf.area / 10000)
   fieldCenter: null,     // { lat, lng } — centroid of polygon, for fallback name lookup
 

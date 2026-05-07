@@ -261,7 +261,7 @@ export default function ProcessingScreen({ onComplete }) {
 
       // Process soil data and navigate after a short delay
       const completeTimer = setTimeout(async () => {
-        // Get soil prediction from ML service (Liam's SoilScan-Sentinel2 model output)
+        // Get soil prediction from ML service (Sentinel-2 model output)
         const prediction = await predictForLocation(municipality || 'La Trinidad');
         const recommendations = getRecommendationsForScenario(
           prediction,

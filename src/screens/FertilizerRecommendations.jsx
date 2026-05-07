@@ -475,13 +475,13 @@ export default function FertilizerRecommendations() {
           </div>
 
           {/* Engine-direct output panel — fills the bottom-right space with
-              Hans's raw response so the user can see the engine's exact strings,
+              the engine's raw response so the user can see its exact strings,
               the pH recommendation message, and the inventory check result. */}
           <div
             className="grid grid-cols-2 gap-3"
             style={{ flex: 1, minHeight: 0 }}
           >
-            {/* Raw prescription strings — Hans's canonical format */}
+            {/* Raw prescription strings — engine's canonical format */}
             <div
               style={{
                 background: 'var(--color-paper-card)',

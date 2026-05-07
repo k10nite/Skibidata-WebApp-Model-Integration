@@ -115,8 +115,8 @@ Location Selection screen with a satellite map centred on La Trinidad.
 | Variable | Required | Purpose |
 |---|---|---|
 | `VITE_MAPBOX_TOKEN` | Yes | Public `pk.*` Mapbox token. Restrict to your dev + production origins on the Mapbox dashboard. |
-| `VITE_RULE_API_URL` | Recommended | Hans's rule engine. Defaults work for the live deployment. |
-| `VITE_LIAM_API_URL` | Recommended | Direct URL to Liam's ML API. On request failure (CORS, timeout, 5xx) the webapp falls back to the bundled placeholder JSON. |
+| `VITE_RULE_API_URL` | Recommended | Rule-based fertilizer engine. Defaults work for the live deployment. |
+| `VITE_ML_INFERENCE_URL` | Recommended | Direct URL to the Sentinel-2 ML inference API. On request failure (CORS, timeout, 5xx) the webapp falls back to the bundled placeholder JSON. (Legacy alias `VITE_LIAM_API_URL` still works.) |
 | `VITE_DEBUG_LOGS` | Optional | Set to `false` to silence the dev logger. Defaults on. |
 | `VITE_KIMI_API_KEY` | Optional | Kimi LLM API for ad-hoc dev experiments. Not in the active flow. |
 
@@ -139,8 +139,8 @@ thesis/
 │   │   ├── FertilizerRecommendations.jsx    # Screen 6 — engine call + breakdown
 │   │   └── Complete.jsx                     # Screen 7 — summary + download
 │   ├── services/
-│   │   ├── liamMLService.js                 # POST /predict to Liam (smart CORS probe)
-│   │   ├── recommendationService.js         # POST /recommendation to Hans's engine
+│   │   ├── sentinelMLService.js             # POST /predict to the Sentinel-2 inference API
+│   │   ├── recommendationService.js         # POST /recommendation to the rule-based engine
 │   │   ├── mlPredictionService.js           # Placeholder JSON fallback for ML
 │   │   ├── satelliteService.js              # Open-Meteo + NASA POWER
 │   │   ├── mapboxStaticService.js           # Polygon thumbnail URL builder
@@ -225,7 +225,7 @@ The webapp deploys to Railway via GitHub integration on every push to
 is `npm run preview -- --host 0.0.0.0 --port $PORT`.
 
 Railway env vars match the `.env.example` keys — `VITE_MAPBOX_TOKEN`,
-`VITE_RULE_API_URL`, `VITE_LIAM_API_URL` — all inlined into the JS
+`VITE_RULE_API_URL`, `VITE_ML_INFERENCE_URL` — all inlined into the JS
 bundle at build time, so changes require a redeploy.
 
 ---

@@ -62,7 +62,7 @@ function phLabel(ph) {
   return 'ALKALINE';
 }
 
-// Normalize Liam dominant_class to title-case ("low" → "Low")
+// Normalize inference dominant_class to title-case ("low" → "Low")
 function normalizeStatus(s) {
   if (!s) return 'Medium';
   const lower = s.toString().toLowerCase();
@@ -103,33 +103,33 @@ export default function SoilStatus() {
 
   if (!soilData) return null;
 
-  const liam = soilData.liam;
+  const inference = soilData.raw || soilData.liam;
   const nStatus = normalizeStatus(readRating(soilData.nitrogen));
   const pStatus = normalizeStatus(readRating(soilData.phosphorus));
   const kStatus = normalizeStatus(readRating(soilData.potassium));
   const ph = phToNumeric(soilData);
 
-  // Estimated ppm (from status fraction × target). When Liam ships real
-  // ppm in the future this can read from soilData[key].value directly.
+  // Estimated ppm (from status fraction × target). When the inference API
+  // ships real ppm this can read from soilData[key].value directly.
   const estimatedPpm = (key, status) => {
     const cfg = NUTRIENT_CONFIG[key];
     return cfg.target * STATUS_FRACTION[status];
   };
 
   const measurements = {
-    nitrogen:   { status: nStatus, ppm: estimatedPpm('nitrogen',   nStatus), dist: liam?.nitrogen?.class_distribution },
-    phosphorus: { status: pStatus, ppm: estimatedPpm('phosphorus', pStatus), dist: liam?.phosphorus?.class_distribution },
-    potassium:  { status: kStatus, ppm: estimatedPpm('potassium',  kStatus), dist: liam?.potassium?.class_distribution }
+    nitrogen:   { status: nStatus, ppm: estimatedPpm('nitrogen',   nStatus), dist: inference?.nitrogen?.class_distribution },
+    phosphorus: { status: pStatus, ppm: estimatedPpm('phosphorus', pStatus), dist: inference?.phosphorus?.class_distribution },
+    potassium:  { status: kStatus, ppm: estimatedPpm('potassium',  kStatus), dist: inference?.potassium?.class_distribution }
   };
 
   const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   const lat = fieldCenter?.lat ?? 16.4619;
   const lng = fieldCenter?.lng ?? 120.5874;
   const elevation = 1300; // weather service has this; static fallback for now
-  const sampleCount = liam?.sample_count ?? 0;
-  const polygonAreaHa = liam?.polygon_area_ha ?? fieldAreaHa ?? 0;
-  const warnings = liam?.warnings?.length ?? 0;
-  const sourceLabel = liam ? 'liam-railway' : (soilData.source || 'placeholder');
+  const sampleCount = inference?.sample_count ?? 0;
+  const polygonAreaHa = inference?.polygon_area_ha ?? fieldAreaHa ?? 0;
+  const warnings = inference?.warnings?.length ?? 0;
+  const sourceLabel = inference ? 'sentinel-2-inference' : (soilData.source || 'placeholder');
   const verticesCount = field?.coordinates?.[0]?.length ?? 0;
 
   return (
@@ -314,7 +314,7 @@ export default function SoilStatus() {
               <NutrientCell label="NITROGEN"   sym="N" status={measurements.nitrogen.status}   ppm={measurements.nitrogen.ppm}   dist={measurements.nitrogen.dist} />
               <NutrientCell label="PHOSPHORUS" sym="P" status={measurements.phosphorus.status} ppm={measurements.phosphorus.ppm} dist={measurements.phosphorus.dist} />
               <NutrientCell label="POTASSIUM"  sym="K" status={measurements.potassium.status}  ppm={measurements.potassium.ppm}  dist={measurements.potassium.dist} />
-              <PhCell ph={ph} dist={liam?.ph?.class_distribution} />
+              <PhCell ph={ph} dist={inference?.ph?.class_distribution} />
             </div>
           </div>
 
@@ -324,7 +324,7 @@ export default function SoilStatus() {
             <Pill label="area" value={`${polygonAreaHa.toFixed(2)} ha`} />
             <Pill label="warnings" value={warnings} accent={warnings > 0 ? 'var(--color-rust)' : undefined} />
             <Pill label="source" value={sourceLabel} />
-            <Pill label="model" value={liam ? 'rf+svm' : 'placeholder.json'} />
+            <Pill label="model" value={inference ? 'rf+svm' : 'placeholder.json'} />
           </div>
 
           {/* Nutrient targets chart — hand-rolled, full width */}

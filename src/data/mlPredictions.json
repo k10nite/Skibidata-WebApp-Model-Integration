@@ -4,7 +4,7 @@
     "generatedAt": "2026-05-01T00:00:00Z",
     "model": null,
     "modelRepo": "https://github.com/ljiro/SoilScan-Sentinel2",
-    "note": "Placeholder predictions shipped before Liam's SoilScan-Sentinel2 inference output is available. Replace `metadata.source` with `\"ml-static\"` and overwrite per-location entries with real model output. Shape per location: { nitrogen, phosphorus, potassium: 'Low'|'Medium'|'High'; pH: rating string; raw: { pH_class: 1..11, n_confidence?, p_confidence?, k_confidence? } | null }."
+    "note": "Placeholder predictions shipped before live SoilScan-Sentinel2 inference output is available. Replace `metadata.source` with `\"ml-static\"` and overwrite per-location entries with real model output. Shape per location: { nitrogen, phosphorus, potassium: 'Low'|'Medium'|'High'; pH: rating string; raw: { pH_class: 1..11, n_confidence?, p_confidence?, k_confidence? } | null }."
   },
   "locations": {
     "La Trinidad": {

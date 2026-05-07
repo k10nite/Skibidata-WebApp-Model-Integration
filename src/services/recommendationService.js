@@ -4,11 +4,11 @@ import { log } from './logger';
 const RULE_API_URL = import.meta.env.VITE_RULE_API_URL;
 const FETCH_TIMEOUT_MS = 8000;
 
-// Canonical NPK % for every fertilizer Hans's engine knows. Mirrors
-// _hans_rulebased/fertilizers.json. Used as a fallback when the engine's
-// response doesn't include the inventory needed for per-row breakdown
-// (the response only includes user_inventory, which is empty when the
-// user hasn't picked any chips).
+// Canonical NPK % for every fertilizer the rule engine knows. Mirrors the
+// engine's fertilizers.json. Used as a fallback when the engine's response
+// doesn't include the inventory needed for per-row breakdown (the response
+// only includes user_inventory, which is empty when the user hasn't picked
+// any chips).
 const MASTER_INVENTORY = {
   'Urea':                        { n: 46,   p: 0,  k: 0 },
   'Ammonium Sulfate':            { n: 21,   p: 0,  k: 0 },
@@ -26,7 +26,7 @@ const MASTER_INVENTORY = {
   'Muriate of Potash':           { n: 0,    p: 0,  k: 60 }
 };
 
-// Hans's engine advertises L/M/H/VH status codes via OpenAPI, but crop_npk_rules.json
+// The rule engine advertises L/M/H/VH status codes via OpenAPI, but crop_npk_rules.json
 // keys use long-form Low/Medium/High and the lookup falls through to 0 if codes don't match.
 // We send long-form to match the rules dict directly (verified empirically against deployed engine).
 const N_STATUS_MAP = { Low: 'Low', Medium: 'Medium', High: 'High' };
@@ -44,8 +44,8 @@ const CROP_LABEL_MAP = {
   chayote: 'Chayote'
 };
 
-// Hans's engine does string equality on fertilizer names — including the
-// parenthesized portions like "(14-14-14)" and "(18)". The previous
+// The rule engine does string equality on fertilizer names — including the
+// parenthesized portions like "(14-14-14)" and "(18)". An earlier
 // implementation stripped parens, which broke 5 of 14 chips silently.
 // Now we just split on commas/semicolons/newlines and trim whitespace.
 function parseAvailableFertilizers(text) {
@@ -67,8 +67,8 @@ function readRating(field) {
 }
 
 // pH lands in the store via different paths: mlPredictions.json emits
-// strings like "Slightly Acidic", liamMLService normalizes Liam's response
-// to a number. Tolerate both. Also tolerate the legacy lowercase `ph` key.
+// strings like "Slightly Acidic", sentinelMLService normalizes the inference
+// response to a number. Tolerate both. Also tolerate the legacy lowercase `ph` key.
 function readPh(soilData) {
   const candidates = [soilData?.pH, soilData?.ph];
   for (const v of candidates) {

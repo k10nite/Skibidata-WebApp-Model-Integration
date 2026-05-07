@@ -132,10 +132,10 @@ function readRating(field) {
 }
 
 function phToNumeric(soilData) {
-  // Liam's response normalizes pH dominant_class to a numeric value.
+  // The inference service normalizes pH dominant_class to a numeric value.
   if (typeof soilData?.pH === 'number') return soilData.pH;
   if (typeof soilData?.pH === 'string') {
-    // Try direct parse first ("6.4" from Liam normalizer).
+    // Try direct parse first ("6.4" from inference normalizer).
     const n = parseFloat(soilData.pH);
     if (!Number.isNaN(n) && n >= 3 && n <= 9) return n;
     // Categorical mlPredictions.json strings.
@@ -482,7 +482,7 @@ export default function PlantSelection() {
             </div>
           </motion.div>
 
-          {/* Soil profile — N/P/K + pH with confidence bars when Liam data exists */}
+          {/* Soil profile — N/P/K + pH with confidence bars when inference data exists */}
           <motion.div variants={itemVariants} className="mb-6">
             <div
               className="flex items-baseline justify-between"
@@ -588,7 +588,7 @@ export default function PlantSelection() {
           <motion.div variants={itemVariants} className="mb-6">
             <div className="flex items-baseline justify-between" style={{ marginBottom: '10px' }}>
               <Eyebrow>ENGINE INPUTS</Eyebrow>
-              <Caption>passed to Hans&apos;s rule-based engine on Continue</Caption>
+              <Caption>passed to the rule-based engine on Continue</Caption>
             </div>
 
             <div

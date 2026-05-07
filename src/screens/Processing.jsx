@@ -11,7 +11,7 @@ import { Check, Loader2, AlertTriangle } from 'lucide-react';
 import useAppStore from '../store/appStore';
 import { getSatelliteAnalysis } from '../services/satelliteService';
 import { predictForLocation } from '../services/mlPredictionService';
-import { predictForField, getLiamApiUrl } from '../services/liamMLService';
+import { predictForField, getMLApiUrl } from '../services/sentinelMLService';
 import { buildPolygonPreviewUrl } from '../services/mapboxStaticService';
 import { log } from '../services/logger';
 
@@ -84,27 +84,27 @@ export default function Processing() {
       setStep('satellite', 'warn');
     }
 
-    // Step 2 — extract (visual delay so user sees the step move; this is
-    // genuinely happening server-side inside Liam if his API is reachable)
+    // Step 2 — extract (visual delay so user sees the step advance; the
+    // actual extraction happens server-side inside the inference API).
     setStep('extract', 'running');
     await new Promise((r) => setTimeout(r, 350));
     setStep('extract', 'done');
 
-    // Step 3 — ML prediction (Liam first, fall back to placeholder)
+    // Step 3 — ML prediction (deployed inference first, fall back to placeholder)
     setStep('predict', 'running');
     let prediction = null;
-    if (field && getLiamApiUrl()) {
+    if (field && getMLApiUrl()) {
       try {
         prediction = await predictForField(field);
-        setMlSource('liam-ml');
-        log.ml('Liam returned prediction', prediction);
+        setMlSource('ml-inference');
+        log.ml('Inference returned prediction', prediction);
       } catch (err) {
-        log.warn('Liam call failed — falling back to placeholder JSON', err?.message);
+        log.warn('Inference call failed — falling back to placeholder JSON', err?.message);
         try {
           prediction = await predictForLocation(locationName);
           setMlSource('placeholder');
         } catch (err2) {
-          setErrorMsg('Both Liam and placeholder ML services failed.');
+          setErrorMsg('Both inference and placeholder ML services failed.');
           log.warn('placeholder ML also failed', err2?.message);
         }
       }
@@ -377,7 +377,7 @@ export default function Processing() {
                   opacity: 0.7
                 }}
               >
-                ML SOURCE · <span style={{ color: mlSource === 'liam-ml' ? 'var(--color-moss)' : 'var(--color-rust)', fontWeight: 600 }}>{mlSource ? mlSource.toUpperCase() : 'PENDING'}</span>
+                ML SOURCE · <span style={{ color: mlSource === 'ml-inference' ? 'var(--color-moss)' : 'var(--color-rust)', fontWeight: 600 }}>{mlSource ? mlSource.toUpperCase() : 'PENDING'}</span>
               </div>
               {errorMsg ? (
                 <div
