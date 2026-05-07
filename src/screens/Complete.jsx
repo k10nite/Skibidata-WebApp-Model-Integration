@@ -29,7 +29,6 @@ export default function Complete() {
     selectedPlant,
     municipality,
     recommendations,
-    recommendationSummary,
     soilData,
     fieldAreaHa,
     resetApp,
@@ -50,19 +49,6 @@ export default function Complete() {
   const kStatus = readRating(soilData?.potassium) || 'Medium';
   const phValue = typeof soilData?.pH === 'number' ? soilData.pH.toFixed(1) : '6.5';
 
-  const handleDownloadReport = () => {
-    const summary = generateTextSummary();
-    const blob = new Blob([summary], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ulat-pataba-${selectedPlant?.name}-${new Date().toISOString().split('T')[0]}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
   const handleNewAnalysis = () => {
     resetApp();
     navigate('/location-selection');
@@ -70,46 +56,6 @@ export default function Complete() {
 
   const handleBackToPrescription = () => {
     navigate('/fertilizer-recommendations');
-  };
-
-  const generateTextSummary = () => {
-    return `
-================================================================================
-ULAT NG REKOMENDASYON SA PATABA
-(Fertilizer Recommendation Report)
-================================================================================
-Petsa: ${new Date().toLocaleString('fil-PH')}
-Lokasyon: ${municipality}
-Tanim: ${selectedPlant?.name} (${selectedPlant?.scientificName || ''})
-
-KALAGAYAN NG LUPA (Soil Status)
---------------------------------------------------------------------------------
-Nitrogen (N):        ${nStatus}
-Phosphorus (P):      ${pStatus}
-Potassium (K):       ${kStatus}
-pH ng Lupa:          ${phValue}
-
-BUOD NG REKOMENDASYON (Recommendations Summary)
---------------------------------------------------------------------------------
-Kabuuang Produkto:   ${recommendationSummary?.totalProducts || 0}
-Mataas na Priyoridad: ${recommendationSummary?.highPriority || 0}
-Katamtamang Priyoridad: ${recommendationSummary?.mediumPriority || 0}
-
-MGA PRODUKTONG PATABA (Fertilizer Products)
---------------------------------------------------------------------------------
-${recommendations?.map((rec, i) => `
-${i + 1}. ${rec.fertilizer?.name || rec.name} (${rec.fertilizer?.formula || rec.formula})
-   Priyoridad: ${rec.priority}
-   Nutrient: ${rec.nutrient}
-   Dahilan: ${rec.reason}
-   Paggamit: ${rec.fertilizer?.applicationRate || rec.applicationRate}
-`).join('\n') || 'Walang kailangang pataba - perpekto na ang lupa!'}
-
-================================================================================
-Ginawa ng SkibiDATA - Powered by Sentinel-2 Satellite & AI
-Para sa mga Magsasaka ng CAR Highland Farms
-================================================================================
-    `.trim();
   };
 
   return (
@@ -228,13 +174,6 @@ Para sa mga Magsasaka ng CAR Highland Farms
           <motion.div variants={itemVariants}>
             <Eyebrow>ACTIONS</Eyebrow>
             <div className="flex gap-4 mt-3">
-              <button
-                onClick={handleDownloadReport}
-                className="terrace-btn"
-                style={{ letterSpacing: '0.18em', flex: '1' }}
-              >
-                ↓ DOWNLOAD REPORT
-              </button>
               <button
                 onClick={handleNewAnalysis}
                 className="terrace-btn"

@@ -99,7 +99,7 @@ External APIs:
    per-fertilizer NPK breakdown table. Hover any cell for the explicit
    `qty × NPK% = result` math.
 7. **Complete Summary** (`/complete`) — Field report in 2×2 hairline grid
-   (FIELD / SOIL / CROP / PRESCRIPTION). Plain-text download supported.
+   (FIELD / SOIL / CROP / PRESCRIPTION).
 
 ---
 
