@@ -53,12 +53,6 @@ const itemVariants = {
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────
 
-// function readRating(field) {
-//   if (typeof field === 'string') return field;
-//   if (field && typeof field === 'object' && typeof field.rating === 'string') return field.rating;
-//   return 'Medium';
-// }
-
 // Estimated soil ppm from categorical status — rough heuristic so the
 // TARGETS panel shows a realistic measured/gap instead of "0 / target".
 const STATUS_FRACTION = { Low: 0.25, Medium: 0.55, High: 0.85 };
@@ -145,6 +139,7 @@ export default function FertilizerRecommendations() {
 
   // Get current selected candidate data
   const selectedCandidate = fertilizerData?.candidates?.[selectedCandidateIndex] || null;
+  
   // Engine returns two parallel target objects:
   //   base_targets_per_ha → stable kg/ha (read off crop_npk_rules.json)
   //   total_base          → base_per_ha × area_ha (total kg for the field)
@@ -188,6 +183,8 @@ export default function FertilizerRecommendations() {
   if (!selectedPlant) return null;
 
   const candidates = fertilizerData?.candidates || [];
+  // Safely access the raw engine standard_mix array to grab Total Sacks
+  const engineMixes = fertilizerData?._engineRaw?.standard_mix || [];
 
   return (
     <motion.div
@@ -368,6 +365,11 @@ export default function FertilizerRecommendations() {
                       }}
                     >
                       {candidate.totalWeight.toFixed(0)} kg
+                      {engineMixes[index]?.['Total Sacks'] != null && (
+                        <span style={{ opacity: 0.5, marginLeft: '6px' }}>
+                          ({engineMixes[index]['Total Sacks'].toFixed(2)} sacks)
+                        </span>
+                      )}
                     </span>
                   </div>
                 </motion.div>
@@ -458,8 +460,13 @@ export default function FertilizerRecommendations() {
                     {/* Totals row */}
                     <tr style={{ background: 'var(--color-paper-deep)', borderBottom: '1px solid var(--color-contour)' }}>
                       <td style={{ ...tableCellStyle, fontWeight: 700 }}>TOTAL</td>
-                      <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', fontWeight: 700 }}>
-                        {selectedCandidate.totalWeight.toFixed(0)} kg
+                      <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', fontWeight: 700, lineHeight: 1.2 }}>
+                        <div>{selectedCandidate.totalWeight.toFixed(0)} kg</div>
+                        {engineMixes[selectedCandidateIndex]?.['Total Sacks'] != null && (
+                          <div style={{ fontSize: '10px', opacity: 0.6, fontWeight: 500, marginTop: '2px' }}>
+                            ~{engineMixes[selectedCandidateIndex]['Total Sacks'].toFixed(2)} sacks
+                          </div>
+                        )}
                       </td>
                       <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', fontWeight: 700 }}>
                         {selectedCandidate.applied.n.toFixed(0)}
@@ -528,7 +535,11 @@ export default function FertilizerRecommendations() {
               </div>
               <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', lineHeight: 1.7 }}>
                 <div style={{ opacity: 0.55, marginBottom: '4px' }}>Source: <span style={{ color: 'var(--color-moss)' }}>{selectedCandidate?.sourceName}</span></div>
-                <div style={{ opacity: 0.55, marginBottom: '8px' }}>Total Weight: {selectedCandidate?.totalWeight?.toFixed(2)} kg</div>
+                <div style={{ opacity: 0.55, marginBottom: '8px' }}>
+                  Total Weight: {selectedCandidate?.totalWeight?.toFixed(2)} kg
+                  {engineMixes[selectedCandidateIndex]?.['Total Sacks'] != null && 
+                    ` (${engineMixes[selectedCandidateIndex]['Total Sacks'].toFixed(2)} sacks)`}
+                </div>
                 <div style={{ opacity: 0.55, marginBottom: '4px' }}>Prescription:</div>
                 <ul style={{ paddingLeft: '14px', margin: 0 }}>
                   {(selectedCandidate?.rawPrescription || []).map((line, i) => (
