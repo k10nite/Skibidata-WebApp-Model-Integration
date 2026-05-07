@@ -104,9 +104,11 @@ function mapSoilToEngine(soilData, cropKey, areaHectares, availableFertilizers) 
   };
 }
 
-// Engine emits Prescription strings like "10.5 kg/1.0 ha of Urea".
-// The format is defined in engine_rules.json: "{qty} kg/{area} {unit} of {fertilizer_name}".
-const PRESCRIPTION_RE = /^([\d.]+)\s*kg\/([\d.]+)\s+(\S+)\s+of\s+(.+)$/;
+// Engine has emitted both:
+//   "10.5 kg/1.0 ha of Urea"
+//   "1.35 sack/s per 0.22 ha or 67.97 kg/0.22 haof Urea"
+// Parse the kg segment and tolerate the missing space in "haof".
+const PRESCRIPTION_RE = /(?:^|or\s+)([\d.]+)\s*kg\s*\/\s*([\d.]+)\s*([A-Za-z0-9]+)\s*of\s+(.+)$/i;
 
 // (Pricing/cost is intentionally NOT computed in this service — the panel
 // asked the webapp to drop ₱ display end-to-end. Engine response carries
@@ -122,6 +124,12 @@ function classifyByInventory(name, inventory) {
   if (isPureN) return { stage: 'Side-dress (N)', sortOrder: 1 };
   if (isPureK) return { stage: 'Top-dress (K)', sortOrder: 2 };
   return { stage: 'Application', sortOrder: 3 };
+}
+
+function stripSortOrder(recommendation) {
+  const clean = { ...recommendation };
+  delete clean.sortOrder;
+  return clean;
 }
 
 function parsePrescriptionString(s) {
@@ -201,7 +209,7 @@ function normalizeEngineResponse(engineRes, soilData, cropKey, areaHectares) {
         };
       })
       .sort((a, b) => a.sortOrder - b.sortOrder)
-      .map(({ sortOrder: _, ...cleanRec }) => cleanRec);
+      .map(stripSortOrder);
 
     return {
       sourceName: combo.Source || `Combo ${index + 1}`,
@@ -235,7 +243,7 @@ function normalizeEngineResponse(engineRes, soilData, cropKey, areaHectares) {
       };
     })
     .sort((a, b) => a.sortOrder - b.sortOrder)
-    .map(({ sortOrder: _, ...cleanRec }) => cleanRec);
+    .map(stripSortOrder);
   const totalBase = engineRes.total_base ?? { N: 0, P: 0, K: 0 };
   const ph = engineRes.ph_result ?? {};
   const phNeeded = typeof ph.ph_action === 'string' && ph.ph_action !== 'none';
