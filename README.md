@@ -307,9 +307,9 @@ Detailed measurement in `docs/results-performance.md`.
 
 - **Aragona, Hans Fredrick** — Rule-based fertilizer recommendation engine
   (`SoilScanRuleBased`)
-- **Bravo, Matt Danielle** — Rule-based engine support
-- **Cayton, Neil Clarence** — Web application + system integration (this repo)
-- **Fabe, Milton Junsel** — UI prototyping (`fertilizer-ui/`, `mapbox/`)
+- **Bravo, Matt Danielle** — Rule-engine validation & nutrient calibration research
+- **Cayton, Neil Clarence** — Web application & system integration (this repo)
+- **Fabe, Milton Junsel** — Frontend prototyping & alternate UI exploration
 - **Magpili, Dylan Yeoj** — Field data acquisition & ground-truth dataset curation
 - **Morados, Lou Diamond** — Mobile app & backend, fertilizer inventory naming
 - **Morales, Liam Jiro** — ML model + Sentinel-2 inference API
