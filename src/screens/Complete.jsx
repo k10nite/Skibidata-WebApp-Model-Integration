@@ -25,6 +25,7 @@ export default function Complete() {
     recommendationSummary,
     soilData,
     fieldAreaHa,
+    areaHectares,
     resetApp,
   } = useAppStore();
 
@@ -40,18 +41,61 @@ export default function Complete() {
   const nStatus = readRating(soilData?.nitrogen) || 'Medium';
   const pStatus = readRating(soilData?.phosphorus) || 'Medium';
   const kStatus = readRating(soilData?.potassium) || 'Medium';
-  const phValue = typeof soilData?.pH === 'number' ? soilData.pH.toFixed(1) : '6.5';
+  const phRaw = soilData?.pH ?? soilData?.ph;
+  const phValue = typeof phRaw === 'number' ? phRaw.toFixed(1) : String(phRaw || '6.5');
+
+  const firstPositiveNumber = (...values) => {
+    for (const value of values) {
+      const number = Number(value);
+      if (Number.isFinite(number) && number > 0) return number;
+    }
+    return 1;
+  };
+
+  const readNumber = (...values) => {
+    for (const value of values) {
+      const number = Number(value);
+      if (Number.isFinite(number)) return number;
+    }
+    return null;
+  };
+
+  const prescriptionAreaHa = firstPositiveNumber(
+    recommendationSummary?.areaHectares,
+    areaHectares,
+    fieldAreaHa,
+    1
+  );
+  const prescriptionAreaLabel = `${prescriptionAreaHa.toFixed(2)} ha`;
 
   // Prescription data — engine shape from FertilizerRecommendations.handleContinue:
   //   recommendations[]: { fertilizer: {name}, amountKg, deliveredN/P/K, stage, ... }
   //   recommendationSummary: { totalNutrients: {n,p,k}, areaHectares, expectedYield }
-  const prescriptionRows = Array.isArray(recommendations) ? recommendations : [];
+  const prescriptionRows = Array.isArray(recommendations)
+    ? recommendations.map((rawRow) => {
+        const row = rawRow || {};
+        const amountKg = readNumber(row.amountKg, row.amount, row.qty) || 0;
+        const npkPercent = row.fertilizer?.npkPercent || row.fertilizer?.npk || {};
+        const nPct = readNumber(npkPercent.n, npkPercent.N) || 0;
+        const pPct = readNumber(npkPercent.p, npkPercent.P) || 0;
+        const kPct = readNumber(npkPercent.k, npkPercent.K) || 0;
+
+        return {
+          ...row,
+          amountKg,
+          deliveredN: readNumber(row.deliveredN, row.n, row.N) ?? (amountKg * nPct) / 100,
+          deliveredP: readNumber(row.deliveredP, row.p, row.P) ?? (amountKg * pPct) / 100,
+          deliveredK: readNumber(row.deliveredK, row.k, row.K) ?? (amountKg * kPct) / 100
+        };
+      })
+    : [];
   const hasPrescription = prescriptionRows.length > 0;
   const totalKg = prescriptionRows.reduce((sum, r) => sum + (Number(r.amountKg) || 0), 0);
-  const applied = recommendationSummary?.totalNutrients || {
-    n: prescriptionRows.reduce((s, r) => s + (Number(r.deliveredN) || 0), 0),
-    p: prescriptionRows.reduce((s, r) => s + (Number(r.deliveredP) || 0), 0),
-    k: prescriptionRows.reduce((s, r) => s + (Number(r.deliveredK) || 0), 0),
+  const summaryNutrients = recommendationSummary?.totalNutrients || {};
+  const applied = {
+    n: readNumber(summaryNutrients.n, summaryNutrients.N) ?? prescriptionRows.reduce((s, r) => s + (Number(r.deliveredN) || 0), 0),
+    p: readNumber(summaryNutrients.p, summaryNutrients.P) ?? prescriptionRows.reduce((s, r) => s + (Number(r.deliveredP) || 0), 0),
+    k: readNumber(summaryNutrients.k, summaryNutrients.K) ?? prescriptionRows.reduce((s, r) => s + (Number(r.deliveredK) || 0), 0),
   };
 
   const handleNewAnalysis = () => {
@@ -133,7 +177,7 @@ export default function Complete() {
           >
             <CompactCell title="FIELD">
               <CompactRow label="LOC" value={municipality || 'La Trinidad'} />
-              <CompactRow label="AREA" value={`${fieldAreaHa?.toFixed(2) || '1.0'} ha`} />
+              <CompactRow label="AREA" value={prescriptionAreaLabel} />
               <CompactRow label="pH" value={phValue} />
             </CompactCell>
 
@@ -185,7 +229,7 @@ export default function Complete() {
               </div>
               {hasPrescription && (
                 <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '10px', color: 'var(--color-earth-deep)', opacity: 0.55, letterSpacing: '0.1em' }}>
-                  per {fieldAreaHa?.toFixed(2) || '1.0'} ha
+                  for {prescriptionAreaLabel}
                 </div>
               )}
             </div>
@@ -215,9 +259,9 @@ export default function Complete() {
                   <div style={{ gridColumn: '1 / -1', borderTop: '1px dashed var(--color-contour)', marginTop: '4px' }} />
                   <Cell bold>TOTAL</Cell>
                   <Cell align="right" bold>{totalKg.toFixed(1)} kg</Cell>
-                  <Cell align="right" bold>{Number(applied.n || applied.N || 0).toFixed(1)}</Cell>
-                  <Cell align="right" bold>{Number(applied.p || applied.P || 0).toFixed(1)}</Cell>
-                  <Cell align="right" bold>{Number(applied.k || applied.K || 0).toFixed(1)}</Cell>
+                  <Cell align="right" bold>{Number(applied.n || 0).toFixed(1)}</Cell>
+                  <Cell align="right" bold>{Number(applied.p || 0).toFixed(1)}</Cell>
+                  <Cell align="right" bold>{Number(applied.k || 0).toFixed(1)}</Cell>
                 </div>
 
                 {/* Applied NPK telemetry strip */}
@@ -229,9 +273,9 @@ export default function Complete() {
                   letterSpacing: '0.05em',
                   fontVariantNumeric: 'tabular-nums'
                 }}>
-                  <span>APPLIED N · {Number(applied.n || applied.N || 0).toFixed(1)} kg/ha</span>
-                  <span>APPLIED P · {Number(applied.p || applied.P || 0).toFixed(1)} kg/ha</span>
-                  <span>APPLIED K · {Number(applied.k || applied.K || 0).toFixed(1)} kg/ha</span>
+                  <span>APPLIED N · {Number(applied.n || 0).toFixed(1)} kg total</span>
+                  <span>APPLIED P · {Number(applied.p || 0).toFixed(1)} kg total</span>
+                  <span>APPLIED K · {Number(applied.k || 0).toFixed(1)} kg total</span>
                 </div>
               </>
             ) : (
