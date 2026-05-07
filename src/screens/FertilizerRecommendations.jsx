@@ -567,9 +567,13 @@ export default function FertilizerRecommendations() {
                       <Caption>{ic_valid ? '✓ valid' : '✗ insufficient'}</Caption>
                     </div>
                     {has_user_inv && (
-                      <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '10px', color: 'var(--color-earth-deep)', opacity: 0.65, marginBottom: '6px', letterSpacing: '0.03em' }}>
-                        {inv.map((f) => `${f.name} (${f.n}-${f.p}-${f.k})`).join(' · ')}
-                      </div>
+                      <ul style={{ margin: '0 0 6px 0', padding: '0 0 0 16px' }}>
+                        {inv.map((f) => (
+                          <li key={f.name} style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '10px', color: 'var(--color-earth-deep)', opacity: 0.75, letterSpacing: '0.03em', lineHeight: 1.7 }}>
+                            {f.name} <span style={{ opacity: 0.55 }}>({f.n}-{f.p}-{f.k})</span>
+                          </li>
+                        ))}
+                      </ul>
                     )}
                     {ic_reason && (
                       <div style={{ fontFamily: '"Fraunces", serif', fontStyle: 'italic', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.85, lineHeight: 1.4 }}>
