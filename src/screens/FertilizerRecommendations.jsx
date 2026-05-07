@@ -267,12 +267,12 @@ export default function FertilizerRecommendations() {
           >
             <div className="flex items-baseline justify-between mb-1">
               <Eyebrow>TARGETS</Eyebrow>
-              <Caption>target</Caption>
+              <Caption>target / current · kg/ha</Caption>
             </div>
             <div className="mt-2 space-y-3">
-              <TargetRow label="N" target={selectedCandidate.applied.n.toFixed(0)} />
-              <TargetRow label="P" target={selectedCandidate.applied.p.toFixed(0)}  />
-              <TargetRow label="K" target={selectedCandidate.applied.k.toFixed(0)} />
+              <TargetRow label="N" target={nTarget} measured={nMeasured} gap={nTarget - nMeasured} />
+              <TargetRow label="P" target={pTarget} measured={pMeasured} gap={pTarget - pMeasured} />
+              <TargetRow label="K" target={kTarget} measured={kMeasured} gap={kTarget - kMeasured} />
               <div className="flex items-baseline justify-between py-1" style={{ borderBottom: '1px dotted var(--color-contour)' }}>
                 <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.6, letterSpacing: '0.1em' }}>pH</span>
                 <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '13px', color: 'var(--color-earth-deep)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
@@ -297,6 +297,10 @@ export default function FertilizerRecommendations() {
                 fontVariantNumeric: 'tabular-nums'
               }}
             >
+              <div style={{ marginBottom: '2px' }}>
+                FOR {engineAreaHa.toFixed(2)} HA → TOTAL
+              </div>
+              <div>
                 N {(nTarget * engineAreaHa).toFixed(0)} kg ·
                 P {(pTarget * engineAreaHa).toFixed(0)} kg ·
                 K {(kTarget * engineAreaHa).toFixed(0)} kg
@@ -970,16 +974,6 @@ function TargetRow({ label, target, measured, gap }) {
         </span>
       </span>
     </div>
-  );
-}
-
-function MetPercentage({ value, target }) {
-  const pct = target > 0 ? (value / target) * 100 : 0;
-  const color = pct >= 95 ? 'var(--color-moss)' : pct >= 80 ? 'var(--color-ochre)' : 'var(--color-rust)';
-  return (
-    <span style={{ color }}>
-      {pct.toFixed(0)}%
-    </span>
   );
 }
 
