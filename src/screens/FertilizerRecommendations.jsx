@@ -251,12 +251,12 @@ export default function FertilizerRecommendations() {
           >
             <div className="flex items-baseline justify-between mb-1">
               <Eyebrow>TARGETS</Eyebrow>
-              <Caption>target / current · kg/ha</Caption>
+              <Caption>target</Caption>
             </div>
             <div className="mt-2 space-y-3">
-              <TargetRow label="N" target={nTarget} measured={nMeasured} gap={nTarget - nMeasured} />
-              <TargetRow label="P" target={pTarget} measured={pMeasured} gap={pTarget - pMeasured} />
-              <TargetRow label="K" target={kTarget} measured={kMeasured} gap={kTarget - kMeasured} />
+              <TargetRow label="N" target={selectedCandidate.applied.n.toFixed(0)} />
+              <TargetRow label="P" target={selectedCandidate.applied.p.toFixed(0)}  />
+              <TargetRow label="K" target={selectedCandidate.applied.k.toFixed(0)} />
               <div className="flex items-baseline justify-between py-1" style={{ borderBottom: '1px dotted var(--color-contour)' }}>
                 <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.6, letterSpacing: '0.1em' }}>pH</span>
                 <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '13px', color: 'var(--color-earth-deep)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
@@ -281,10 +281,6 @@ export default function FertilizerRecommendations() {
                 fontVariantNumeric: 'tabular-nums'
               }}
             >
-              <div style={{ marginBottom: '2px' }}>
-                FOR {engineAreaHa.toFixed(2)} HA → TOTAL
-              </div>
-              <div>
                 N {(nTarget * engineAreaHa).toFixed(0)} kg ·
                 P {(pTarget * engineAreaHa).toFixed(0)} kg ·
                 K {(kTarget * engineAreaHa).toFixed(0)} kg
@@ -463,7 +459,7 @@ export default function FertilizerRecommendations() {
                       <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', fontWeight: 700, lineHeight: 1.2 }}>
                         <div>{selectedCandidate.totalWeight.toFixed(0)} kg</div>
                         {engineMixes[selectedCandidateIndex]?.['Total Sacks'] != null && (
-                          <div style={{ fontSize: '10px', opacity: 0.6, fontWeight: 500, marginTop: '2px' }}>
+                          <div style={{ fontSize: '13px', opacity: 1.5, fontWeight: 500, marginTop: '2px' }}>
                             ~{engineMixes[selectedCandidateIndex]['Total Sacks'].toFixed(2)} sacks
                           </div>
                         )}
@@ -480,7 +476,7 @@ export default function FertilizerRecommendations() {
                     </tr>
                     {/* Target row */}
                     <tr style={{ borderBottom: '1px solid var(--color-contour)' }}>
-                      <td style={tableCellStyle}>TARGET</td>
+                      <td style={tableCellStyle}>Standard Recommendation per hectare</td>
                       <td style={tableCellStyle}>—</td>
                       <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
                         {nTarget}
@@ -490,20 +486,6 @@ export default function FertilizerRecommendations() {
                       </td>
                       <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
                         {kTarget}
-                      </td>
-                    </tr>
-                    {/* Met % row */}
-                    <tr>
-                      <td style={tableCellStyle}>MET %</td>
-                      <td style={tableCellStyle}>—</td>
-                      <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
-                        <MetPercentage value={selectedCandidate.applied.n} target={nTarget} />
-                      </td>
-                      <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
-                        <MetPercentage value={selectedCandidate.applied.p} target={pTarget} />
-                      </td>
-                      <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums' }}>
-                        <MetPercentage value={selectedCandidate.applied.k} target={kTarget} />
                       </td>
                     </tr>
                   </tbody>
