@@ -542,7 +542,7 @@ export default function FertilizerRecommendations() {
                 const ic = fertilizerData?._engineRaw?.inventory_check;
                 const ic_valid = ic?.valid;
                 const ic_reason = ic?.reason;
-                const ic_details = ic?.details;
+                const ic_details_raw = ic?.details;
                 const inv = fertilizerData?._engineRaw?.user_inventory;
                 const has_user_inv = Array.isArray(inv) && inv.length > 0;
                 if (!has_user_inv && !ic_reason) return (
@@ -557,16 +557,34 @@ export default function FertilizerRecommendations() {
                     <Caption>no on-hand fertilizers selected — engine drew from full catalog</Caption>
                   </div>
                 );
-                const detailLines = Array.isArray(ic_details?.prescription)
-                  ? ic_details.prescription
-                  : Array.isArray(ic_details?.Prescription)
-                    ? ic_details.Prescription
-                    : null;
-                const totalWeight = ic_details?.total_weight ?? ic_details?.['Total Weight'];
-                const appliedN = ic_details?.applied?.N ?? ic_details?.['Applied N'];
-                const appliedP = ic_details?.applied?.P ?? ic_details?.['Applied P'];
-                const appliedK = ic_details?.applied?.K ?? ic_details?.['Applied K'];
-                const sourceName = ic_details?.source ?? ic_details?.Source;
+                // Engine returns `details` as an array of source-prescriptions
+                // (each item has Source, Prescription[], Total Weight, Applied N/P/K).
+                // Older shape was a single object — tolerate both.
+                const detailsArr = Array.isArray(ic_details_raw)
+                  ? ic_details_raw
+                  : ic_details_raw && typeof ic_details_raw === 'object'
+                    ? [ic_details_raw]
+                    : [];
+                const readLines = (d) => Array.isArray(d?.Prescription)
+                  ? d.Prescription
+                  : Array.isArray(d?.prescription) ? d.prescription : null;
+                const readSource = (d) => d?.Source ?? d?.source;
+                const readWeight = (d) => d?.['Total Weight'] ?? d?.total_weight;
+                const readApplied = (d, key) => {
+                  if (d?.applied?.[key] != null) return d.applied[key];
+                  return d?.[`Applied ${key}`];
+                };
+                const top = detailsArr[0];
+                const detailLines = readLines(top);
+                const totalWeight = readWeight(top);
+                const appliedN = readApplied(top, 'N');
+                const appliedP = readApplied(top, 'P');
+                const appliedK = readApplied(top, 'K');
+                const sourceName = readSource(top);
+                const otherSources = detailsArr.slice(1, 4)
+                  .map(readSource)
+                  .filter(Boolean);
+                const remainingCount = Math.max(0, detailsArr.length - 1 - otherSources.length);
                 return (
                   <div style={{
                     background: 'var(--color-paper-card)',
@@ -617,6 +635,25 @@ export default function FertilizerRecommendations() {
                             {appliedN != null && <span>· N {Number(appliedN).toFixed(1)}</span>}
                             {appliedP != null && <span>· P {Number(appliedP).toFixed(1)}</span>}
                             {appliedK != null && <span>· K {Number(appliedK).toFixed(1)}</span>}
+                          </div>
+                        )}
+                        {(otherSources.length > 0 || remainingCount > 0) && (
+                          <div style={{
+                            marginTop: '6px',
+                            fontFamily: '"JetBrains Mono", monospace',
+                            fontSize: '9px',
+                            color: 'var(--color-earth-deep)',
+                            opacity: 0.55,
+                            letterSpacing: '0.05em',
+                            lineHeight: 1.6
+                          }}>
+                            <div style={{ marginBottom: '2px' }}>OTHER VIABLE SOURCES</div>
+                            {otherSources.map((s, i) => (
+                              <div key={i}>· {s}</div>
+                            ))}
+                            {remainingCount > 0 && (
+                              <div>· +{remainingCount} more</div>
+                            )}
                           </div>
                         )}
                       </div>
