@@ -145,15 +145,22 @@ export default function FertilizerRecommendations() {
 
   // Get current selected candidate data
   const selectedCandidate = fertilizerData?.candidates?.[selectedCandidateIndex] || null;
-  const engineTargets = fertilizerData?._engineRaw?.total_base || {};
+  // Engine returns two parallel target objects:
+  //   base_targets_per_ha → stable kg/ha (read off crop_npk_rules.json)
+  //   total_base          → base_per_ha × area_ha (total kg for the field)
+  // The TARGETS card shows kg/ha so it stays interpretable regardless of
+  // field size. The supporting caption below converts to total kg using
+  // engine.area_ha.
+  const engineTargetsPerHa = fertilizerData?._engineRaw?.base_targets_per_ha || {};
+  const engineAreaHa = Number(fertilizerData?._engineRaw?.area_ha) || areaHectares || 1;
   const phAction = fertilizerData?._engineRaw?.ph_result?.ph_action || 'none';
 
-  // Calculate nutrient gaps
+  // Calculate nutrient gaps in kg/ha.
   const soil = soilData || DEFAULT_SOIL_DATA;
   const ph = phToNumeric(soil);
-  const nTarget = engineTargets.N || 150;
-  const pTarget = engineTargets.P || 60;
-  const kTarget = engineTargets.K || 75;
+  const nTarget = Number(engineTargetsPerHa.N) || 150;
+  const pTarget = Number(engineTargetsPerHa.P) || 60;
+  const kTarget = Number(engineTargetsPerHa.K) || 75;
   const nMeasured = estimateMeasured(soil.nitrogen, nTarget);
   const pMeasured = estimateMeasured(soil.phosphorus, pTarget);
   const kMeasured = estimateMeasured(soil.potassium, kTarget);
@@ -247,8 +254,11 @@ export default function FertilizerRecommendations() {
               padding: '18px 20px'
             }}
           >
-            <Eyebrow>TARGETS</Eyebrow>
-            <div className="mt-3 space-y-3">
+            <div className="flex items-baseline justify-between mb-1">
+              <Eyebrow>TARGETS</Eyebrow>
+              <Caption>target / current · kg/ha</Caption>
+            </div>
+            <div className="mt-2 space-y-3">
               <TargetRow label="N" target={nTarget} measured={nMeasured} gap={nTarget - nMeasured} />
               <TargetRow label="P" target={pTarget} measured={pMeasured} gap={pTarget - pMeasured} />
               <TargetRow label="K" target={kTarget} measured={kMeasured} gap={kTarget - kMeasured} />
@@ -259,6 +269,30 @@ export default function FertilizerRecommendations() {
                     {phAction !== 'none' ? phAction : 'optimal'}
                   </span>
                 </span>
+              </div>
+            </div>
+            {/* Total-kg conversion for the actual field area */}
+            <div
+              style={{
+                marginTop: '10px',
+                paddingTop: '10px',
+                borderTop: '1px dashed var(--color-contour)',
+                fontFamily: '"JetBrains Mono", monospace',
+                fontSize: '9px',
+                color: 'var(--color-earth-deep)',
+                opacity: 0.55,
+                letterSpacing: '0.05em',
+                lineHeight: 1.6,
+                fontVariantNumeric: 'tabular-nums'
+              }}
+            >
+              <div style={{ marginBottom: '2px' }}>
+                FOR {engineAreaHa.toFixed(2)} HA → TOTAL
+              </div>
+              <div>
+                N {(nTarget * engineAreaHa).toFixed(0)} kg ·
+                P {(pTarget * engineAreaHa).toFixed(0)} kg ·
+                K {(kTarget * engineAreaHa).toFixed(0)} kg
               </div>
             </div>
           </div>
@@ -778,12 +812,12 @@ function TargetRow({ label, target, measured, gap }) {
     <div className="flex items-baseline justify-between py-1" style={{ borderBottom: '1px dotted var(--color-contour)' }}>
       <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.6, letterSpacing: '0.1em' }}>{label}</span>
       <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', fontVariantNumeric: 'tabular-nums' }}>
-        <span style={{ color: 'var(--color-earth-deep)', fontWeight: 600 }}>{target}</span>
+        <span style={{ color: 'var(--color-earth-deep)', fontWeight: 600 }}>{Number(target).toFixed(0)}</span>
         <span style={{ opacity: 0.4, margin: '0 4px' }}>/</span>
-        <span style={{ opacity: 0.6 }}>{measured.toFixed(0)}</span>
+        <span style={{ opacity: 0.6 }}>{Number(measured).toFixed(0)}</span>
         <span style={{ opacity: 0.4, marginLeft: '4px' }}>kg/ha</span>
         <span style={{ color: gapColor, marginLeft: '8px', fontWeight: 600 }}>
-          {gap > 0 ? '+' : ''}{gap.toFixed(0)}
+          {gap > 0 ? '+' : ''}{Number(gap).toFixed(0)}
         </span>
       </span>
     </div>
