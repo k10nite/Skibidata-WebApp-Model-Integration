@@ -576,6 +576,22 @@ export default function FertilizerRecommendations() {
                 const ic_details_raw = ic?.details;
                 const inv = fertilizerData?._engineRaw?.user_inventory;
                 const has_user_inv = Array.isArray(inv) && inv.length > 0;
+                const sufficiency = fertilizerData?._engineRaw?.inventory_sufficiency || {};
+                // What's actually missing — surfaced as a concrete diagnostic
+                // instead of the engine's generic "could not produce a valid mix" string.
+                const missingNutrients = [];
+                if (sufficiency.has_n === false) missingNutrients.push('N');
+                if (sufficiency.has_p === false) missingNutrients.push('P');
+                if (sufficiency.has_k === false) missingNutrients.push('K');
+                // Suggested catalog fertilizers per missing nutrient — pulled from
+                // the engine's fertilizers.json. These all live in MASTER_INVENTORY
+                // in recommendationService.
+                const SUGGESTIONS_BY_NUTRIENT = {
+                  N: ['Urea (46-0-0)', 'Ammonium Sulfate (21-0-0)', 'Nitrabor (15.4-0-0)'],
+                  P: ['Solophos (18)', 'Super phosphate(20)', 'Duofos (22)', 'T-14 (Complete)', 'Yara Mila Palme (13-33-21)'],
+                  K: ['Muriate of Potash', 'Yara Mila Winner (15-9-20)', 'Yara Unik (16-16-16)']
+                };
+                const structuralIssue = !ic_valid && missingNutrients.length === 0;
                 if (!has_user_inv && !ic_reason) return (
                   <div style={{
                     background: 'var(--color-paper-card)',
@@ -721,9 +737,133 @@ export default function FertilizerRecommendations() {
                       </>
                     )}
 
+                    {/* Diagnostic — only shown when invalid. Surfaces what
+                        the engine actually computed (inventory_sufficiency)
+                        and points to specific catalog fertilizers that
+                        would close the gap. */}
+                    {!ic_valid && (missingNutrients.length > 0 || structuralIssue) && (
+                      <div
+                        style={{
+                          marginTop: '8px',
+                          paddingTop: '8px',
+                          borderTop: '1px dashed var(--color-contour)'
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontFamily: '"JetBrains Mono", monospace',
+                            fontSize: '9px',
+                            letterSpacing: '0.18em',
+                            color: 'var(--color-rust)',
+                            fontWeight: 600,
+                            marginBottom: '4px'
+                          }}
+                        >
+                          WHY IT&apos;S INSUFFICIENT
+                        </div>
+                        {missingNutrients.length > 0 ? (
+                          <>
+                            <div
+                              style={{
+                                fontFamily: '"Fraunces", serif',
+                                fontSize: '11px',
+                                fontStyle: 'italic',
+                                color: 'var(--color-earth-deep)',
+                                lineHeight: 1.45,
+                                marginBottom: '6px'
+                              }}
+                            >
+                              Your inventory has no source for{' '}
+                              <span style={{ fontStyle: 'normal', fontWeight: 600 }}>
+                                {missingNutrients.join(' & ')}
+                              </span>
+                              . The engine cannot satisfy the {missingNutrients.join('/')} target without it.
+                            </div>
+                            {missingNutrients.map((nutrient) => (
+                              <div key={nutrient} style={{ marginBottom: '4px' }}>
+                                <span
+                                  style={{
+                                    fontFamily: '"JetBrains Mono", monospace',
+                                    fontSize: '9px',
+                                    letterSpacing: '0.12em',
+                                    color: 'var(--color-earth-deep)',
+                                    opacity: 0.6,
+                                    fontWeight: 600
+                                  }}
+                                >
+                                  PICK FROM (for {nutrient}):
+                                </span>
+                                <div
+                                  style={{
+                                    fontFamily: '"JetBrains Mono", monospace',
+                                    fontSize: '10px',
+                                    color: 'var(--color-earth-deep)',
+                                    opacity: 0.85,
+                                    lineHeight: 1.55,
+                                    paddingLeft: '4px'
+                                  }}
+                                >
+                                  {SUGGESTIONS_BY_NUTRIENT[nutrient].map((s, i) => (
+                                    <div key={i}>· {s}</div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </>
+                        ) : (
+                          <>
+                            <div
+                              style={{
+                                fontFamily: '"Fraunces", serif',
+                                fontSize: '11px',
+                                fontStyle: 'italic',
+                                color: 'var(--color-earth-deep)',
+                                lineHeight: 1.45,
+                                marginBottom: '6px'
+                              }}
+                            >
+                              All three nutrients are present, but the solver
+                              structurally needs at least one <strong>pure-N</strong>{' '}
+                              (Urea/Ammonium Sulfate/Nitrabor) <strong>and</strong>{' '}
+                              one <strong>pure-K</strong> (Muriate of Potash) source
+                              to balance against your P-compound. Yours are all compound NPK
+                              formulations — none of them stand in for those fillers.
+                            </div>
+                            <div style={{ marginBottom: '4px' }}>
+                              <span
+                                style={{
+                                  fontFamily: '"JetBrains Mono", monospace',
+                                  fontSize: '9px',
+                                  letterSpacing: '0.12em',
+                                  color: 'var(--color-earth-deep)',
+                                  opacity: 0.6,
+                                  fontWeight: 600
+                                }}
+                              >
+                                ADD AT LEAST ONE OF EACH:
+                              </span>
+                              <div
+                                style={{
+                                  fontFamily: '"JetBrains Mono", monospace',
+                                  fontSize: '10px',
+                                  color: 'var(--color-earth-deep)',
+                                  opacity: 0.85,
+                                  lineHeight: 1.55,
+                                  paddingLeft: '4px'
+                                }}
+                              >
+                                <div>· pure-N: {SUGGESTIONS_BY_NUTRIENT.N.join(', ')}</div>
+                                <div>· pure-K: Muriate of Potash</div>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+
                     {ic_reason && (
-                      <div style={{ marginTop: '6px', fontFamily: '"Fraunces", serif', fontStyle: 'italic', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.85, lineHeight: 1.4 }}>
-                        {ic_reason}
+                      <div style={{ marginTop: '8px', fontFamily: '"Fraunces", serif', fontStyle: 'italic', fontSize: '10px', color: 'var(--color-earth-deep)', opacity: 0.55, lineHeight: 1.4 }}>
+                        engine: {ic_reason}
                       </div>
                     )}
                   </div>
