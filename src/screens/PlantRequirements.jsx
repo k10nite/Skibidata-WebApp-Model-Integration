@@ -11,7 +11,8 @@ import useAppStore from '../store/appStore';
 import {
   ArrowRight,
   Sprout,
-  Leaf
+  Leaf,
+  Apple
 } from 'lucide-react';
 
 // Terrace easing and motion settings
@@ -46,49 +47,165 @@ const NUTRIENT_VALUES = {
   }
 };
 
-// Plant database with scientific names and editorial descriptions
+// Plant database with scientific names and editorial descriptions.
+// Keys mirror the `id` field set by PlantSelection's CROPS_DATA so the
+// lookup `PLANT_DATA[selectedPlant.id]` resolves directly. NPK ranges
+// are sourced from PhilRice + BSU extension recommendations for the
+// CAR highland context.
 const PLANT_DATA = {
+  cabbage: {
+    scientificName: 'Brassica oleracea var. capitata',
+    commonName: 'Cabbage',
+    filipinoName: 'Repolyo',
+    icon: Leaf,
+    description: 'A cool-season cole crop well-adapted to CAR highland elevations of 1,000–2,000 m. Heavy nitrogen feeder during head formation; moderate phosphorus and potassium for firm head density. Prefers slightly acidic loam with consistent moisture; susceptible to clubroot below pH 5.5.',
+    requirements: { nitrogen: 'HIGH', phosphorus: 'MEDIUM-HIGH', potassium: 'MEDIUM-HIGH', pH: 'MEDIUM' }
+  },
+  cabbage_head: {
+    scientificName: 'Brassica oleracea var. capitata',
+    commonName: 'Cabbage (Head)',
+    filipinoName: 'Repolyong Ulo',
+    icon: Leaf,
+    description: 'A dense-headed cabbage cultivar prioritized for storage and transport. NPK requirements mirror standard cabbage with slightly elevated potassium for head firmness. Performs best in cool, well-drained highland soils with steady irrigation.',
+    requirements: { nitrogen: 'HIGH', phosphorus: 'MEDIUM-HIGH', potassium: 'HIGH', pH: 'MEDIUM' }
+  },
+  pechay: {
+    scientificName: 'Brassica rapa subsp. chinensis',
+    commonName: 'Pechay',
+    filipinoName: 'Pechay',
+    icon: Leaf,
+    description: 'A short-cycle leafy brassica harvested 30–45 days after planting. Highest demand is nitrogen for leaf expansion; moderate phosphorus supports root development. Tolerates a wide pH range but prefers slightly acidic to neutral conditions.',
+    requirements: { nitrogen: 'HIGH', phosphorus: 'MEDIUM', potassium: 'MEDIUM', pH: 'MEDIUM' }
+  },
+  lettuce: {
+    scientificName: 'Lactuca sativa',
+    commonName: 'Lettuce',
+    filipinoName: 'Litsugas',
+    icon: Leaf,
+    description: 'A cool-season leafy crop sensitive to heat-induced bolting. Moderate nitrogen for leaf production; balanced phosphorus and potassium for root vigor and stress tolerance. Prefers loose, fertile, slightly acidic soils with constant soil moisture to prevent tip-burn.',
+    requirements: { nitrogen: 'MEDIUM-HIGH', phosphorus: 'MEDIUM', potassium: 'MEDIUM', pH: 'MEDIUM' }
+  },
+  potato: {
+    scientificName: 'Solanum tuberosum',
+    commonName: 'Potato',
+    filipinoName: 'Patatas',
+    icon: Sprout,
+    description: 'A cool-climate tuber crop suited to CAR elevations above 1,200 m. Moderate nitrogen during vegetative growth; high phosphorus for tuber initiation; very high potassium for tuber bulking and starch quality. Prefers acidic, well-drained sandy loam.',
+    requirements: { nitrogen: 'MEDIUM', phosphorus: 'HIGH', potassium: 'HIGH', pH: 'LOW' }
+  },
+  carrot: {
+    scientificName: 'Daucus carota subsp. sativus',
+    commonName: 'Carrot',
+    filipinoName: 'Karot',
+    icon: Sprout,
+    description: 'A biennial root crop grown as an annual in CAR. Low to moderate nitrogen (excess produces forked roots); high phosphorus for root elongation; moderate potassium for sugar content. Requires deep, stone-free, slightly acidic loam for straight, well-formed roots.',
+    requirements: { nitrogen: 'MEDIUM', phosphorus: 'HIGH', potassium: 'MEDIUM-HIGH', pH: 'MEDIUM' }
+  },
+  tomato: {
+    scientificName: 'Solanum lycopersicum',
+    commonName: 'Tomato',
+    filipinoName: 'Kamatis',
+    icon: Apple,
+    description: 'A warm-season fruiting crop adapted to mid-elevation CAR conditions. Balanced NPK with elevated potassium during fruit set and ripening for sugar accumulation and disease resistance. Prefers slightly acidic to neutral soil with steady moisture; calcium availability critical to prevent blossom-end rot.',
+    requirements: { nitrogen: 'MEDIUM-HIGH', phosphorus: 'MEDIUM-HIGH', potassium: 'HIGH', pH: 'MEDIUM' }
+  },
+  string_beans: {
+    scientificName: 'Vigna unguiculata subsp. sesquipedalis',
+    commonName: 'String Beans',
+    filipinoName: 'Sitaw',
+    icon: Sprout,
+    description: 'A nitrogen-fixing legume requiring trellis support. Low external nitrogen needs (Rhizobium symbiosis supplies most); moderate phosphorus for nodulation and pod development; moderate potassium for pod fill. Prefers warm, well-drained loam at 6.0–7.0 pH.',
+    requirements: { nitrogen: 'LOW', phosphorus: 'MEDIUM', potassium: 'MEDIUM', pH: 'MEDIUM' }
+  },
+  baguio_beans: {
+    scientificName: 'Phaseolus vulgaris',
+    commonName: 'Baguio Beans',
+    filipinoName: 'Habichuelas',
+    icon: Sprout,
+    description: 'A bush snap-bean variety thriving in cool CAR conditions. Self-sufficient in nitrogen via root nodulation; moderate phosphorus for pod set; moderate potassium for pod quality. Prefers neutral pH and well-drained soils; avoid waterlogged conditions.',
+    requirements: { nitrogen: 'LOW', phosphorus: 'MEDIUM', potassium: 'MEDIUM', pH: 'MEDIUM' }
+  },
+  broccoli: {
+    scientificName: 'Brassica oleracea var. italica',
+    commonName: 'Broccoli',
+    filipinoName: 'Broccoli',
+    icon: Leaf,
+    description: 'A cool-season cole crop demanding rich soil and consistent fertility. High nitrogen for compact head formation; moderate phosphorus and potassium for stem strength. Performs best at slightly acidic to neutral pH with adequate boron and calcium.',
+    requirements: { nitrogen: 'HIGH', phosphorus: 'MEDIUM-HIGH', potassium: 'MEDIUM-HIGH', pH: 'MEDIUM' }
+  },
+  cauliflower: {
+    scientificName: 'Brassica oleracea var. botrytis',
+    commonName: 'Cauliflower',
+    filipinoName: 'Cauliflower',
+    icon: Leaf,
+    description: 'A cool-climate brassica producing dense white curds. High nitrogen for vegetative growth, but excess can delay heading; moderate phosphorus and potassium support curd development. Sensitive to micronutrient deficiencies (boron, molybdenum).',
+    requirements: { nitrogen: 'HIGH', phosphorus: 'MEDIUM-HIGH', potassium: 'MEDIUM-HIGH', pH: 'MEDIUM' }
+  },
+  eggplant: {
+    scientificName: 'Solanum melongena',
+    commonName: 'Eggplant',
+    filipinoName: 'Talong',
+    icon: Apple,
+    description: 'A warm-season fruiting crop tolerant to a range of soil conditions. Moderate to high nitrogen during early growth; balanced phosphorus for flowering; elevated potassium for fruit quality and shelf life. Sensitive to acidic soils below pH 5.5.',
+    requirements: { nitrogen: 'MEDIUM-HIGH', phosphorus: 'MEDIUM-HIGH', potassium: 'HIGH', pH: 'MEDIUM' }
+  },
+  squash: {
+    scientificName: 'Cucurbita maxima',
+    commonName: 'Squash',
+    filipinoName: 'Kalabasa',
+    icon: Sprout,
+    description: 'A vining cucurbit producing large fruits over 90–120 days. Moderate nitrogen for vine growth; balanced phosphorus and potassium for fruit set and quality. Prefers warm, well-drained sandy loam with high organic matter.',
+    requirements: { nitrogen: 'MEDIUM', phosphorus: 'MEDIUM', potassium: 'MEDIUM-HIGH', pH: 'MEDIUM' }
+  },
+  ampalaya: {
+    scientificName: 'Momordica charantia',
+    commonName: 'Ampalaya',
+    filipinoName: 'Ampalaya',
+    icon: Sprout,
+    description: 'A vining cucurbit known as bitter gourd. Low to moderate nitrogen; balanced phosphorus and potassium for sustained fruiting. Prefers warm temperatures, trellis support, and slightly acidic to neutral well-drained soil.',
+    requirements: { nitrogen: 'MEDIUM', phosphorus: 'MEDIUM', potassium: 'MEDIUM', pH: 'MEDIUM' }
+  },
+  chayote: {
+    scientificName: 'Sechium edule',
+    commonName: 'Chayote',
+    filipinoName: 'Sayote',
+    icon: Sprout,
+    description: 'A perennial vining cucurbit highly productive in mid-elevation CAR. Moderate nitrogen for vine vigor; balanced phosphorus and potassium for sustained fruiting over multiple harvest cycles. Prefers cool to mild temperatures and well-drained loamy soil.',
+    requirements: { nitrogen: 'MEDIUM', phosphorus: 'MEDIUM', potassium: 'MEDIUM', pH: 'MEDIUM' }
+  },
+  asparagus: {
+    scientificName: 'Asparagus officinalis',
+    commonName: 'Asparagus',
+    filipinoName: 'Asparagus',
+    icon: Sprout,
+    description: 'A perennial high-value crop with a 15–20 year productive lifespan. Moderate to high nitrogen split-applied across the season; high phosphorus for crown establishment; moderate potassium for spear quality. Tolerates slightly alkaline soils, unusual among CAR vegetables.',
+    requirements: { nitrogen: 'MEDIUM-HIGH', phosphorus: 'HIGH', potassium: 'MEDIUM', pH: 'HIGH' }
+  },
+
+  // Generic fallbacks
   rice: {
-    id: 'rice',
     scientificName: 'Oryza sativa',
     commonName: 'Rice',
     filipinoName: 'Palay',
     icon: Leaf,
-    description: 'A semi-aquatic cereal grass native to Asia, requiring consistent moisture and balanced nutrition. Thrives in flooded paddies with slightly acidic to neutral soil conditions. High nitrogen demand during vegetative growth phase, transitioning to potassium requirements during grain filling.',
-    requirements: {
-      nitrogen: 'HIGH',
-      phosphorus: 'MEDIUM-HIGH',
-      potassium: 'HIGH',
-      pH: 'MEDIUM'
-    }
+    description: 'A semi-aquatic cereal grass native to Asia, requiring consistent moisture and balanced nutrition. Thrives in flooded paddies with slightly acidic to neutral soil conditions.',
+    requirements: { nitrogen: 'HIGH', phosphorus: 'MEDIUM-HIGH', potassium: 'HIGH', pH: 'MEDIUM' }
   },
   corn: {
-    id: 'corn',
     scientificName: 'Zea mays',
     commonName: 'Corn',
     filipinoName: 'Mais',
     icon: Sprout,
-    description: 'A tall annual grass requiring well-drained soils and full sunlight exposure. Moderate to high nitrogen needs during early growth stages, with balanced phosphorus for root development. Prefers slightly acidic to neutral soil pH for optimal nutrient uptake.',
-    requirements: {
-      nitrogen: 'HIGH',
-      phosphorus: 'MEDIUM',
-      potassium: 'MEDIUM-HIGH',
-      pH: 'MEDIUM'
-    }
+    description: 'A tall annual grass requiring well-drained soils and full sunlight. Moderate to high nitrogen needs during early growth, with balanced phosphorus for root development.',
+    requirements: { nitrogen: 'HIGH', phosphorus: 'MEDIUM', potassium: 'MEDIUM-HIGH', pH: 'MEDIUM' }
   },
   vegetables: {
-    id: 'vegetables',
     scientificName: 'Mixed cultivars',
     commonName: 'Vegetables',
     filipinoName: 'Gulay',
     icon: Leaf,
-    description: 'Diverse group of herbaceous plants with varying nutrient requirements. Generally benefit from balanced NPK nutrition and consistent soil moisture. Most vegetable crops prefer slightly acidic to neutral pH for optimal nutrient availability and root health.',
-    requirements: {
-      nitrogen: 'MEDIUM-HIGH',
-      phosphorus: 'MEDIUM',
-      potassium: 'MEDIUM',
-      pH: 'MEDIUM'
-    }
+    description: 'Diverse group of herbaceous plants with varying nutrient requirements. Generally benefit from balanced NPK nutrition and consistent soil moisture. Most vegetable crops prefer slightly acidic to neutral pH for optimal nutrient availability.',
+    requirements: { nitrogen: 'MEDIUM-HIGH', phosphorus: 'MEDIUM', potassium: 'MEDIUM', pH: 'MEDIUM' }
   }
 };
 
@@ -174,20 +291,36 @@ function TopographicBackground() {
 export default function PlantRequirements() {
   const navigate = useNavigate();
 
-  // Note: Using selectedCrop to match existing usage, though store defines selectedPlant
-  const { selectedCrop, soilData } = useAppStore();
+  // The store key is `selectedPlant` (an object {name, id, nameFil, category}).
+  // Earlier this screen read a non-existent `selectedCrop` and silently
+  // fell back to Rice for every crop the user picked. Fixed.
+  const { selectedPlant, soilData } = useAppStore();
   const containerRef = useRef(null);
   const isInView = useInView(containerRef, { once: true, margin: "-100px" });
 
-  // Redirect if no data
   useEffect(() => {
-    if (!soilData) {
-      navigate('/soil-status');
-    }
+    if (!soilData) navigate('/soil-status');
   }, [soilData, navigate]);
 
-  // Get plant data (fallback to rice if selectedCrop doesn't exist)
-  const plant = PLANT_DATA[selectedCrop] || PLANT_DATA.rice;
+  // Look up plant data by the id PlantSelection set. If the picked crop
+  // isn't in our PLANT_DATA table, build a graceful fallback using the
+  // actual selected name + Filipino name from the store, plus a generic
+  // vegetables description, so the screen never silently shows Rice.
+  const plant = (() => {
+    const id = selectedPlant?.id;
+    if (id && PLANT_DATA[id]) return PLANT_DATA[id];
+    if (selectedPlant?.name) {
+      const generic = PLANT_DATA.vegetables;
+      return {
+        ...generic,
+        scientificName: selectedPlant.name,
+        commonName: selectedPlant.name,
+        filipinoName: selectedPlant.nameFil || generic.filipinoName,
+        description: `A ${selectedPlant.category || 'highland'} crop grown in CAR municipalities. Specific nutrient demands vary; use the rule-based engine on the next screen for the precise prescription. Generic guidance: balanced NPK with a slight phosphorus emphasis at planting and elevated potassium during fruit/tuber set.`
+      };
+    }
+    return PLANT_DATA.vegetables;
+  })();
   const PlantIcon = plant.icon;
 
   if (!soilData) {
