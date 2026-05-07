@@ -22,7 +22,7 @@ all deployed on Railway in the same `asia-southeast1-eqsg3a` region.
 │  Browser — React SPA (this repo)                                   │
 │  Vite + Tailwind + Mapbox GL + Zustand + Framer Motion             │
 └──────────────────────┬─────────────────────────────────────────────┘
-                       │ HTTPS (CORS-tolerant w/ smart probe)
+                       │ HTTPS — direct to each service
         ┌──────────────┼──────────────────────────────────┐
         │              │                                  │
         ▼              ▼                                  ▼
@@ -31,16 +31,8 @@ all deployed on Railway in the same `asia-southeast1-eqsg3a` region.
 │ NASA POWER   │  │ Sentinel-2 +   │          │ FastAPI service     │
 │ (weather +   │  │ scikit-learn   │          │ Crop NPK rules +    │
 │  elevation)  │  │ (NPK + pH      │          │ multi-candidate     │
-│              │  │  classifiers)  │◄────────►│ fertilizer mixing   │
-└──────────────┘  └───────┬────────┘   CORS   │                     │
-                          │           proxy   │                     │
-                          ▼                   └─────────────────────┘
-                   ┌────────────────┐
-                   │ cors-proxy/    │  This repo, separate Railway
-                   │ (FastAPI       │  service. Forwards Liam's
-                   │  forwarder)    │  endpoints with permissive
-                   └────────────────┘  CORS headers — bypassed
-                                       once upstream ships CORS.
+│              │  │  classifiers)  │          │ fertilizer mixing   │
+└──────────────┘  └────────────────┘          └─────────────────────┘
 ```
 
 | Service | Repo | Deployment |
@@ -48,7 +40,6 @@ all deployed on Railway in the same `asia-southeast1-eqsg3a` region.
 | Webapp (this repo) | [`Skibidata-WebApp-Model-Integration`](https://github.com/k10nite/Skibidata-WebApp-Model-Integration) | `skibidata-webapp-model-integration-production.up.railway.app` |
 | Rule engine | [`SoilScanRuleBased`](https://github.com/HansFredrick/SoilScanRuleBased) | `soilscanrulebased-production.up.railway.app` |
 | ML API | [`SoilScan-Sentinel2-API`](https://github.com/ljiro/SoilScan-Sentinel2-API) | `soilscan-sentinel2-api-production.up.railway.app` |
-| CORS proxy | This repo, `cors-proxy/` | `soilscan-cors-proxy-production.up.railway.app` (when deployed) |
 
 ---
 
@@ -125,8 +116,7 @@ Location Selection screen with a satellite map centred on La Trinidad.
 |---|---|---|
 | `VITE_MAPBOX_TOKEN` | Yes | Public `pk.*` Mapbox token. Restrict to your dev + production origins on the Mapbox dashboard. |
 | `VITE_RULE_API_URL` | Recommended | Hans's rule engine. Defaults work for the live deployment. |
-| `VITE_LIAM_API_URL` | Recommended | Direct URL to Liam's ML API. Falls back to CORS proxy if browser preflight fails. |
-| `VITE_LIAM_PROXY_URL` | Optional | This repo's CORS proxy. Used when Liam's direct endpoint rejects the browser. |
+| `VITE_LIAM_API_URL` | Recommended | Direct URL to Liam's ML API. On request failure (CORS, timeout, 5xx) the webapp falls back to the bundled placeholder JSON. |
 | `VITE_DEBUG_LOGS` | Optional | Set to `false` to silence the dev logger. Defaults on. |
 | `VITE_KIMI_API_KEY` | Optional | Kimi LLM API for ad-hoc dev experiments. Not in the active flow. |
 
@@ -159,11 +149,6 @@ thesis/
 │   │   ├── mlPredictions.json               # Fallback NPK/pH per municipality
 │   │   └── fertilizerRecommendations.js     # (legacy local stub, dead path)
 │   └── styles/index.css                     # Terrace design system tokens + classes
-├── cors-proxy/                              # FastAPI proxy to Liam's API
-│   ├── main.py
-│   ├── requirements.txt
-│   ├── Procfile
-│   └── railway.json
 ├── docs/
 │   ├── design.md                            # Cross-project design reference
 │   ├── results-discussion.md                # Thesis Chapter 3 draft
@@ -212,28 +197,6 @@ npm run lint:fix
 ESLint config blocks unused-disable-directives and treats warnings as
 errors. Fix locally before pushing.
 
-### The CORS proxy (separate Railway service)
-
-Liam's deployed API doesn't have CORS middleware yet, so browser-to-API
-calls fail at preflight. The webapp's `liamMLService.js` performs a
-one-time CORS probe at startup; if the upstream rejects the probe it
-falls back to a proxy URL. The proxy is a tiny FastAPI service in
-`cors-proxy/` deployed as a separate Railway service.
-
-To run the proxy locally:
-
-```bash
-cd cors-proxy
-python -m venv .venv
-.venv/Scripts/activate    # or source .venv/bin/activate on Mac/Linux
-pip install -r requirements.txt
-uvicorn main:app --port 8080 --reload
-```
-
-When Liam adds `CORSMiddleware` upstream, the smart probe detects it on
-the next page reload and the proxy is bypassed automatically — no env
-var change needed.
-
 ### Dev logging
 
 `src/services/logger.js` provides channel-prefixed console output
@@ -261,14 +224,9 @@ The webapp deploys to Railway via GitHub integration on every push to
 `main`. Build command is `npm install && npm run build`; start command
 is `npm run preview -- --host 0.0.0.0 --port $PORT`.
 
-The `cors-proxy/` directory deploys as a separate Railway service in
-the same project (`skibidaddling`), with `Root Directory = cors-proxy/`
-configured in service settings.
-
 Railway env vars match the `.env.example` keys — `VITE_MAPBOX_TOKEN`,
-`VITE_RULE_API_URL`, `VITE_LIAM_API_URL`, `VITE_LIAM_PROXY_URL` — all
-inlined into the JS bundle at build time, so changes require a
-redeploy.
+`VITE_RULE_API_URL`, `VITE_LIAM_API_URL` — all inlined into the JS
+bundle at build time, so changes require a redeploy.
 
 ---
 

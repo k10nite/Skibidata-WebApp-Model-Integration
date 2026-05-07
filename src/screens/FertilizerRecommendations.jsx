@@ -535,11 +535,14 @@ export default function FertilizerRecommendations() {
                 </div>
               </div>
 
-              {/* Inventory check */}
+              {/* Inventory check — shows the engine's on-inventory-only
+                  prescription when valid, plus the user's stock list and
+                  the engine's reason text. */}
               {(() => {
                 const ic = fertilizerData?._engineRaw?.inventory_check;
                 const ic_valid = ic?.valid;
                 const ic_reason = ic?.reason;
+                const ic_details = ic?.details;
                 const inv = fertilizerData?._engineRaw?.user_inventory;
                 const has_user_inv = Array.isArray(inv) && inv.length > 0;
                 if (!has_user_inv && !ic_reason) return (
@@ -554,29 +557,104 @@ export default function FertilizerRecommendations() {
                     <Caption>no on-hand fertilizers selected — engine drew from full catalog</Caption>
                   </div>
                 );
+                const detailLines = Array.isArray(ic_details?.prescription)
+                  ? ic_details.prescription
+                  : Array.isArray(ic_details?.Prescription)
+                    ? ic_details.Prescription
+                    : null;
+                const totalWeight = ic_details?.total_weight ?? ic_details?.['Total Weight'];
+                const appliedN = ic_details?.applied?.N ?? ic_details?.['Applied N'];
+                const appliedP = ic_details?.applied?.P ?? ic_details?.['Applied P'];
+                const appliedK = ic_details?.applied?.K ?? ic_details?.['Applied K'];
+                const sourceName = ic_details?.source ?? ic_details?.Source;
                 return (
                   <div style={{
                     background: 'var(--color-paper-card)',
                     border: `1px solid ${ic_valid ? 'var(--color-moss)' : 'var(--color-rust)'}`,
                     borderRadius: '4px',
                     padding: '14px 18px',
-                    flex: 1
+                    flex: 1,
+                    overflowY: 'auto'
                   }}>
                     <div className="flex items-baseline justify-between mb-2">
                       <Eyebrow>INVENTORY CHECK</Eyebrow>
                       <Caption>{ic_valid ? '✓ valid' : '✗ insufficient'}</Caption>
                     </div>
-                    {has_user_inv && (
-                      <ul style={{ margin: '0 0 6px 0', padding: '0 0 0 16px' }}>
-                        {inv.map((f) => (
-                          <li key={f.name} style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '10px', color: 'var(--color-earth-deep)', opacity: 0.75, letterSpacing: '0.03em', lineHeight: 1.7 }}>
-                            {f.name} <span style={{ opacity: 0.55 }}>({f.n}-{f.p}-{f.k})</span>
-                          </li>
-                        ))}
-                      </ul>
+
+                    {/* On-inventory prescription (when valid) */}
+                    {ic_valid && detailLines && detailLines.length > 0 && (
+                      <div style={{ marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px dashed var(--color-contour)' }}>
+                        <div style={{
+                          fontFamily: '"JetBrains Mono", monospace',
+                          fontSize: '9px',
+                          letterSpacing: '0.18em',
+                          color: 'var(--color-moss)',
+                          fontWeight: 600,
+                          marginBottom: '4px'
+                        }}>
+                          USING ONLY YOUR STOCK
+                        </div>
+                        {sourceName && (
+                          <div style={{ fontFamily: '"Fraunces", serif', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.7, marginBottom: '4px' }}>
+                            via <span style={{ fontStyle: 'italic' }}>{sourceName}</span>
+                          </div>
+                        )}
+                        <ul style={{ margin: '0 0 6px 0', padding: '0 0 0 14px' }}>
+                          {detailLines.map((line, i) => (
+                            <li key={i} style={{
+                              fontFamily: '"JetBrains Mono", monospace',
+                              fontSize: '10px',
+                              color: 'var(--color-earth-deep)',
+                              letterSpacing: '0.02em',
+                              lineHeight: 1.65,
+                              listStyle: 'square'
+                            }}>{line}</li>
+                          ))}
+                        </ul>
+                        {(totalWeight != null || appliedN != null) && (
+                          <div className="flex flex-wrap gap-x-3 gap-y-0.5" style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '9px', color: 'var(--color-earth-deep)', opacity: 0.7, fontVariantNumeric: 'tabular-nums', letterSpacing: '0.02em' }}>
+                            {totalWeight != null && <span>total {Number(totalWeight).toFixed(2)} kg</span>}
+                            {appliedN != null && <span>· N {Number(appliedN).toFixed(1)}</span>}
+                            {appliedP != null && <span>· P {Number(appliedP).toFixed(1)}</span>}
+                            {appliedK != null && <span>· K {Number(appliedK).toFixed(1)}</span>}
+                          </div>
+                        )}
+                      </div>
                     )}
+
+                    {/* On-hand stock list */}
+                    {has_user_inv && (
+                      <>
+                        <div style={{
+                          fontFamily: '"JetBrains Mono", monospace',
+                          fontSize: '9px',
+                          letterSpacing: '0.18em',
+                          color: 'var(--color-earth-deep)',
+                          opacity: 0.55,
+                          fontWeight: 600,
+                          marginBottom: '4px'
+                        }}>
+                          ON HAND ({inv.length})
+                        </div>
+                        <ul style={{ margin: '0 0 6px 0', padding: '0 0 0 14px' }}>
+                          {inv.map((f) => (
+                            <li key={f.name} style={{
+                              fontFamily: '"JetBrains Mono", monospace',
+                              fontSize: '10px',
+                              color: 'var(--color-earth-deep)',
+                              opacity: 0.75,
+                              letterSpacing: '0.02em',
+                              lineHeight: 1.65
+                            }}>
+                              {f.name} <span style={{ opacity: 0.55 }}>({f.n}-{f.p}-{f.k})</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+
                     {ic_reason && (
-                      <div style={{ fontFamily: '"Fraunces", serif', fontStyle: 'italic', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.85, lineHeight: 1.4 }}>
+                      <div style={{ marginTop: '6px', fontFamily: '"Fraunces", serif', fontStyle: 'italic', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.85, lineHeight: 1.4 }}>
                         {ic_reason}
                       </div>
                     )}
