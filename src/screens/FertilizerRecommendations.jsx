@@ -53,21 +53,6 @@ const itemVariants = {
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────
 
-// Estimated soil ppm from categorical status — rough heuristic so the
-// TARGETS panel shows a realistic measured/gap instead of "0 / target".
-const STATUS_FRACTION = { Low: 0.25, Medium: 0.55, High: 0.85 };
-function readRatingStr(field) {
-  if (typeof field === 'string') return field;
-  if (field && typeof field === 'object' && typeof field.rating === 'string') return field.rating;
-  return 'Medium';
-}
-function estimateMeasured(field, target) {
-  if (typeof field === 'number') return field;
-  if (field && typeof field === 'object' && typeof field.value === 'number') return field.value;
-  const fraction = STATUS_FRACTION[readRatingStr(field)] ?? 0.55;
-  return target * fraction;
-}
-
 function phToNumeric(soilData) {
   if (typeof soilData?.pH === 'number') return soilData.pH;
   if (typeof soilData?.ph === 'number') return soilData.ph;
@@ -150,15 +135,11 @@ export default function FertilizerRecommendations() {
   const engineAreaHa = Number(fertilizerData?._engineRaw?.area_ha) || areaHectares || 1;
   const phAction = fertilizerData?._engineRaw?.ph_result?.ph_action || 'none';
 
-  // Calculate nutrient gaps in kg/ha.
   const soil = soilData || DEFAULT_SOIL_DATA;
   const ph = phToNumeric(soil);
   const nTarget = Number(engineTargetsPerHa.N) || 150;
   const pTarget = Number(engineTargetsPerHa.P) || 60;
   const kTarget = Number(engineTargetsPerHa.K) || 75;
-  const nMeasured = estimateMeasured(soil.nitrogen, nTarget);
-  const pMeasured = estimateMeasured(soil.phosphorus, pTarget);
-  const kMeasured = estimateMeasured(soil.potassium, kTarget);
 
   const handleCandidateSelect = (index) => {
     setSelectedCandidateIndex(index);
@@ -270,9 +251,17 @@ export default function FertilizerRecommendations() {
               <Caption>target</Caption>
             </div>
             <div className="mt-2 space-y-3">
-              <TargetRow label="N" target={selectedCandidate.applied.n.toFixed(0)} />
-              <TargetRow label="P" target={selectedCandidate.applied.p.toFixed(0)}  />
-              <TargetRow label="K" target={selectedCandidate.applied.k.toFixed(0)}  />
+              {selectedCandidate ? (
+                <>
+                  <TargetRow label="N" target={selectedCandidate.applied.n} />
+                  <TargetRow label="P" target={selectedCandidate.applied.p} />
+                  <TargetRow label="K" target={selectedCandidate.applied.k} />
+                </>
+              ) : (
+                <div className="text-center p-4" style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '12px', color: 'var(--color-earth-deep)', opacity: 0.7 }}>
+                  Calculating...
+                </div>
+              )}
               <div className="flex items-baseline justify-between py-1" style={{ borderBottom: '1px dotted var(--color-contour)' }}>
                 <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.6, letterSpacing: '0.1em' }}>pH</span>
                 <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '13px', color: 'var(--color-earth-deep)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
@@ -951,19 +940,13 @@ function Sep() {
   return <span style={{ opacity: 0.4, margin: '0 10px' }}>·</span>;
 }
 
-function TargetRow({ label, target, measured, gap }) {
-  const gapColor = gap > 0 ? 'var(--color-rust)' : gap < -20 ? 'var(--color-moss)' : 'var(--color-ochre)';
+function TargetRow({ label, target }) {
   return (
     <div className="flex items-baseline justify-between py-1" style={{ borderBottom: '1px dotted var(--color-contour)' }}>
       <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.6, letterSpacing: '0.1em' }}>{label}</span>
       <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', fontVariantNumeric: 'tabular-nums' }}>
         <span style={{ color: 'var(--color-earth-deep)', fontWeight: 600 }}>{Number(target).toFixed(0)}</span>
-        <span style={{ opacity: 0.4, margin: '0 4px' }}>/</span>
-        <span style={{ opacity: 0.6 }}>{Number(measured).toFixed(0)}</span>
         <span style={{ opacity: 0.4, marginLeft: '4px' }}>kg/ha</span>
-        <span style={{ color: gapColor, marginLeft: '8px', fontWeight: 600 }}>
-          {gap > 0 ? '+' : ''}{Number(gap).toFixed(0)}
-        </span>
       </span>
     </div>
   );
