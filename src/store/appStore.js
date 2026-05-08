@@ -41,21 +41,68 @@ const useAppStore = create((set) => ({
     set({ location, municipality, barangay }),
 
   setField: (field, areaHa, center) =>
-    set({ field, fieldAreaHa: areaHa, fieldCenter: center }),
+    set({
+      field,
+      fieldAreaHa: areaHa,
+      fieldCenter: center,
+      selectedPlant: null,
+      plantRequirements: null,
+      soilData: null,
+      soilScenario: null,
+      satelliteData: null,
+      weatherData: null,
+      vegetationIndex: null,
+      recommendations: null,
+      recommendationSummary: null,
+      areaHectares: areaHa > 0 ? areaHa : 1,
+      availableFertilizers: ''
+    }),
 
   clearField: () =>
-    set({ field: null, fieldAreaHa: 0, fieldCenter: null }),
+    set({
+      field: null,
+      fieldAreaHa: 0,
+      fieldCenter: null,
+      selectedPlant: null,
+      plantRequirements: null,
+      soilData: null,
+      soilScenario: null,
+      satelliteData: null,
+      weatherData: null,
+      vegetationIndex: null,
+      recommendations: null,
+      recommendationSummary: null,
+      areaHectares: 1,
+      availableFertilizers: ''
+    }),
 
   setSelectedPlant: (plant, requirements) =>
-    set({ selectedPlant: plant, plantRequirements: requirements }),
+    set((state) => {
+      const previousKey = state.selectedPlant?.id || state.selectedPlant?.name || null;
+      const nextKey = plant?.id || plant?.name || null;
+      const changed = previousKey !== nextKey;
+      return {
+        selectedPlant: plant,
+        plantRequirements: requirements,
+        recommendations: changed ? null : state.recommendations,
+        recommendationSummary: changed ? null : state.recommendationSummary
+      };
+    }),
 
   setSoilData: (soilData, scenario) =>
-    set({ soilData, soilScenario: scenario }),
+    set({
+      soilData,
+      soilScenario: scenario,
+      recommendations: null,
+      recommendationSummary: null
+    }),
 
   setMLPrediction: (prediction) =>
     set({
       soilData: prediction,
-      soilScenario: { status: prediction, source: prediction?.source ?? 'ml' }
+      soilScenario: { status: prediction, source: prediction?.source ?? 'ml' },
+      recommendations: null,
+      recommendationSummary: null
     }),
 
   setSatelliteData: (satelliteData) =>
@@ -63,17 +110,27 @@ const useAppStore = create((set) => ({
       satelliteData,
       weatherData: satelliteData?.weather || null,
       vegetationIndex: satelliteData?.vegetation || null,
-      soilData: satelliteData?.soil || null
+      soilData: satelliteData?.soil || null,
+      recommendations: null,
+      recommendationSummary: null
     }),
 
   setRecommendations: (recommendations, summary) =>
     set({ recommendations, recommendationSummary: summary }),
 
   setAreaHectares: (areaHectares) =>
-    set({ areaHectares }),
+    set((state) => ({
+      areaHectares,
+      recommendations: Number(state.areaHectares) !== Number(areaHectares) ? null : state.recommendations,
+      recommendationSummary: Number(state.areaHectares) !== Number(areaHectares) ? null : state.recommendationSummary
+    })),
 
   setAvailableFertilizers: (availableFertilizers) =>
-    set({ availableFertilizers }),
+    set((state) => ({
+      availableFertilizers,
+      recommendations: state.availableFertilizers !== availableFertilizers ? null : state.recommendations,
+      recommendationSummary: state.availableFertilizers !== availableFertilizers ? null : state.recommendationSummary
+    })),
 
   nextScreen: () =>
     set((state) => ({

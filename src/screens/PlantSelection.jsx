@@ -227,6 +227,7 @@ const itemVariants = {
 export default function PlantSelection() {
   const navigate = useNavigate();
   const {
+    selectedPlant,
     setSelectedPlant,
     soilData,
     municipality,
@@ -239,7 +240,12 @@ export default function PlantSelection() {
     setAvailableFertilizers
   } = useAppStore();
 
-  const [selectedCrop, setSelectedCrop] = useState(null);
+  const [selectedCrop, setSelectedCrop] = useState(() => {
+    if (!selectedPlant) return null;
+    return CROPS_DATA.find((crop) =>
+      crop.id === selectedPlant.id || crop.engineLabel === selectedPlant.name
+    ) || null;
+  });
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [weather, setWeather] = useState(null);
@@ -249,6 +255,17 @@ export default function PlantSelection() {
     const known = ALL_FERTILIZERS.map((f) => f.name);
     return new Set(items.filter((it) => known.includes(it)));
   });
+
+  useEffect(() => {
+    if (!selectedPlant) {
+      setSelectedCrop(null);
+      return;
+    }
+    const storedCrop = CROPS_DATA.find((crop) =>
+      crop.id === selectedPlant.id || crop.engineLabel === selectedPlant.name
+    ) || null;
+    setSelectedCrop(storedCrop);
+  }, [selectedPlant]);
 
   // One-time area seed from polygon
   useEffect(() => {
