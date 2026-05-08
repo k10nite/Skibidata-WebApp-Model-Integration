@@ -433,7 +433,7 @@ ${i + 1}. ${rec.fertilizer.name} (${rec.fertilizer.formula})
 `).join('\n') || 'No fertilizer needed - soil is in perfect condition!'}
 
 ================================================================================
-Created by LupAI - Powered by Sentinel-2 Satellite & AI
+Created by ANES - Powered by Sentinel-2 Satellite & AI
 For CAR Highland Farmers
 ================================================================================
     `.trim();

@@ -405,7 +405,7 @@ export default function ProcessingScreen({ onComplete }) {
 
         {/* Bottom Info */}
         <p className="text-center text-gray-400 text-xs mt-6">
-          FertilizerAI • CAR Region Optimized
+          ANES • CAR Region Optimized
         </p>
       </div>
 

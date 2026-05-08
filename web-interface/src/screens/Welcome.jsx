@@ -36,7 +36,7 @@ const Welcome = () => {
       <div className="welcome-content">
         <motion.div variants={itemVariants} className="logo-container">
           <Sprout size={64} className="logo-icon" />
-          <h1 className="app-title">FertilizerAI</h1>
+          <h1 className="app-title">ANES</h1>
         </motion.div>
 
         <motion.p variants={itemVariants} className="welcome-subtitle">

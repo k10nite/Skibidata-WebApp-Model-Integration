@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import useAppStore from '../store/appStore';
+import AnesBrand from '../components/AnesBrand';
 import { getRecommendationForCrop, getRecommendationForCropAsync } from '../services/recommendationService';
 import { log } from '../services/logger';
 
@@ -199,15 +200,16 @@ export default function FertilizerRecommendations() {
       {/* ─── Top breadcrumb strip ─── */}
       <motion.header
         variants={itemVariants}
-        className="flex items-center justify-between px-4 sm:px-6 lg:px-14 xl:px-20 py-4"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 lg:px-14 xl:px-20 py-4"
         style={{
           borderBottom: '1px solid var(--color-contour)',
           background: 'var(--color-paper-card)',
           flexShrink: 0
         }}
       >
+        <AnesBrand compact />
         <div
-          className="overflow-x-auto whitespace-nowrap"
+          className="overflow-x-auto whitespace-nowrap max-w-full"
           style={{
             fontFamily: '"JetBrains Mono", monospace',
             fontSize: '12px',

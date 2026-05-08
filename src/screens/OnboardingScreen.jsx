@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const onboardingSteps = [
   {
-    title: 'Welcome to FertilizerAI',
+    title: 'Welcome to ANES',
     description: 'Get personalized fertilizer recommendations based on your soil conditions and crops.',
     image: '🌾',
   },

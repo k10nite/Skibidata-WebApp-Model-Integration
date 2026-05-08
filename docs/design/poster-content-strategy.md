@@ -1,7 +1,7 @@
-# LupAI Research Poster - Content Strategy
+# ANES Research Poster - Content Strategy
 
 ## Title Suggestion
-**LupAI: AI-Powered Fertilizer Recommendation System for Filipino Highland Farmers**
+**ANES: AI-Powered Fertilizer Recommendation System for Filipino Highland Farmers**
 *Leveraging Sentinel-2 Satellite Data and Machine Learning for Precision Agriculture*
 
 ---
@@ -26,7 +26,7 @@ Filipino smallholder farmers in the Cordillera Administrative Region (CAR) face 
 
 ## Solution Overview
 
-**LupAI** is a web-based precision agriculture platform that combines satellite remote sensing, artificial intelligence, and user-friendly design to deliver personalized fertilizer recommendations to Filipino farmers.
+**ANES** is a web-based precision agriculture platform that combines satellite remote sensing, artificial intelligence, and user-friendly design to deliver personalized fertilizer recommendations to Filipino farmers.
 
 ### Core Innovation
 - **Sentinel-2 Satellite Integration**: Real-time soil nutrient analysis using European Space Agency satellite data
@@ -302,5 +302,5 @@ Filipino smallholder farmers in the Cordillera Administrative Region (CAR) face 
 ---
 
 *Document created: February 24, 2026*
-*Project: LupAI - Fertilizer Recommendation System*
+*Project: ANES - Fertilizer Recommendation System*
 *Developer: Neil*

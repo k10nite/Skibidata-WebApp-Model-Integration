@@ -5,6 +5,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import AnesBrand from '../components/AnesBrand';
 import useAppStore from '../store/appStore';
 
 const containerVariants = {
@@ -124,14 +125,16 @@ export default function Complete() {
       {/* ─── Top session strip ─── */}
       <motion.header
         variants={itemVariants}
-        className="flex items-center justify-between px-4 sm:px-6 lg:px-14 xl:px-20 py-4"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 lg:px-14 xl:px-20 py-4"
         style={{
           borderBottom: '1px solid var(--color-contour)',
           background: 'var(--color-paper-card)',
           flexShrink: 0
         }}
       >
+        <AnesBrand compact />
         <div
+          className="max-w-full overflow-x-auto whitespace-nowrap"
           style={{
             fontFamily: '"JetBrains Mono", monospace',
             fontSize: '12px',

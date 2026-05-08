@@ -12,6 +12,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
+import AnesBrand from '../components/AnesBrand';
 import useAppStore from '../store/appStore';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
@@ -189,7 +190,7 @@ export default function LocationSelection() {
       variants={containerVariants}
       initial="initial"
       animate="animate"
-      className="min-h-screen bg-[var(--color-paper)] relative overflow-hidden"
+      className="min-h-screen bg-[var(--color-paper)] relative overflow-x-hidden"
     >
       <svg className="terrace-topo opacity-8" viewBox="0 0 1200 800" preserveAspectRatio="none">
         <path d="M0,200 Q300,150 600,200 T1200,200" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.6" />
@@ -200,8 +201,9 @@ export default function LocationSelection() {
       <div className="relative z-10 min-h-screen flex flex-col lg:flex-row terrace-page-with-mobile-actions">
         {/* Map Section — 62% Hero */}
         <motion.div variants={itemVariants} className="w-full lg:w-[62%] relative">
-          <div className="h-[88vh] lg:h-screen p-4 sm:p-6 lg:p-12 flex flex-col">
+          <div className="min-h-[88vh] lg:min-h-screen p-4 sm:p-6 lg:p-12 flex flex-col">
             <motion.div variants={itemVariants} className="mb-4 lg:mb-6">
+              <AnesBrand className="mb-5" />
               <div className="terrace-eyebrow mb-2 lg:mb-4">01 — LOCATION</div>
               <h1
                 className="terrace-display mb-1 lg:mb-2"
@@ -265,13 +267,13 @@ export default function LocationSelection() {
         {/* Editorial Rail — 38% */}
         <motion.div
           variants={itemVariants}
-          className="hidden lg:block w-[38%] relative"
+          className="hidden lg:block w-[38%] relative lg:max-h-screen lg:overflow-y-auto"
           style={{
             background: 'var(--color-paper-card)',
             borderLeft: '1px solid var(--color-contour)'
           }}
         >
-          <div className="h-screen px-10 py-10 flex flex-col">
+          <div className="min-h-screen px-10 pt-10 pb-32 flex flex-col">
 
             {/* Step indicator strip */}
             <motion.div
@@ -294,7 +296,7 @@ export default function LocationSelection() {
             </motion.div>
 
             {/* Editorial intro — Fraunces italic */}
-            <motion.div variants={itemVariants} className="mb-10">
+            <motion.div variants={itemVariants} className="mb-7">
               <div
                 className="text-2xl leading-snug mb-4"
                 style={{
@@ -320,7 +322,7 @@ export default function LocationSelection() {
             </motion.div>
 
             {/* Numbered instruction strip */}
-            <motion.div variants={itemVariants} className="mb-10">
+            <motion.div variants={itemVariants} className="mb-7">
               <div className="terrace-eyebrow mb-4">HOW</div>
               <ol className="space-y-2.5">
                 {[
@@ -364,7 +366,7 @@ export default function LocationSelection() {
             </motion.div>
 
             {/* FIELD AREA hero */}
-            <motion.div variants={itemVariants} className="mb-10">
+            <motion.div variants={itemVariants} className="mb-7">
               <div className="flex items-baseline justify-between mb-3">
                 <div className="terrace-eyebrow">FIELD AREA</div>
                 {areaHa > 0 && (
@@ -435,7 +437,7 @@ export default function LocationSelection() {
             </motion.div>
 
             {/* Quick-locations grid — fills the empty space + adds utility */}
-            <motion.div variants={itemVariants} className="mb-10">
+            <motion.div variants={itemVariants} className="mb-7">
               <div className="flex items-baseline justify-between mb-4">
                 <div className="terrace-eyebrow">QUICK LOCATIONS</div>
                 <div
@@ -498,14 +500,15 @@ export default function LocationSelection() {
               </div>
             </motion.div>
 
-            {/* Spacer pushes Continue to bottom */}
-            <div className="flex-1" />
-
             {/* Continue */}
             <motion.div
               variants={itemVariants}
-              className="pt-6"
-              style={{ borderTop: '1px solid var(--color-contour)' }}
+              className="fixed bottom-0 right-0 w-[38%] px-10 pt-5 pb-6"
+              style={{
+                borderTop: '1px solid var(--color-contour)',
+                background: 'var(--color-paper-card)',
+                boxShadow: '0 -12px 28px -18px rgba(45,32,22,0.24)'
+              }}
             >
               <button
                 onClick={handleContinue}

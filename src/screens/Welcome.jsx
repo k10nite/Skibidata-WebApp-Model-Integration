@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Sprout, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import AnesBrand from '../components/AnesBrand';
 
 const Welcome = () => {
   const navigate = useNavigate();
@@ -35,8 +36,8 @@ const Welcome = () => {
     >
       <div className="welcome-content">
         <motion.div variants={itemVariants} className="logo-container">
-          <Sprout size={64} className="logo-icon" />
-          <h1 className="app-title">FertilizerAI</h1>
+          <AnesBrand />
+          <h1 className="app-title">ANES</h1>
         </motion.div>
 
         <motion.p variants={itemVariants} className="welcome-subtitle">
