@@ -946,7 +946,7 @@ function TargetRow({ label, target }) {
       <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.6, letterSpacing: '0.1em' }}>{label}</span>
       <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', fontVariantNumeric: 'tabular-nums' }}>
         <span style={{ color: 'var(--color-earth-deep)', fontWeight: 600 }}>{Number(target).toFixed(0)}</span>
-        <span style={{ opacity: 0.4, marginLeft: '4px' }}>kg/ha</span>
+        <span style={{ opacity: 0.4, marginLeft: '4px' }}>kg</span>
       </span>
     </div>
   );
