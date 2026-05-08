@@ -8,6 +8,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Check, Loader2, AlertTriangle } from 'lucide-react';
+import AnesBrand from '../components/AnesBrand';
 import useAppStore from '../store/appStore';
 import { getSatelliteAnalysis } from '../services/satelliteService';
 import { predictForLocation } from '../services/mlPredictionService';
@@ -161,16 +162,18 @@ export default function Processing() {
 
       {/* Top breadcrumb strip — matches downstream screens */}
       <header
-        className="flex items-center justify-between px-4 sm:px-6 lg:px-12 py-3"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 lg:px-14 xl:px-20 py-4"
         style={{
           borderBottom: '1px solid var(--color-contour)',
           background: 'var(--color-paper-card)'
         }}
       >
+        <AnesBrand compact />
         <div
+          className="max-w-full overflow-x-auto whitespace-nowrap"
           style={{
             fontFamily: '"JetBrains Mono", monospace',
-            fontSize: '11px',
+            fontSize: '12px',
             letterSpacing: '0.18em',
             color: 'var(--color-earth-deep)',
             opacity: 0.85
@@ -185,7 +188,7 @@ export default function Processing() {
         <div
           style={{
             fontFamily: '"JetBrains Mono", monospace',
-            fontSize: '10px',
+            fontSize: '11px',
             letterSpacing: '0.18em',
             color: 'var(--color-earth-deep)',
             opacity: 0.6,
@@ -196,19 +199,19 @@ export default function Processing() {
         </div>
       </header>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-12 py-6 lg:py-10">
+      <div className="relative z-10 w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-14 xl:px-20 py-8 lg:py-12">
 
         {/* Hero strip */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-8"
+          className="mb-9"
         >
           <div
             style={{
               fontFamily: '"JetBrains Mono", monospace',
-              fontSize: '11px',
+              fontSize: '12px',
               letterSpacing: '0.22em',
               color: 'var(--color-moss)',
               fontWeight: 600,
@@ -220,7 +223,7 @@ export default function Processing() {
           <h1
             style={{
               fontFamily: '"Fraunces", serif',
-              fontSize: 'clamp(2rem, 3vw, 2.75rem)',
+              fontSize: 'clamp(2.65rem, 4.2vw, 4.5rem)',
               fontVariationSettings: '"opsz" 144, "wght" 600',
               lineHeight: 1.05,
               color: 'var(--color-earth-deep)',
@@ -232,19 +235,19 @@ export default function Processing() {
         </motion.div>
 
         {/* Main 2-col panel */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 xl:gap-8">
 
           {/* LEFT — polygon thumbnail */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-2"
+            className="lg:col-span-5"
           >
             <div
               className="relative overflow-hidden"
               style={{
-                aspectRatio: '4 / 3',
+                aspectRatio: '16 / 11',
                 background: 'var(--color-paper-card)',
                 border: '1px solid var(--color-contour)',
                 borderRadius: '4px'
@@ -258,7 +261,7 @@ export default function Processing() {
                   fontStyle: 'italic',
                   color: 'var(--color-earth-deep)',
                   opacity: 0.45,
-                  fontSize: '13px'
+                  fontSize: '16px'
                 }}>
                   no polygon
                 </div>
@@ -270,7 +273,7 @@ export default function Processing() {
                   backdropFilter: 'blur(6px)',
                   borderRadius: '2px',
                   fontFamily: '"JetBrains Mono", monospace',
-                  fontSize: '9px',
+                  fontSize: '11px',
                   letterSpacing: '0.18em',
                   color: 'var(--color-earth-deep)',
                   fontWeight: 600
@@ -286,7 +289,7 @@ export default function Processing() {
                     backdropFilter: 'blur(6px)',
                     borderRadius: '2px',
                     fontFamily: '"JetBrains Mono", monospace',
-                    fontSize: '9px',
+                    fontSize: '11px',
                     color: 'var(--color-earth-deep)',
                     fontVariantNumeric: 'tabular-nums'
                   }}
@@ -298,7 +301,7 @@ export default function Processing() {
 
             {/* Telemetry mini-grid */}
             <div
-              className="grid grid-cols-2 gap-px mt-4"
+              className="grid grid-cols-2 gap-px mt-5"
               style={{ background: 'var(--color-contour)', border: '1px solid var(--color-contour)', borderRadius: '4px', overflow: 'hidden' }}
             >
               <TelemCell label="LOCATION" value={telemetry.location} />
@@ -313,20 +316,20 @@ export default function Processing() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.06, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-3"
+            className="lg:col-span-7"
           >
             <div
               style={{
                 background: 'var(--color-paper-card)',
                 border: '1px solid var(--color-contour)',
                 borderRadius: '4px',
-                padding: '20px 24px'
+                padding: '28px 32px'
               }}
             >
               <div
                 style={{
                   fontFamily: '"JetBrains Mono", monospace',
-                  fontSize: '10px',
+                  fontSize: '12px',
                   letterSpacing: '0.22em',
                   color: 'var(--color-moss)',
                   fontWeight: 600,
@@ -350,7 +353,7 @@ export default function Processing() {
 
             {/* Soil readout — fills in after step 4 */}
             <div
-              className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-px"
+              className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-px"
               style={{ background: 'var(--color-contour)', border: '1px solid var(--color-contour)', borderRadius: '4px', overflow: 'hidden' }}
             >
               <SoilCell label="N" value={telemetry.n} />
@@ -361,7 +364,7 @@ export default function Processing() {
 
             {/* Status footer */}
             <div
-              className="mt-4 px-4 py-3 flex items-center justify-between"
+              className="mt-5 px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
               style={{
                 background: 'var(--color-paper-card)',
                 border: '1px solid var(--color-contour)',
@@ -371,7 +374,7 @@ export default function Processing() {
               <div
                 style={{
                   fontFamily: '"JetBrains Mono", monospace',
-                  fontSize: '10px',
+                  fontSize: '11px',
                   letterSpacing: '0.18em',
                   color: 'var(--color-earth-deep)',
                   opacity: 0.7
@@ -385,7 +388,7 @@ export default function Processing() {
                   style={{
                     fontFamily: '"Fraunces", serif',
                     fontStyle: 'italic',
-                    fontSize: '11px',
+                    fontSize: '13px',
                     color: 'var(--color-rust)'
                   }}
                 >
@@ -397,7 +400,7 @@ export default function Processing() {
                   style={{
                     fontFamily: '"Fraunces", serif',
                     fontStyle: 'italic',
-                    fontSize: '11px',
+                    fontSize: '13px',
                     color: 'var(--color-earth-deep)',
                     opacity: 0.6
                   }}
@@ -424,23 +427,23 @@ function StepRow({ index, label, sub, state }) {
     state === 'warn' ? 'var(--color-rust)' :
     'var(--color-contour)';
   return (
-    <li className="flex items-center gap-3" style={{ padding: '6px 0', borderBottom: '1px dotted var(--color-contour)' }}>
+    <li className="flex items-center gap-4" style={{ padding: '12px 0', borderBottom: '1px dotted var(--color-contour)' }}>
       <div
         className="flex items-center justify-center"
         style={{
-          width: '24px',
-          height: '24px',
+          width: '30px',
+          height: '30px',
           borderRadius: '2px',
           background: state === 'done' ? 'var(--color-moss)' : 'var(--color-paper)',
           border: `1px solid ${accent}`,
           flexShrink: 0
         }}
       >
-        {state === 'done' && <Check className="w-3.5 h-3.5" style={{ color: 'var(--color-paper)' }} />}
-        {state === 'running' && <Loader2 className="w-3.5 h-3.5 animate-spin" style={{ color: 'var(--color-ochre)' }} />}
-        {state === 'warn' && <AlertTriangle className="w-3.5 h-3.5" style={{ color: 'var(--color-rust)' }} />}
+        {state === 'done' && <Check className="w-4 h-4" style={{ color: 'var(--color-paper)' }} />}
+        {state === 'running' && <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'var(--color-ochre)' }} />}
+        {state === 'warn' && <AlertTriangle className="w-4 h-4" style={{ color: 'var(--color-rust)' }} />}
         {state === 'pending' && (
-          <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '10px', color: 'var(--color-earth-deep)', opacity: 0.45, fontWeight: 600 }}>
+          <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '12px', color: 'var(--color-earth-deep)', opacity: 0.45, fontWeight: 600 }}>
             {index}
           </span>
         )}
@@ -449,7 +452,7 @@ function StepRow({ index, label, sub, state }) {
         <div
           style={{
             fontFamily: '"Fraunces", serif',
-            fontSize: '14px',
+            fontSize: '18px',
             fontVariationSettings: '"opsz" 144, "wght" 500',
             color: state === 'pending' ? 'var(--color-earth-deep)' : 'var(--color-earth-deep)',
             opacity: state === 'pending' ? 0.55 : 1,
@@ -461,7 +464,7 @@ function StepRow({ index, label, sub, state }) {
         <div
           style={{
             fontFamily: '"JetBrains Mono", monospace',
-            fontSize: '10px',
+            fontSize: '12px',
             color: 'var(--color-earth-deep)',
             opacity: 0.5,
             marginTop: '2px',
@@ -474,7 +477,7 @@ function StepRow({ index, label, sub, state }) {
       <div
         style={{
           fontFamily: '"JetBrains Mono", monospace',
-          fontSize: '9px',
+          fontSize: '11px',
           letterSpacing: '0.18em',
           fontWeight: 600,
           color: accent,
@@ -490,11 +493,11 @@ function StepRow({ index, label, sub, state }) {
 
 function TelemCell({ label, value, mono }) {
   return (
-    <div style={{ background: 'var(--color-paper-card)', padding: '12px 14px' }}>
+    <div style={{ background: 'var(--color-paper-card)', padding: '16px 18px' }}>
       <div
         style={{
           fontFamily: '"JetBrains Mono", monospace',
-          fontSize: '9px',
+          fontSize: '10px',
           letterSpacing: '0.22em',
           color: 'var(--color-earth-deep)',
           opacity: 0.5,
@@ -507,7 +510,7 @@ function TelemCell({ label, value, mono }) {
       <div
         style={{
           fontFamily: mono ? '"JetBrains Mono", monospace' : '"Fraunces", serif',
-          fontSize: mono ? '13px' : '15px',
+          fontSize: mono ? '16px' : '18px',
           fontVariationSettings: mono ? undefined : '"opsz" 144, "wght" 500',
           fontVariantNumeric: mono ? 'tabular-nums' : undefined,
           color: 'var(--color-earth-deep)',
@@ -526,11 +529,11 @@ function SoilCell({ label, value }) {
     ? (value === 'Low' ? 'var(--color-rust)' : value === 'High' ? 'var(--color-moss)' : 'var(--color-ochre)')
     : 'var(--color-contour)';
   return (
-    <div style={{ background: 'var(--color-paper-card)', padding: '12px 14px' }}>
+    <div style={{ background: 'var(--color-paper-card)', padding: '16px 18px' }}>
       <div
         style={{
           fontFamily: '"JetBrains Mono", monospace',
-          fontSize: '9px',
+          fontSize: '10px',
           letterSpacing: '0.22em',
           color: 'var(--color-earth-deep)',
           opacity: 0.5,
@@ -543,7 +546,7 @@ function SoilCell({ label, value }) {
       <div
         style={{
           fontFamily: '"JetBrains Mono", monospace',
-          fontSize: '14px',
+          fontSize: '17px',
           color: value ? color : 'var(--color-earth-deep)',
           opacity: value ? 1 : 0.35,
           fontVariantNumeric: 'tabular-nums',

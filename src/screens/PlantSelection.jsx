@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import useAppStore from '../store/appStore';
+import AnesBrand from '../components/AnesBrand';
 import { getWeatherData } from '../services/satelliteService';
 import { buildPolygonPreviewUrl } from '../services/mapboxStaticService';
 import { log } from '../services/logger';
@@ -373,14 +374,15 @@ export default function PlantSelection() {
         {/* ─────────── LEFT (62%) — content-first composition ─────────── */}
         <motion.div
           variants={itemVariants}
-          className="w-full lg:w-[62%] px-4 sm:px-6 lg:px-14 py-6 lg:py-10"
+          className="w-full lg:w-[60%] px-4 sm:px-6 lg:px-14 xl:px-20 py-6 lg:py-10"
         >
           {/* Hero — slim, no giant ornament */}
           <div className="mb-6">
+            <AnesBrand compact className="mb-5" />
             <div
               style={{
                 fontFamily: '"JetBrains Mono", monospace',
-                fontSize: '11px',
+                fontSize: '12px',
                 letterSpacing: '0.22em',
                 color: 'var(--color-moss)',
                 fontWeight: 600,
@@ -392,7 +394,7 @@ export default function PlantSelection() {
             <h1
               style={{
                 fontFamily: '"Fraunces", serif',
-                fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
+                fontSize: 'clamp(3rem, 4.6vw, 4.5rem)',
                 lineHeight: 1.0,
                 fontVariationSettings: '"opsz" 144, "wght" 600',
                 color: 'var(--color-earth-deep)',
@@ -696,14 +698,14 @@ export default function PlantSelection() {
         {/* ─────────── RIGHT (38%) — index ─────────── */}
         <motion.div
           variants={itemVariants}
-          className="w-full lg:w-[38%] flex flex-col lg:sticky lg:top-0 lg:h-screen"
+          className="w-full lg:w-[40%] flex flex-col lg:sticky lg:top-0 lg:h-screen"
           style={{
             background: 'var(--color-paper-card)',
             borderTop: '1px solid var(--color-contour)',
             borderLeft: '1px solid var(--color-contour)'
           }}
         >
-          <div className="px-8 py-6" style={{ borderBottom: '1px solid var(--color-contour)' }}>
+          <div className="px-7 xl:px-9 py-7" style={{ borderBottom: '1px solid var(--color-contour)' }}>
             <div className="flex items-baseline justify-between mb-3">
               <Eyebrow>INDEX 02 — CROP</Eyebrow>
               <Caption>{totalFiltered} of {CROPS_DATA.length}</Caption>
@@ -727,7 +729,7 @@ export default function PlantSelection() {
                 style={{
                   flex: 1,
                   fontFamily: '"JetBrains Mono", monospace',
-                  fontSize: '13px',
+                  fontSize: '15px',
                   background: 'transparent',
                   border: 'none',
                   outline: 'none',
@@ -753,7 +755,7 @@ export default function PlantSelection() {
 
           {/* Crop list */}
           <div
-            className="flex-1 overflow-y-auto"
+            className="flex-1 overflow-y-auto terrace-scroll"
             style={{ fontFamily: '"Fraunces", serif' }}
           >
             {Object.keys(filteredGrouped).length === 0 && (
@@ -773,12 +775,12 @@ export default function PlantSelection() {
             {Object.entries(filteredGrouped).map(([cat, crops]) => (
               <div key={cat}>
                 <div
-                  className="sticky top-0 z-10 px-8 py-2.5"
+                  className="sticky top-0 z-10 px-7 xl:px-9 py-3"
                   style={{
                     background: 'var(--color-paper-card)',
                     borderBottom: '1px solid var(--color-contour)',
                     fontFamily: '"JetBrains Mono", monospace',
-                    fontSize: '10px',
+                    fontSize: '11px',
                     letterSpacing: '0.22em',
                     color: 'var(--color-moss)',
                     fontWeight: 600,
@@ -797,7 +799,7 @@ export default function PlantSelection() {
                       onClick={() => setSelectedCrop(crop)}
                       className="w-full text-left flex items-center transition-all duration-150"
                       style={{
-                        padding: '12px 32px',
+                        padding: '17px 28px',
                         background: isSelected ? 'var(--color-paper-deep)' : 'transparent',
                         borderBottom: '1px solid var(--color-contour)',
                         borderLeft: `3px solid ${isSelected ? 'var(--color-moss)' : 'transparent'}`
@@ -807,7 +809,7 @@ export default function PlantSelection() {
                         <div
                           style={{
                             fontFamily: '"Fraunces", serif',
-                            fontSize: '15px',
+                            fontSize: '18px',
                             fontVariationSettings: '"opsz" 144, "wght" 500',
                             color: 'var(--color-earth-deep)',
                             lineHeight: 1.2
@@ -819,7 +821,7 @@ export default function PlantSelection() {
                           style={{
                             fontFamily: '"Fraunces", serif',
                             fontStyle: 'italic',
-                            fontSize: '12px',
+                            fontSize: '14px',
                             color: 'var(--color-earth-deep)',
                             opacity: 0.55,
                             marginTop: '1px'
@@ -832,7 +834,7 @@ export default function PlantSelection() {
                         <div
                           style={{
                             fontFamily: '"JetBrains Mono", monospace',
-                            fontSize: '9px',
+                            fontSize: '10px',
                             letterSpacing: '0.18em',
                             color: 'var(--color-moss)',
                             fontWeight: 600
@@ -849,12 +851,12 @@ export default function PlantSelection() {
           </div>
 
           {/* Continue — sticky-bottom on mobile via terrace-mobile-actions */}
-          <div className="hidden lg:block px-8 py-5" style={{ borderTop: '1px solid var(--color-contour)' }}>
+          <div className="hidden lg:block px-7 xl:px-9 py-5 terrace-nav-shell">
             {selectedCrop && (
               <div
                 style={{
                   fontFamily: '"JetBrains Mono", monospace',
-                  fontSize: '10px',
+                  fontSize: '11px',
                   letterSpacing: '0.18em',
                   color: 'var(--color-earth-deep)',
                   opacity: 0.6,
@@ -869,7 +871,7 @@ export default function PlantSelection() {
               disabled={!selectedCrop}
               className="terrace-btn w-full"
               style={{
-                padding: '1rem 2rem',
+                padding: '1.1rem 2rem',
                 opacity: selectedCrop ? 1 : 0.4,
                 cursor: selectedCrop ? 'pointer' : 'not-allowed',
                 letterSpacing: '0.18em'

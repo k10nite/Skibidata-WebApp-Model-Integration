@@ -218,6 +218,52 @@
   transform: translateY(-1px);
 }
 
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(62, 42, 31, 0.28) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(62, 42, 31, 0.24);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(62, 42, 31, 0.38);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.terrace-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(62, 42, 31, 0.24) transparent;
+}
+
+.terrace-nav-shell {
+  border-top: 1px solid var(--color-contour);
+  background: color-mix(in srgb, var(--color-paper-card) 94%, white 6%);
+  box-shadow: 0 -12px 30px -20px rgba(45, 32, 22, 0.28);
+}
+
+.terrace-nav-meta {
+  font-family: var(--font-data);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  color: rgba(62, 42, 31, 0.62);
+  text-transform: uppercase;
+}
+
 /* ===== MOBILE ACTION BAR =====
    Pins the primary CTA(s) to the bottom of the viewport on mobile so they
    stay visible above the fold without scroll. On lg+ it falls back to

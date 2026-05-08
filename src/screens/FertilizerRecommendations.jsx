@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import useAppStore from '../store/appStore';
 import AnesBrand from '../components/AnesBrand';
 import { getRecommendationForCrop, getRecommendationForCropAsync } from '../services/recommendationService';
@@ -271,7 +272,7 @@ export default function FertilizerRecommendations() {
               <Eyebrow>COMBOS ({candidates.length})</Eyebrow>
               <Caption>ranked by weight</Caption>
             </div>
-            <div className="flex flex-col gap-1 overflow-y-auto h-full">
+            <div className="flex flex-col gap-1 overflow-y-auto terrace-scroll h-full">
               {candidates.map((candidate, index) => (
                 <motion.div
                   key={index}
@@ -847,25 +848,44 @@ export default function FertilizerRecommendations() {
       {/* ─── Bottom strip ─── */}
       <motion.footer
         variants={itemVariants}
-        className="flex items-center justify-between gap-3 px-4 sm:px-6 lg:px-12 py-3 lg:py-4 fixed lg:relative bottom-0 left-0 right-0 z-50"
+        className="terrace-nav-shell flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 lg:px-14 xl:px-20 py-4 fixed lg:relative bottom-0 left-0 right-0 z-50"
         style={{
-          borderTop: '1px solid var(--color-contour)',
-          background: 'var(--color-paper-card)',
           flexShrink: 0,
-          paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0))',
-          boxShadow: '0 -8px 20px -8px rgba(45,32,22,0.08)'
+          paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0))'
         }}
       >
+        <div className="terrace-nav-meta">
+          {selectedCandidate?.sourceName || 'Select a fertilizer combo'}
+          {selectedCandidate && ` · ${selectedCandidate.totalWeight.toFixed(0)} kg`}
+        </div>
+        <div className="flex w-full sm:w-auto items-center gap-3">
+          <button
+            onClick={handleBack}
+            className="terrace-btn-ghost flex-1 sm:flex-none justify-center"
+            style={{ padding: '0.95rem 1.35rem', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Crop</span>
+          </button>
+          <button
+            onClick={handleContinue}
+            className="terrace-btn group flex-[1.6] sm:flex-none justify-center"
+            style={{ padding: '0.95rem 1.8rem', letterSpacing: '0.18em', display: 'inline-flex', alignItems: 'center', gap: '10px' }}
+          >
+            <span>Summary</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+          </button>
+        </div>
         <button
           onClick={handleBack}
-          className="terrace-btn-ghost"
+          className="hidden"
           style={{ padding: '0.85rem 1.2rem' }}
         >
           ← Back
         </button>
         <button
           onClick={handleContinue}
-          className="terrace-btn group flex-1 lg:flex-none justify-center"
+          className="hidden"
           style={{ padding: '0.85rem 1.6rem', letterSpacing: '0.18em', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
         >
           Continue → Summary

@@ -12,7 +12,6 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
-import AnesBrand from '../components/AnesBrand';
 import useAppStore from '../store/appStore';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
@@ -201,16 +200,15 @@ export default function LocationSelection() {
       <div className="relative z-10 min-h-screen flex flex-col lg:flex-row terrace-page-with-mobile-actions">
         {/* Map Section — 62% Hero */}
         <motion.div variants={itemVariants} className="w-full lg:w-[62%] relative">
-          <div className="min-h-[88vh] lg:min-h-screen p-4 sm:p-6 lg:p-12 flex flex-col">
-            <motion.div variants={itemVariants} className="mb-4 lg:mb-6">
-              <AnesBrand className="mb-5" />
-              <div className="terrace-eyebrow mb-2 lg:mb-4">01 — LOCATION</div>
+          <div className="min-h-screen lg:h-screen p-4 sm:p-6 lg:px-12 lg:py-8 flex flex-col">
+            <motion.div variants={itemVariants} className="mb-4 lg:mb-5 shrink-0">
+              <div className="terrace-eyebrow mb-2">01 — LOCATION</div>
               <h1
-                className="terrace-display mb-1 lg:mb-2"
+                className="terrace-display mb-1"
                 style={{
                   fontFamily: '"Fraunces", serif',
                   fontVariationSettings: '"opsz" 144, "wght" 600',
-                  fontSize: 'clamp(1.75rem, 6vw, 3.75rem)',
+                  fontSize: 'clamp(2.25rem, 4.6vw, 4.75rem)',
                   lineHeight: 1.05
                 }}
               >
@@ -221,7 +219,7 @@ export default function LocationSelection() {
               </p>
             </motion.div>
 
-            <motion.div variants={itemVariants} className="flex-1 relative">
+            <motion.div variants={itemVariants} className="flex-1 relative min-h-[420px] lg:min-h-0">
               <div className="h-full w-full terrace-card-hairline overflow-hidden relative">
                 {tokenMissing ? (
                   <div className="h-full w-full flex items-center justify-center bg-[var(--color-paper-card)]">
