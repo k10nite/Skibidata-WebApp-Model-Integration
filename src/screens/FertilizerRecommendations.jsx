@@ -876,20 +876,6 @@ export default function FertilizerRecommendations() {
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
           </button>
         </div>
-        <button
-          onClick={handleBack}
-          className="hidden"
-          style={{ padding: '0.85rem 1.2rem' }}
-        >
-          ← Back
-        </button>
-        <button
-          onClick={handleContinue}
-          className="hidden"
-          style={{ padding: '0.85rem 1.6rem', letterSpacing: '0.18em', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
-        >
-          Continue → Summary
-        </button>
       </motion.footer>
     </motion.div>
   );
