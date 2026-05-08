@@ -129,8 +129,7 @@ export default function FertilizerRecommendations() {
   //   base_targets_per_ha → stable kg/ha (read off crop_npk_rules.json)
   //   total_base          → base_per_ha × area_ha (total kg for the field)
   // The TARGETS card shows kg/ha so it stays interpretable regardless of
-  // field size. The supporting caption below converts to total kg using
-  // engine.area_ha.
+  // field size.
   const engineTargetsPerHa = fertilizerData?._engineRaw?.base_targets_per_ha || {};
   const phAction = fertilizerData?._engineRaw?.ph_result?.ph_action || 'none';
 
@@ -187,7 +186,7 @@ export default function FertilizerRecommendations() {
       initial="initial"
       animate="animate"
       variants={containerVariants}
-      className="min-h-screen lg:h-screen flex flex-col relative lg:overflow-hidden terrace-page-with-mobile-actions"
+      className="min-h-screen flex flex-col relative terrace-page-with-mobile-actions"
       style={{ background: 'var(--color-paper)', fontFamily: '"Fraunces", serif' }}
     >
       {/* Subtle topo backdrop */}
@@ -200,7 +199,7 @@ export default function FertilizerRecommendations() {
       {/* ─── Top breadcrumb strip ─── */}
       <motion.header
         variants={itemVariants}
-        className="flex items-center justify-between px-4 sm:px-6 lg:px-12 py-3"
+        className="flex items-center justify-between px-4 sm:px-6 lg:px-14 xl:px-20 py-4"
         style={{
           borderBottom: '1px solid var(--color-contour)',
           background: 'var(--color-paper-card)',
@@ -211,7 +210,7 @@ export default function FertilizerRecommendations() {
           className="overflow-x-auto whitespace-nowrap"
           style={{
             fontFamily: '"JetBrains Mono", monospace',
-            fontSize: '11px',
+            fontSize: '12px',
             letterSpacing: '0.18em',
             color: 'var(--color-earth-deep)',
             opacity: 0.85
@@ -228,12 +227,12 @@ export default function FertilizerRecommendations() {
       </motion.header>
 
       {/* ─── Main grid ─── */}
-      <div className="flex-1 flex flex-col lg:flex-row lg:min-h-0">
+      <div className="flex-1 flex flex-col lg:flex-row">
 
         {/* LEFT — targets + combos list */}
         <motion.div
           variants={itemVariants}
-          className="flex flex-col gap-4 px-4 sm:px-6 lg:px-12 py-4 lg:py-6 w-full lg:w-[38%] border-b lg:border-b-0 lg:border-r"
+          className="flex flex-col gap-5 px-4 sm:px-6 lg:px-14 xl:px-20 py-5 lg:py-8 w-full lg:w-[38%] border-b lg:border-b-0 lg:border-r"
           style={{ borderColor: 'var(--color-contour)' }}
         >
           {/* Targets panel */}
@@ -242,7 +241,7 @@ export default function FertilizerRecommendations() {
               background: 'var(--color-paper-card)',
               border: '1px solid var(--color-contour)',
               borderRadius: '4px',
-              padding: '18px 20px'
+              padding: '22px 24px'
             }}
           >
             <div className="flex items-baseline justify-between mb-1">
@@ -254,29 +253,13 @@ export default function FertilizerRecommendations() {
               <TargetRow label="P" target={pTarget} />
               <TargetRow label="K" target={kTarget} />
               <div className="flex items-baseline justify-between py-1" style={{ borderBottom: '1px dotted var(--color-contour)' }}>
-                <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.6, letterSpacing: '0.1em' }}>pH</span>
-                <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '13px', color: 'var(--color-earth-deep)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
-                  {ph.toFixed(1)} <span style={{ fontSize: '10px', opacity: 0.6 }}>
+                <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '13px', color: 'var(--color-earth-deep)', opacity: 0.6, letterSpacing: '0.1em' }}>pH</span>
+                <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '15px', color: 'var(--color-earth-deep)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+                  {ph.toFixed(1)} <span style={{ fontSize: '12px', opacity: 0.6 }}>
                     {phAction !== 'none' ? phAction : 'optimal'}
                   </span>
                 </span>
               </div>
-            </div>
-            {/* Total-kg conversion for the actual field area */}
-            <div
-              style={{
-                marginTop: '10px',
-                paddingTop: '10px',
-                borderTop: '1px dashed var(--color-contour)',
-                fontFamily: '"JetBrains Mono", monospace',
-                fontSize: '9px',
-                color: 'var(--color-earth-deep)',
-                opacity: 0.55,
-                letterSpacing: '0.05em',
-                lineHeight: 1.6,
-                fontVariantNumeric: 'tabular-nums'
-              }}
-            >
             </div>
           </div>
 
@@ -297,7 +280,7 @@ export default function FertilizerRecommendations() {
                     border: '1px solid var(--color-contour)',
                     borderLeft: index === selectedCandidateIndex ? '3px solid var(--color-moss)' : '1px solid var(--color-contour)',
                     borderRadius: '4px',
-                    padding: '12px 16px'
+                    padding: '15px 18px'
                   }}
                   whileHover={{ scale: 1.01 }}
                   transition={{ duration: 0.15 }}
@@ -307,7 +290,7 @@ export default function FertilizerRecommendations() {
                       <span
                         style={{
                           fontFamily: '"JetBrains Mono", monospace',
-                          fontSize: '12px',
+                          fontSize: '13px',
                           color: 'var(--color-earth-deep)',
                           opacity: 0.6,
                           fontWeight: 600
@@ -318,7 +301,7 @@ export default function FertilizerRecommendations() {
                       <span
                         style={{
                           fontFamily: '"Fraunces", serif',
-                          fontSize: '13px',
+                          fontSize: '15px',
                           color: 'var(--color-earth-deep)',
                           fontWeight: 500
                         }}
@@ -334,7 +317,7 @@ export default function FertilizerRecommendations() {
                           borderRadius: '2px',
                           padding: '2px 6px',
                           fontFamily: '"JetBrains Mono", monospace',
-                          fontSize: '8px',
+                          fontSize: '10px',
                           letterSpacing: '0.18em',
                           fontWeight: 700
                         }}
@@ -347,7 +330,7 @@ export default function FertilizerRecommendations() {
                     <span
                       style={{
                         fontFamily: '"JetBrains Mono", monospace',
-                        fontSize: '11px',
+                        fontSize: '13px',
                         color: 'var(--color-earth-deep)',
                         fontVariantNumeric: 'tabular-nums'
                       }}
@@ -369,7 +352,7 @@ export default function FertilizerRecommendations() {
         {/* RIGHT — selected combo breakdown */}
         <motion.div
           variants={itemVariants}
-          className="flex-1 flex flex-col gap-4 px-4 sm:px-6 lg:px-12 py-4 lg:py-6 lg:min-h-0 w-full lg:w-[62%]"
+          className="flex-1 flex flex-col gap-5 px-4 sm:px-6 lg:px-14 xl:px-20 py-5 lg:py-8 w-full lg:w-[62%]"
         >
           <div>
             <div className="flex items-baseline justify-between mb-2">
@@ -410,10 +393,10 @@ export default function FertilizerRecommendations() {
                         <tr key={index} style={{ borderBottom: '1px solid var(--color-contour)' }}>
                           <td style={tableCellStyle}>
                             <div>
-                              <div style={{ fontFamily: '"Fraunces", serif', fontSize: '13px', color: 'var(--color-earth-deep)', fontWeight: 500, lineHeight: 1.2 }}>
+                              <div style={{ fontFamily: '"Fraunces", serif', fontSize: '15px', color: 'var(--color-earth-deep)', fontWeight: 500, lineHeight: 1.25 }}>
                                 {presc.fertilizer.name}
                               </div>
-                              <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '10px', color: 'var(--color-earth-deep)', opacity: 0.55, marginTop: '2px', letterSpacing: '0.05em', fontVariantNumeric: 'tabular-nums' }}>
+                              <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.55, marginTop: '3px', letterSpacing: '0.05em', fontVariantNumeric: 'tabular-nums' }}>
                                 {npkRatio}
                               </div>
                             </div>
@@ -451,7 +434,7 @@ export default function FertilizerRecommendations() {
                       <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', fontWeight: 700, lineHeight: 1.25 }}>
                         <div>{selectedCandidate.totalWeight.toFixed(0)} kg</div>
                         {engineMixes[selectedCandidateIndex]?.['Total Sacks'] != null && (
-                          <div style={{ fontSize: '10px', opacity: 0.58, fontWeight: 500, marginTop: '3px', letterSpacing: '0.04em' }}>
+                          <div style={{ fontSize: '11px', opacity: 0.58, fontWeight: 500, marginTop: '4px', letterSpacing: '0.04em' }}>
                             ~{engineMixes[selectedCandidateIndex]['Total Sacks'].toFixed(2)} sacks
                           </div>
                         )}
@@ -499,7 +482,7 @@ export default function FertilizerRecommendations() {
                 background: 'var(--color-paper-card)',
                 border: '1px solid var(--color-contour)',
                 borderRadius: '4px',
-                padding: '14px 18px',
+                padding: '18px 22px',
                 overflow: 'auto'
               }}
             >
@@ -507,7 +490,7 @@ export default function FertilizerRecommendations() {
                 <Eyebrow>ENGINE OUTPUT</Eyebrow>
                 <Caption>standard_mix[{selectedCandidateIndex}]</Caption>
               </div>
-              <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', lineHeight: 1.7 }}>
+              <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '13px', color: 'var(--color-earth-deep)', lineHeight: 1.75 }}>
                 <div style={{ opacity: 0.55, marginBottom: '4px' }}>Source: <span style={{ color: 'var(--color-moss)' }}>{selectedCandidate?.sourceName}</span></div>
                 <div style={{ opacity: 0.55, marginBottom: '8px' }}>
                   Total Weight: {selectedCandidate?.totalWeight?.toFixed(2)} kg
@@ -534,7 +517,7 @@ export default function FertilizerRecommendations() {
                   background: phAction === 'none' ? 'var(--color-paper-card)' : 'rgba(183, 110, 64, 0.08)',
                   border: `1px solid ${phAction === 'none' ? 'var(--color-contour)' : 'var(--color-rust)'}`,
                   borderRadius: '4px',
-                  padding: '14px 18px'
+                  padding: '18px 22px'
                 }}
               >
                 <div className="flex items-baseline justify-between mb-2">
@@ -543,7 +526,7 @@ export default function FertilizerRecommendations() {
                     pH {ph.toFixed(1)} · {fertilizerData?._engineRaw?.ph_result?.ph_status || 'acceptable'}
                   </Caption>
                 </div>
-                <div style={{ fontFamily: '"Fraunces", serif', fontStyle: 'italic', fontSize: '12px', color: 'var(--color-earth-deep)', opacity: 0.85, lineHeight: 1.45 }}>
+                <div style={{ fontFamily: '"Fraunces", serif', fontStyle: 'italic', fontSize: '14px', color: 'var(--color-earth-deep)', opacity: 0.85, lineHeight: 1.5 }}>
                   {fertilizerData?._engineRaw?.ph_result?.recommendation_message
                     || (phAction === 'none'
                           ? 'Soil pH within acceptable range — no amendment required.'
@@ -582,7 +565,7 @@ export default function FertilizerRecommendations() {
                     background: 'var(--color-paper-card)',
                     border: '1px solid var(--color-contour)',
                     borderRadius: '4px',
-                    padding: '14px 18px',
+                    padding: '18px 22px',
                     flex: 1
                   }}>
                     <Eyebrow>INVENTORY CHECK</Eyebrow>
@@ -899,7 +882,7 @@ function Eyebrow({ children }) {
     <div
       style={{
         fontFamily: '"JetBrains Mono", monospace',
-        fontSize: '10px',
+        fontSize: '11px',
         letterSpacing: '0.22em',
         color: 'var(--color-moss)',
         fontWeight: 600
@@ -916,7 +899,7 @@ function Caption({ children, style }) {
       style={{
         fontFamily: '"Fraunces", serif',
         fontStyle: 'italic',
-        fontSize: '10px',
+        fontSize: '12px',
         color: 'var(--color-earth-deep)',
         opacity: 0.55,
         ...style
@@ -934,8 +917,8 @@ function Sep() {
 function TargetRow({ label, target }) {
   return (
     <div className="flex items-baseline justify-between py-1" style={{ borderBottom: '1px dotted var(--color-contour)' }}>
-      <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.6, letterSpacing: '0.1em' }}>{label}</span>
-      <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', fontVariantNumeric: 'tabular-nums' }}>
+      <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '13px', color: 'var(--color-earth-deep)', opacity: 0.6, letterSpacing: '0.1em' }}>{label}</span>
+      <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '14px', fontVariantNumeric: 'tabular-nums' }}>
         <span style={{ color: 'var(--color-earth-deep)', fontWeight: 600 }}>{Number(target).toFixed(0)}</span>
         <span style={{ opacity: 0.4, marginLeft: '4px' }}>kg/ha</span>
       </span>
@@ -944,9 +927,9 @@ function TargetRow({ label, target }) {
 }
 
 const tableHeaderStyle = {
-  padding: '12px 16px',
+  padding: '14px 18px',
   fontFamily: '"JetBrains Mono", monospace',
-  fontSize: '9px',
+  fontSize: '11px',
   letterSpacing: '0.22em',
   color: 'var(--color-earth-deep)',
   fontWeight: 600,
@@ -955,9 +938,9 @@ const tableHeaderStyle = {
 };
 
 const tableCellStyle = {
-  padding: '12px 16px',
+  padding: '16px 18px',
   fontFamily: '"Fraunces", serif',
-  fontSize: '12px',
+  fontSize: '14px',
   color: 'var(--color-earth-deep)',
   textAlign: 'left'
 };

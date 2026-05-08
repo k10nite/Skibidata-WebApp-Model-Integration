@@ -137,7 +137,7 @@ export default function SoilStatus() {
       initial="initial"
       animate="animate"
       variants={containerVariants}
-      className="min-h-screen lg:h-screen flex flex-col relative lg:overflow-hidden terrace-page-with-mobile-actions"
+      className="min-h-screen flex flex-col relative terrace-page-with-mobile-actions"
       style={{ background: 'var(--color-paper)', fontFamily: '"Fraunces", serif' }}
     >
       {/* Subtle topo backdrop */}
@@ -150,7 +150,7 @@ export default function SoilStatus() {
       {/* ─── Top breadcrumb strip ─── */}
       <motion.header
         variants={itemVariants}
-        className="flex items-center justify-between px-4 sm:px-6 lg:px-12 py-3 flex-wrap gap-2"
+        className="flex items-center justify-between px-4 sm:px-6 lg:px-14 xl:px-20 py-4 flex-wrap gap-2"
         style={{
           borderBottom: '1px solid var(--color-contour)',
           background: 'var(--color-paper-card)',
@@ -160,7 +160,7 @@ export default function SoilStatus() {
         <div
           style={{
             fontFamily: '"JetBrains Mono", monospace',
-            fontSize: '11px',
+            fontSize: '12px',
             letterSpacing: '0.18em',
             color: 'var(--color-earth-deep)',
             opacity: 0.85
@@ -179,7 +179,7 @@ export default function SoilStatus() {
         <div
           style={{
             fontFamily: '"JetBrains Mono", monospace',
-            fontSize: '10px',
+            fontSize: '11px',
             letterSpacing: '0.18em',
             color: 'var(--color-earth-deep)',
             opacity: 0.6
@@ -190,12 +190,12 @@ export default function SoilStatus() {
       </motion.header>
 
       {/* ─── Main grid ─── */}
-      <div className="flex-1 flex flex-col lg:flex-row lg:min-h-0">
+      <div className="flex-1 flex flex-col lg:flex-row">
 
         {/* LEFT — polygon thumbnail + telemetry */}
         <motion.div
           variants={itemVariants}
-          className="flex flex-col gap-3 px-4 sm:px-6 lg:px-12 py-4 lg:py-6 w-full lg:w-[38%] border-b lg:border-b-0 lg:border-r"
+          className="flex flex-col gap-5 px-4 sm:px-6 lg:px-14 xl:px-20 py-5 lg:py-8 w-full lg:w-[38%] border-b lg:border-b-0 lg:border-r"
           style={{ borderColor: 'var(--color-contour)' }}
         >
           {/* Polygon thumbnail */}
@@ -290,8 +290,7 @@ export default function SoilStatus() {
         {/* RIGHT — measurements + chart */}
         <motion.div
           variants={itemVariants}
-          className="flex-1 flex flex-col gap-4 px-4 sm:px-6 lg:px-12 py-4 lg:py-6 lg:min-h-0"
-          style={{ width: '62%' }}
+          className="flex-1 flex flex-col gap-5 px-4 sm:px-6 lg:px-14 xl:px-20 py-5 lg:py-8 w-full lg:w-[62%]"
         >
           {/* Primary measurements */}
           <div>
@@ -391,7 +390,7 @@ export default function SoilStatus() {
       {/* ─── Bottom strip ─── */}
       <motion.footer
         variants={itemVariants}
-        className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 px-4 sm:px-6 lg:px-12 py-3 lg:py-4 fixed lg:relative bottom-0 left-0 right-0 z-50"
+        className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 px-4 sm:px-6 lg:px-14 xl:px-20 py-3 lg:py-4 fixed lg:relative bottom-0 left-0 right-0 z-50"
         style={{
           borderTop: '1px solid var(--color-contour)',
           background: 'var(--color-paper-card)',

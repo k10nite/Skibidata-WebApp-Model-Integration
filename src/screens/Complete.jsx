@@ -124,7 +124,7 @@ export default function Complete() {
       {/* ─── Top session strip ─── */}
       <motion.header
         variants={itemVariants}
-        className="flex items-center justify-between px-4 sm:px-6 lg:px-12 py-3"
+        className="flex items-center justify-between px-4 sm:px-6 lg:px-14 xl:px-20 py-4"
         style={{
           borderBottom: '1px solid var(--color-contour)',
           background: 'var(--color-paper-card)',
@@ -134,7 +134,7 @@ export default function Complete() {
         <div
           style={{
             fontFamily: '"JetBrains Mono", monospace',
-            fontSize: '11px',
+            fontSize: '12px',
             letterSpacing: '0.18em',
             color: 'var(--color-earth-deep)',
             opacity: 0.7
@@ -145,15 +145,15 @@ export default function Complete() {
       </motion.header>
 
       {/* ─── Main content ─── */}
-      <div className="flex-1 px-4 sm:px-6 lg:px-12 py-6 lg:py-8">
-        <div className="w-full max-w-5xl mx-auto">
+      <div className="flex-1 px-4 sm:px-6 lg:px-14 xl:px-20 py-6 lg:py-10">
+        <div className="w-full max-w-7xl mx-auto">
           {/* Title */}
           <motion.div variants={itemVariants} className="mb-6">
             <h1
               style={{
                 fontFamily: '"Fraunces", serif',
                 fontVariationSettings: '"opsz" 144, "wght" 600',
-                fontSize: 'clamp(22px, 5vw, 32px)',
+                fontSize: '34px',
                 color: 'var(--color-earth-deep)',
                 letterSpacing: '-0.01em',
                 marginBottom: '4px',
@@ -188,10 +188,10 @@ export default function Complete() {
             </CompactCell>
 
             <CompactCell title="CROP">
-              <div style={{ fontFamily: '"Fraunces", serif', fontSize: '14px', color: 'var(--color-earth-deep)', fontWeight: 500, marginTop: '6px', marginBottom: '2px' }}>
+              <div style={{ fontFamily: '"Fraunces", serif', fontSize: '16px', color: 'var(--color-earth-deep)', fontWeight: 500, marginTop: '6px', marginBottom: '2px' }}>
                 {selectedPlant?.name || 'Cabbage'}
               </div>
-              <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '10px', color: 'var(--color-earth-deep)', opacity: 0.55, letterSpacing: '0.05em' }}>
+              <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '12px', color: 'var(--color-earth-deep)', opacity: 0.55, letterSpacing: '0.05em' }}>
                 {selectedPlant?.category ? `${selectedPlant.category} · highland` : 'vegetables · highland'}
               </div>
             </CompactCell>
@@ -200,7 +200,7 @@ export default function Complete() {
           {/* ─── HERO: PRESCRIPTION ─── */}
           <motion.div
             variants={itemVariants}
-            className="mb-6 px-5 py-5 sm:px-7 sm:py-6"
+            className="mb-6 px-5 py-5 sm:px-8 sm:py-7"
             style={{
               background: 'var(--color-paper-card)',
               border: `1px solid ${hasPrescription ? 'var(--color-moss)' : 'var(--color-contour)'}`,
@@ -212,7 +212,7 @@ export default function Complete() {
                 <div
                   style={{
                     fontFamily: '"JetBrains Mono", monospace',
-                    fontSize: '10px',
+                    fontSize: '11px',
                     letterSpacing: '0.22em',
                     color: 'var(--color-moss)',
                     fontWeight: 600,
@@ -221,14 +221,14 @@ export default function Complete() {
                 >
                   PRESCRIPTION
                 </div>
-                <div style={{ fontFamily: '"Fraunces", serif', fontSize: '20px', color: 'var(--color-earth-deep)', fontWeight: 500 }}>
+                <div style={{ fontFamily: '"Fraunces", serif', fontSize: '24px', color: 'var(--color-earth-deep)', fontWeight: 500 }}>
                   {hasPrescription
                     ? `${prescriptionRows.length} fertilizer${prescriptionRows.length === 1 ? '' : 's'} · ${totalKg.toFixed(1)} kg total`
                     : 'No prescription generated'}
                 </div>
               </div>
               {hasPrescription && (
-                <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '10px', color: 'var(--color-earth-deep)', opacity: 0.55, letterSpacing: '0.1em' }}>
+                <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '12px', color: 'var(--color-earth-deep)', opacity: 0.55, letterSpacing: '0.1em' }}>
                   for {prescriptionAreaLabel}
                 </div>
               )}
@@ -237,7 +237,7 @@ export default function Complete() {
             {hasPrescription ? (
               <>
                 {/* Per-row breakdown table — horizontal scroll on small screens */}
-                <div className="grid mb-5 overflow-x-auto" style={{ gridTemplateColumns: 'minmax(140px, 1fr) 80px 56px 56px 56px', gap: '8px 12px' }}>
+                <div className="grid mb-5 overflow-x-auto" style={{ gridTemplateColumns: 'minmax(180px, 1fr) 112px 76px 76px 76px', gap: '10px 16px' }}>
                   <ColHead>FERTILIZER</ColHead>
                   <ColHead align="right">AMOUNT</ColHead>
                   <ColHead align="right">N kg</ColHead>
@@ -267,7 +267,7 @@ export default function Complete() {
                 {/* Applied NPK telemetry strip */}
                 <div className="flex flex-wrap gap-x-6 gap-y-1" style={{
                   fontFamily: '"JetBrains Mono", monospace',
-                  fontSize: '10px',
+                  fontSize: '12px',
                   color: 'var(--color-earth-deep)',
                   opacity: 0.7,
                   letterSpacing: '0.05em',
@@ -327,7 +327,7 @@ function Eyebrow({ children }) {
     <div
       style={{
         fontFamily: '"JetBrains Mono", monospace',
-        fontSize: '10px',
+        fontSize: '11px',
         letterSpacing: '0.22em',
         color: 'var(--color-moss)',
         fontWeight: 600
@@ -340,7 +340,7 @@ function Eyebrow({ children }) {
 
 function CompactCell({ title, children }) {
   return (
-    <div style={{ background: 'var(--color-paper-card)', padding: '14px 16px' }}>
+    <div style={{ background: 'var(--color-paper-card)', padding: '18px 20px' }}>
       <Eyebrow>{title}</Eyebrow>
       <div className="mt-3 space-y-1">{children}</div>
     </div>
@@ -352,14 +352,14 @@ function CompactRow({ label, value }) {
     <div className="flex justify-between items-baseline">
       <span style={{
         fontFamily: '"JetBrains Mono", monospace',
-        fontSize: '10px',
+        fontSize: '12px',
         color: 'var(--color-earth-deep)',
         opacity: 0.55,
         letterSpacing: '0.1em'
       }}>{label}</span>
       <span style={{
         fontFamily: '"JetBrains Mono", monospace',
-        fontSize: '11px',
+        fontSize: '13px',
         color: 'var(--color-earth-deep)',
         fontWeight: 600,
         fontVariantNumeric: 'tabular-nums'
@@ -372,7 +372,7 @@ function ColHead({ children, align = 'left' }) {
   return (
     <div style={{
       fontFamily: '"JetBrains Mono", monospace',
-      fontSize: '9px',
+      fontSize: '11px',
       letterSpacing: '0.18em',
       color: 'var(--color-earth-deep)',
       opacity: 0.55,
@@ -390,7 +390,7 @@ function Cell({ children, align = 'left', bold = false }) {
   return (
     <div style={{
       fontFamily: '"JetBrains Mono", monospace',
-      fontSize: '11px',
+      fontSize: '13px',
       color: 'var(--color-earth-deep)',
       fontWeight: bold ? 600 : 400,
       textAlign: align,
