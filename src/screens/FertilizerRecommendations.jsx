@@ -448,10 +448,10 @@ export default function FertilizerRecommendations() {
                     {/* Totals row */}
                     <tr style={{ background: 'var(--color-paper-deep)', borderBottom: '1px solid var(--color-contour)' }}>
                       <td style={{ ...tableCellStyle, fontWeight: 700 }}>TOTAL</td>
-                      <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', fontWeight: 700, lineHeight: 1.2 }}>
+                      <td style={{ ...tableCellStyle, fontFamily: '"JetBrains Mono", monospace', fontVariantNumeric: 'tabular-nums', fontWeight: 700, lineHeight: 1.25 }}>
                         <div>{selectedCandidate.totalWeight.toFixed(0)} kg</div>
                         {engineMixes[selectedCandidateIndex]?.['Total Sacks'] != null && (
-                          <div style={{ fontSize: '13px', opacity: 1.5, fontWeight: 500, marginTop: '2px' }}>
+                          <div style={{ fontSize: '10px', opacity: 0.58, fontWeight: 500, marginTop: '3px', letterSpacing: '0.04em' }}>
                             ~{engineMixes[selectedCandidateIndex]['Total Sacks'].toFixed(2)} sacks
                           </div>
                         )}
