@@ -284,6 +284,7 @@ export default function PlantSelection() {
   }, [municipality]);
 
   const polygonUrl = useMemo(() => buildPolygonPreviewUrl(field, { width: 720, height: 360 }), [field]);
+  const hasField = Boolean(field && fieldAreaHa > 0 && polygonUrl);
   const recommendations = useMemo(() => recommendCrops(soilData, 3), [soilData]);
 
   const filteredGrouped = useMemo(() => {
@@ -323,6 +324,10 @@ export default function PlantSelection() {
   };
 
   const handleContinue = () => {
+    if (!hasField) {
+      navigate('/location-selection');
+      return;
+    }
     if (!selectedCrop) return;
     log.flow('PlantSelection → /soil-status', {
       crop: selectedCrop.engineLabel,
@@ -418,7 +423,7 @@ export default function PlantSelection() {
                 boxShadow: '0 1px 0 rgba(73,40,40,0.04), 0 24px 48px -32px rgba(73,40,40,0.10)'
               }}
             >
-              {polygonUrl ? (
+              {hasField ? (
                 <img
                   src={polygonUrl}
                   alt="Drawn field polygon on satellite imagery"
@@ -435,7 +440,14 @@ export default function PlantSelection() {
                     fontSize: '14px'
                   }}
                 >
-                  No polygon — go back and draw your field.
+                  <div>No polygon — go back and draw your field.</div>
+                  <button
+                    onClick={() => navigate('/location-selection')}
+                    className="terrace-btn mt-5"
+                    style={{ padding: '0.85rem 1.2rem', fontStyle: 'normal' }}
+                  >
+                    Draw Field
+                  </button>
                 </div>
               )}
 
@@ -453,7 +465,7 @@ export default function PlantSelection() {
                   fontWeight: 600
                 }}
               >
-                FIELD · {fieldAreaHa.toFixed(2)} ha
+                FIELD · {hasField ? fieldAreaHa.toFixed(2) : '0.00'} ha
               </div>
 
               {/* Centroid coordinates, bottom-right */}
@@ -483,7 +495,7 @@ export default function PlantSelection() {
               style={{ background: 'var(--color-contour)', border: '1px solid var(--color-contour)', borderRadius: '4px', overflow: 'hidden' }}
             >
               <TelemetryCell label="LOCATION" value={municipality || 'La Trinidad'} />
-              <TelemetryCell label="AREA" value={`${(areaHectares || fieldAreaHa || 0).toFixed(2)} ha`} mono />
+              <TelemetryCell label="AREA" value={hasField ? `${fieldAreaHa.toFixed(2)} ha` : 'No field'} mono />
               <TelemetryCell
                 label="CLIMATE"
                 value={
@@ -636,8 +648,10 @@ export default function PlantSelection() {
                   <div className="flex items-baseline gap-2">
                     <input
                       type="number"
-                      value={areaHectares}
+                      value={hasField ? areaHectares : ''}
                       onChange={(e) => setAreaHectares(Number(e.target.value) || 0)}
+                      disabled={!hasField}
+                      placeholder="--"
                       min="0.1"
                       step="0.1"
                       style={{
@@ -649,7 +663,8 @@ export default function PlantSelection() {
                         borderBottom: '1px dotted var(--color-contour)',
                         outline: 'none',
                         width: '120px',
-                        color: 'var(--color-earth-deep)'
+                        color: 'var(--color-earth-deep)',
+                        opacity: hasField ? 1 : 0.35
                       }}
                     />
                     <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '13px', color: 'var(--color-earth-deep)', opacity: 0.6 }}>
@@ -852,7 +867,20 @@ export default function PlantSelection() {
 
           {/* Continue — sticky-bottom on mobile via terrace-mobile-actions */}
           <div className="hidden lg:block px-7 xl:px-9 py-5 terrace-nav-shell">
-            {selectedCrop && (
+            {!hasField ? (
+              <div
+                style={{
+                  fontFamily: '"JetBrains Mono", monospace',
+                  fontSize: '11px',
+                  letterSpacing: '0.18em',
+                  color: 'var(--color-rust)',
+                  opacity: 0.8,
+                  marginBottom: '8px'
+                }}
+              >
+                DRAW A FIELD BOUNDARY FIRST
+              </div>
+            ) : selectedCrop && (
               <div
                 style={{
                   fontFamily: '"JetBrains Mono", monospace',
@@ -868,16 +896,16 @@ export default function PlantSelection() {
             )}
             <button
               onClick={handleContinue}
-              disabled={!selectedCrop}
+              disabled={hasField && !selectedCrop}
               className="terrace-btn w-full"
               style={{
                 padding: '1.1rem 2rem',
-                opacity: selectedCrop ? 1 : 0.4,
-                cursor: selectedCrop ? 'pointer' : 'not-allowed',
+                opacity: !hasField || selectedCrop ? 1 : 0.4,
+                cursor: !hasField || selectedCrop ? 'pointer' : 'not-allowed',
                 letterSpacing: '0.18em'
               }}
             >
-              {selectedCrop ? 'CONTINUE — REVIEW SOIL' : 'PICK A CROP FIRST'}
+              {!hasField ? 'DRAW FIELD FIRST' : selectedCrop ? 'CONTINUE — REVIEW SOIL' : 'PICK A CROP FIRST'}
             </button>
           </div>
         </motion.div>
@@ -894,7 +922,21 @@ export default function PlantSelection() {
           paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0))'
         }}
       >
-        {selectedCrop && (
+        {!hasField ? (
+          <div
+            style={{
+              fontFamily: '"JetBrains Mono", monospace',
+              fontSize: '9px',
+              letterSpacing: '0.18em',
+              color: 'var(--color-rust)',
+              opacity: 0.8,
+              marginBottom: '6px',
+              textAlign: 'center'
+            }}
+          >
+            DRAW A FIELD BOUNDARY FIRST
+          </div>
+        ) : selectedCrop && (
           <div
             style={{
               fontFamily: '"JetBrains Mono", monospace',
@@ -911,16 +953,16 @@ export default function PlantSelection() {
         )}
         <button
           onClick={handleContinue}
-          disabled={!selectedCrop}
+          disabled={hasField && !selectedCrop}
           className="terrace-btn w-full justify-center"
           style={{
             padding: '0.95rem 1rem',
-            opacity: selectedCrop ? 1 : 0.4,
-            cursor: selectedCrop ? 'pointer' : 'not-allowed',
+            opacity: !hasField || selectedCrop ? 1 : 0.4,
+            cursor: !hasField || selectedCrop ? 'pointer' : 'not-allowed',
             letterSpacing: '0.18em'
           }}
         >
-          {selectedCrop ? 'CONTINUE — REVIEW SOIL' : 'PICK A CROP FIRST'}
+          {!hasField ? 'DRAW FIELD FIRST' : selectedCrop ? 'CONTINUE — REVIEW SOIL' : 'PICK A CROP FIRST'}
         </button>
       </div>
     </motion.div>
