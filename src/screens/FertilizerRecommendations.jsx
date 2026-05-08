@@ -132,7 +132,6 @@ export default function FertilizerRecommendations() {
   // field size. The supporting caption below converts to total kg using
   // engine.area_ha.
   const engineTargetsPerHa = fertilizerData?._engineRaw?.base_targets_per_ha || {};
-  const engineAreaHa = Number(fertilizerData?._engineRaw?.area_ha) || areaHectares || 1;
   const phAction = fertilizerData?._engineRaw?.ph_result?.ph_action || 'none';
 
   const soil = soilData || DEFAULT_SOIL_DATA;
@@ -251,17 +250,9 @@ export default function FertilizerRecommendations() {
               <Caption>target</Caption>
             </div>
             <div className="mt-2 space-y-3">
-              {selectedCandidate ? (
-                <>
-                  <TargetRow label="N" target={selectedCandidate.applied.n} />
-                  <TargetRow label="P" target={selectedCandidate.applied.p} />
-                  <TargetRow label="K" target={selectedCandidate.applied.k} />
-                </>
-              ) : (
-                <div className="text-center p-4" style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '12px', color: 'var(--color-earth-deep)', opacity: 0.7 }}>
-                  Calculating...
-                </div>
-              )}
+              <TargetRow label="N" target={nTarget} />
+              <TargetRow label="P" target={pTarget} />
+              <TargetRow label="K" target={kTarget} />
               <div className="flex items-baseline justify-between py-1" style={{ borderBottom: '1px dotted var(--color-contour)' }}>
                 <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.6, letterSpacing: '0.1em' }}>pH</span>
                 <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '13px', color: 'var(--color-earth-deep)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
@@ -946,7 +937,7 @@ function TargetRow({ label, target }) {
       <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--color-earth-deep)', opacity: 0.6, letterSpacing: '0.1em' }}>{label}</span>
       <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', fontVariantNumeric: 'tabular-nums' }}>
         <span style={{ color: 'var(--color-earth-deep)', fontWeight: 600 }}>{Number(target).toFixed(0)}</span>
-        <span style={{ opacity: 0.4, marginLeft: '4px' }}>kg</span>
+        <span style={{ opacity: 0.4, marginLeft: '4px' }}>kg/ha</span>
       </span>
     </div>
   );
